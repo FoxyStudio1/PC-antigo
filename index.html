@@ -262,6 +262,8 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic;}
 .em-item.unread .em-from{color:#ffaaff;text-shadow:0 0 6px rgba(255,100,255,.35);}
 .em-item.unread .em-subj{color:#ffddff;}
+.em-item.sent .em-from{color:#88ccff;}
+.em-item.sent .em-subj{color:#6699cc;font-style:italic;}
 
 /* Vista email */
 .em-view{flex:1;background:#0a0012;overflow-y:auto;display:flex;flex-direction:column;}
@@ -284,14 +286,22 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 #win-reg{position:absolute;top:18px;left:76px;width:415px;
   background:#f5f0e8;
   border:2px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
-  box-shadow:3px 3px 0 #000;display:none;z-index:22;}
-#win-reg.open{display:block;}
+  box-shadow:3px 3px 0 #000;display:none;z-index:22;
+  max-height:280px;display:none;flex-direction:column;}
+#win-reg.open{display:flex;}
 .reg-ruler{height:15px;background:linear-gradient(180deg,#e8e4dc,#d8d4cc);
   border-bottom:1px solid #aaa;display:flex;align-items:center;padding:0 8px;
-  font-size:7px;font-family:'Courier New',monospace;color:#777;gap:14px;}
+  font-size:7px;font-family:'Courier New',monospace;color:#777;gap:14px;flex-shrink:0;}
+.reg-scroll{flex:1;overflow-y:auto;margin:3px;}
+.reg-scroll::-webkit-scrollbar{width:14px;}
+.reg-scroll::-webkit-scrollbar-track{background:#d4d0c8;border-left:1px solid #808080;}
+.reg-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#c0bbb0,#a8a398);
+  border:1px solid #fff;border-bottom-color:#808080;border-right-color:#808080;}
+.reg-scroll::-webkit-scrollbar-button{background:#d4d0c8;height:14px;
+  border:1px solid #fff;border-bottom-color:#808080;border-right-color:#808080;display:block;}
 .reg-body{background:#fff;min-height:170px;padding:16px 20px;
   font-size:11px;font-family:'Courier New',monospace;color:#1a1a1a;line-height:1.9;
-  border:1px solid #ccc;margin:3px;}
+  border:1px solid #ccc;}
 .reg-body .reg-date{font-size:8px;color:#888;text-align:right;margin-bottom:6px;}
 .reg-body .reg-title{font-size:12px;font-weight:bold;color:#111;margin-bottom:8px;
   border-bottom:1px solid #ddd;padding-bottom:4px;letter-spacing:1px;}
@@ -476,12 +486,18 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
               <div class="reg-ruler">
                 <span>·1</span><span>·5</span><span>·10</span><span>·15</span><span>·20</span><span>·25</span>
               </div>
+              <div class="reg-scroll">
               <div class="reg-body">
-                <div class="reg-date">Última modificação: 10/08/2025 · 23:44</div>
+                <div class="reg-date">Última modificação: 11/08/2025 · 22:17</div>
                 <div class="reg-title">— REGISTO PESSOAL —</div>
                 <p>Sera que ele vai aguentar da doença,<br>sera que devo ajudar?</p>
+                <br>
+                <p>Finalmente aproveitei o dia e mudei o nome do Kael no Endermail. Já não aparece como UserFriend3000, agora está normal.</p>
+                <p>O dia foi uma bosta. Estou mesmo exausto de tantas aulas de programação. Ainda bem que foi o último dia. Não aguentava mais olhar para código.</p>
+                <p>Vou começar a voltar a postar vídeos no canal. Aliás… melhor ainda.<br>Vou criar um canal só para ensinar a criar jogos. Acho que vou chamar <b>Foxy'Studio</b>.</p>
               </div>
-              <div class="win-status">1 linha(s) · 1 ficheiro aberto · SYSCORP OS</div>
+              </div><!-- /reg-scroll -->
+              <div class="win-status" style="flex-shrink:0;">4 linha(s) · 1 ficheiro aberto · SYSCORP OS</div>
             </div>
 
             <!-- ══ ARQUIVOS ══ -->
@@ -493,6 +509,19 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
               </div>
               <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Ver</span></div>
               <div class="win-body">
+                <!-- Galeria de fotos -->
+                <div class="f-icon" ondblclick="openApp('galeria')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#c89020" stroke-width="1"/>
+                    <rect x="1" y="7" width="15" height="6" rx="2 2 0 0" fill="#f5c040" stroke="#c89020" stroke-width="1"/>
+                    <rect x="1" y="11" width="32" height="21" rx="2" fill="#f5c040" stroke="#c89020" stroke-width=".5"/>
+                    <rect x="6" y="15" width="22" height="13" rx="1" fill="#fff" stroke="#ddd" stroke-width=".5"/>
+                    <rect x="7" y="16" width="20" height="11" rx="1" fill="#d0e8ff"/>
+                    <circle cx="11" cy="20" r="2" fill="#ffcc44"/>
+                    <polyline points="7,27 13,22 17,25 21,20 27,27" fill="none" stroke="#4488cc" stroke-width="1.2"/>
+                  </svg>
+                  <span class="f-icon-lbl">Galeria_de_fotos</span>
+                </div>
                 <div class="f-icon" onclick="openPass(1)">
                   <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
                     <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
@@ -516,7 +545,78 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                   <span class="f-icon-lbl">Pasta_02</span>
                 </div>
               </div>
-              <div class="win-status">2 objeto(s) — acesso restrito</div>
+              <div class="win-status">3 objeto(s)</div>
+            </div>
+
+            <!-- ══ GALERIA DE FOTOS ══ -->
+            <div class="os-win" id="win-galeria" style="top:35px;left:90px;width:310px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">🖼</span>
+                <span class="win-tb-title">Galeria_de_fotos</span>
+                <button class="win-x" onclick="closeApp('galeria')">✕</button>
+              </div>
+              <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Ver</span></div>
+              <div class="win-body" style="flex-direction:column;gap:6px;">
+                <!-- Foto -->
+                <div class="f-icon" ondblclick="openFoto()">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="3" width="32" height="28" rx="1" fill="#e8f0ff" stroke="#aac" stroke-width="1"/>
+                    <rect x="2" y="4" width="30" height="26" rx="1" fill="#d0e4ff"/>
+                    <circle cx="10" cy="11" r="3" fill="#ffe066"/>
+                    <polyline points="2,24 10,16 16,20 22,13 32,24" fill="none" stroke="#4477cc" stroke-width="1.5"/>
+                  </svg>
+                  <span class="f-icon-lbl">Parabéns.jpg</span>
+                </div>
+                <!-- Pasta Privada -->
+                <div class="f-icon" onclick="openPass('privada')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="1" y="7" width="13" height="6" rx="2 2 0 0" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="11" y="19" width="12" height="9" rx="1" fill="#383838"/>
+                    <path d="M13 19 v-3.5 a4 4 0 0 1 8 0 v3.5" fill="none" stroke="#282828" stroke-width="2.8" stroke-linecap="round"/>
+                    <circle cx="17" cy="23.5" r="2" fill="#aaa"/>
+                    <rect x="16.2" y="23.5" width="1.6" height="2.8" fill="#aaa"/>
+                  </svg>
+                  <span class="f-icon-lbl">Privada</span>
+                </div>
+              </div>
+              <div class="win-status">2 objeto(s)</div>
+            </div>
+
+            <!-- VIEWER DA FOTO -->
+            <div class="os-win" id="win-foto" style="top:50px;left:110px;width:340px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">🖼</span>
+                <span class="win-tb-title">Parabéns.jpg — Visualizador</span>
+                <button class="win-x" onclick="closeApp('foto')">✕</button>
+              </div>
+              <div style="background:#808080;padding:6px;display:flex;align-items:center;justify-content:center;min-height:180px;">
+                <img src="Parabéns.jpg" alt="Parabéns"
+                     style="max-width:320px;max-height:220px;display:block;border:2px solid #fff;border-bottom-color:#444;border-right-color:#444;box-shadow:2px 2px 6px rgba(0,0,0,.6);"
+                     onerror="this.style.display='none';document.getElementById('foto-err').style.display='flex'">
+                <div id="foto-err" style="display:none;width:200px;height:120px;background:#000;color:#666;font-family:'Courier New',monospace;font-size:9px;align-items:center;justify-content:center;text-align:center;border:1px solid #333;">
+                  [Parabéns.jpg<br>não encontrado]
+                </div>
+              </div>
+              <div class="win-status">Parabéns.jpg · imagem JPEG</div>
+            </div>
+
+            <!-- DOC PRIVADA (abre depois de senha correta) -->
+            <div class="os-win" id="win-privada" style="top:55px;left:95px;width:370px;">
+              <div class="win-tb">
+                <span style="margin-right:3px;font-size:10px">📄</span>
+                <span class="win-tb-title">doc_privado.txt — Notepad</span>
+                <button class="win-x" onclick="closeApp('privada')">✕</button>
+              </div>
+              <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Formatar</span></div>
+              <div class="reg-body" style="min-height:unset;max-height:200px;overflow-y:auto;margin:3px;font-size:10.5px;line-height:1.8;">
+                <div class="reg-date">15/09/2025</div>
+                <br>
+                <p>Venho escrever isto porque não sei com quem falar. O Kael, que se dedicou tanto no jogo, está horrível. Não consigo lhe dizer isso, ele ficaria muito triste.</p>
+                <p>Foi 1 ano a trabalhar no jogo "Life", mano, um jogo onde és o rei e mandas numa vila cheia de pessoas NPCs. É mau.</p>
+                <p><i>Desculpa Kael</i></p>
+              </div>
+              <div class="win-status">doc_privado.txt · SYSCORP OS</div>
             </div>
 
             <!-- MODAL SENHA -->
@@ -574,23 +674,43 @@ const EMAILS = [
     from: 'UserFriend3000',
     date: '10/8/2025 às 10:35',
     subject: 'Como estás foxy',
-    unread: true,
+    unread: false,
     body: [
       'Oi foxy, queres jogar alguma coisa ando cansado e não sei se ainda tenho muito tempo mas queres?',
       'Se puderes chamar o Gaybriel e o Gavin agradecia gostaria muito!',
       'Encontrei um jogo novo se chamada Minecraft podemos testar não?'
     ]
-  }
-  /* Adiciona próximos emails aqui:
-  ,{
+  },
+  {
     id: 2,
-    from: '???',
-    date: '3/3/2026 às 08:23',
-    subject: 'Como estás',
+    from: 'Gavin',
+    date: '20/8/2025 às 8:00',
+    subject: 'Finalmente Férias',
     unread: true,
-    body: ['...']
+    body: [
+      'Finalmente estamos de férias.',
+      'Sobre o que falámos ontem na escola… aquele jogo que disseste, o Minecraft (acho que é esse o nome 😅), fui ver uns vídeos e até parece fixe. Não pensei que fosse gostar, mas até curti a ideia de poder construir tudo do zero.',
+      'Então somos só nós os quatro, certo? Eu, tu, o Gaybriel e o Kael3000.',
+      'Já guardei o contacto dele, por isso já não vou precisar de procurar mais pelo UserFriend3000. Aquilo estava estranho mesmo.',
+      'O Gaybriel ainda está meio chateado com o Kael… diz que ele não fez o trabalho da escola porque estava ocupado a trabalhar no "projeto" dele no jogo.'
+    ]
+  },
+  {
+    id: 3,
+    from: 'Para Gavin',
+    date: '20/8/2025 às 8:30',
+    subject: 'Serio',
+    unread: false,
+    sent: true,
+    body: [
+      'Ele ainda está chateado com isso? Já passou tempo suficiente… o Kael só estava focado no jogo dele. Ele sempre foi assim quando mete uma ideia na cabeça.',
+      'Vou instalar o Minecraft hoje. O Kael disse que já instalou, só faltam vocês os dois.',
+      'Ele falou que compra o jogo para quem ainda não tiver. Disse que vai usar o dinheiro que ganhou naquele torneio da escola — o de fazer o melhor jogo em 5 horas. Ainda não acredito que ele ganhou aquilo tão rápido…',
+      'Ele anda mesmo empenhado nesse "projeto". Disse que quer mostrar-nos quando estivermos todos online.',
+      'Bom… amanhã jogamos então.'
+    ]
   }
-  */
+  /* Adiciona próximos emails aqui */
 ];
 
 let STATE = 'off';
@@ -730,11 +850,18 @@ function openApp(app){
   if(app==='mail') document.getElementById('win-mail').classList.add('open');
   else if(app==='reg') document.getElementById('win-reg').classList.add('open');
   else if(app==='arq') document.getElementById('win-arq').classList.add('open');
+  else if(app==='galeria') document.getElementById('win-galeria').classList.add('open');
 }
 function closeApp(app){
   if(app==='mail') document.getElementById('win-mail').classList.remove('open');
   else if(app==='reg') document.getElementById('win-reg').classList.remove('open');
   else if(app==='arq') document.getElementById('win-arq').classList.remove('open');
+  else if(app==='galeria') document.getElementById('win-galeria').classList.remove('open');
+  else if(app==='foto') document.getElementById('win-foto').classList.remove('open');
+  else if(app==='privada') document.getElementById('win-privada').classList.remove('open');
+}
+function openFoto(){
+  document.getElementById('win-foto').classList.add('open');
 }
 
 /* Renderizar lista de emails */
@@ -742,7 +869,7 @@ function renderEmails(){
   const list=document.getElementById('em-list'); list.innerHTML='';
   EMAILS.forEach(em=>{
     const div=document.createElement('div');
-    div.className='em-item'+(em.unread?' unread':'');
+    div.className='em-item'+(em.unread?' unread':'')+(em.sent?' sent':'');
     div.dataset.id=em.id;
     div.innerHTML=`
       <div class="em-from">${em.from}</div>
@@ -791,6 +918,11 @@ function closePass(){document.getElementById('modal-pass').classList.remove('ope
 function tryPass(){
   const v=document.getElementById('pass-in').value;
   if(!v){document.getElementById('pass-err').textContent='Erro: campo vazio.';return;}
+  if(passTarget==='privada' && v==='0107'){
+    closePass();
+    document.getElementById('win-privada').classList.add('open');
+    return;
+  }
   document.getElementById('pass-err').textContent='⛔ Acesso negado. Senha incorreta.';
   document.getElementById('pass-in').value='';
   SCR.style.filter='brightness(2) sepia(1) hue-rotate(290deg) saturate(3)';
@@ -808,6 +940,7 @@ function updateClock(){
 document.getElementById('s-desk').addEventListener('mousedown',e=>{
   if(!e.target.closest('.d-icon')&&!e.target.closest('#win-mail')&&
      !e.target.closest('#win-reg')&&!e.target.closest('#win-arq')&&
+     !e.target.closest('#win-galeria')&&!e.target.closest('#win-foto')&&!e.target.closest('#win-privada')&&
      !e.target.closest('#modal-pass'))
     document.querySelectorAll('.d-icon').forEach(i=>i.classList.remove('sel'));
 });
@@ -820,8 +953,5 @@ setInterval(()=>{
   }
 },3500);
 </script>
-</body>
-</html>
-
 </body>
 </html>
