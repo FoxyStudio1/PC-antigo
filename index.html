@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>███████</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;}
+body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share Tech Mono',monospace;}
+
+.scene{position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 20%,#06030a 0%,#000 65%);z-index:0;}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.06;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");}
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:190;
+  background:radial-gradient(ellipse 70% 65% at 50% 50%,transparent 15%,rgba(0,0,0,0.82) 100%);}
+.particles{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden;}
+@keyframes rise{from{transform:translateY(100vh);opacity:0;}8%{opacity:.45;}92%{opacity:.1;}to{transform:translateY(-60px) translateX(15px);opacity:0;}}
+
+/* MESA */
+.desk{position:fixed;bottom:0;left:0;right:0;height:26vh;
+  background:linear-gradient(180deg,#0f0804 0%,#080502 100%);border-top:1px solid #1c0e06;z-index:5;}
+.desk::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,#301508 30%,#4a2010 50%,#301508 70%,transparent);
+  box-shadow:0 2px 18px rgba(60,20,5,.5);}
+.desk::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(91deg,transparent 0,transparent 55px,rgba(0,0,0,.18) 55px,rgba(0,0,0,.18) 56px);opacity:.4;}
+.keyboard{position:absolute;bottom:8px;left:calc(50% + 180px);
+  transform:perspective(350px) rotateX(22deg);width:180px;height:58px;
+  background:linear-gradient(160deg,#242424,#1a1a1a);border-radius:4px 4px 6px 6px;
+  box-shadow:0 4px 14px rgba(0,0,0,.75),inset 0 1px 2px rgba(255,255,255,.03);}
+.keyboard::before{content:'';position:absolute;top:7px;left:5px;right:5px;bottom:5px;
+  background:repeating-linear-gradient(0deg,transparent 0,transparent 7px,rgba(0,0,0,.3) 7px,rgba(0,0,0,.3) 8px),
+             repeating-linear-gradient(90deg,transparent 0,transparent 9px,rgba(0,0,0,.2) 9px,rgba(0,0,0,.2) 10px);}
+
+/* MONITOR */
+.monitor-wrap{position:fixed;bottom:22vh;left:50%;transform:translateX(-50%);z-index:10;
+  display:flex;flex-direction:column;align-items:center;transition:filter 1.5s;}
+.monitor-wrap.powered{filter:drop-shadow(0 40px 70px rgba(60,100,200,.18));}
+.mon-glow{position:absolute;inset:-30px;z-index:-1;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 50%,rgba(50,90,200,.12),transparent 70%);
+  opacity:0;transition:opacity 1.5s;pointer-events:none;}
+.monitor-wrap.powered .mon-glow{opacity:1;}
+.monitor-body{width:650px;
+  background:linear-gradient(155deg,#2a2a2a 0%,#1e1e1e 50%,#141414 100%);
+  border-radius:14px 14px 10px 10px;padding:16px 16px 26px 16px;position:relative;
+  box-shadow:0 0 0 1px #2e2e2e,0 0 0 3px #0a0a0a,6px 10px 40px rgba(0,0,0,.95),
+    inset 0 2px 4px rgba(255,255,255,.06),inset 0 -3px 8px rgba(0,0,0,.7);}
+.screen-bezel{background:#040404;border-radius:8px;padding:8px;position:relative;
+  box-shadow:inset 0 0 35px rgba(0,0,0,.98),inset 3px 3px 10px rgba(0,0,0,.8);}
+.screen-bezel::after{content:'';position:absolute;top:8px;left:8px;right:8px;bottom:8px;
+  border-radius:4px;pointer-events:none;z-index:60;
+  background:linear-gradient(130deg,rgba(255,255,255,.025) 0%,transparent 45%);}
+.screen{width:590px;height:368px;background:#000;position:relative;overflow:hidden;border-radius:4px;cursor:crosshair;}
+.crt{position:absolute;inset:0;pointer-events:none;z-index:55;border-radius:inherit;}
+.crt::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.11) 2px,rgba(0,0,0,.11) 4px);}
+.crt::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 115% 115% at 50% 50%,transparent 45%,rgba(0,0,0,.55) 100%);}
+@keyframes flicker{0%,88%,93%,98%,100%{opacity:1;}90%{opacity:.72;}95%{opacity:.88;}}
+.screen{animation:flicker 14s infinite;}
+
+.s-state{position:absolute;inset:0;display:none;}
+.s-state.on{display:block;}
+#s-off{background:#000;display:flex;align-items:center;justify-content:center;}
+#s-off.on{display:flex;}
+.off-dot{width:3px;height:3px;background:rgba(180,210,255,.35);border-radius:50%;
+  box-shadow:0 0 18px 10px rgba(140,180,255,.07);animation:dotpulse 6s ease-in-out infinite;}
+@keyframes dotpulse{0%,100%{transform:scale(1);opacity:.35;}50%{transform:scale(2.5);opacity:.65;}}
+#s-boot{background:#000;padding:10px 12px;overflow:hidden;
+  font-family:'VT323',monospace;font-size:13px;line-height:1.55;color:#999;}
+
+/* DESKTOP */
+#s-desk{background:#000;}
+#wallpaper{position:absolute;inset:0;width:100%;height:100%;}
+.desktop{position:absolute;inset:0 0 24px 0;}
+.icon-col{position:absolute;top:8px;left:8px;display:flex;flex-direction:column;gap:6px;}
+.d-icon{width:70px;display:flex;flex-direction:column;align-items:center;
+  padding:5px 3px;border-radius:2px;cursor:pointer;user-select:none;}
+.d-icon:hover{background:rgba(255,255,255,.2);outline:1px dotted rgba(255,255,255,.5);}
+.d-icon.sel{background:rgba(0,60,180,.55);outline:1px dotted rgba(180,200,255,.6);}
+.d-icon-img{width:40px;height:40px;display:block;margin:0 auto 4px;pointer-events:none;image-rendering:pixelated;}
+.d-icon-lbl{font-size:9.5px;color:#fff;text-align:center;pointer-events:none;
+  text-shadow:1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000;
+  font-family:'Courier New',monospace;line-height:1.2;word-break:break-word;}
+
+/* TASKBAR */
+.taskbar{position:absolute;bottom:0;left:0;right:0;height:24px;
+  background:linear-gradient(180deg,#d4d0c8 0%,#b8b4ac 100%);border-top:2px solid #fff;
+  display:flex;align-items:center;padding:0 2px;z-index:15;box-shadow:0 -1px 4px rgba(0,0,0,.4);}
+.tb-start{height:18px;background:linear-gradient(135deg,#088000,#066000);
+  border:1px solid #fff;border-bottom-color:#666;border-right-color:#666;
+  color:#fff;font-size:9px;font-weight:bold;font-family:'Courier New',monospace;
+  padding:0 8px;cursor:pointer;display:flex;align-items:center;gap:3px;}
+.tb-clock{margin-left:auto;font-size:9px;color:#000;font-family:'Courier New',monospace;
+  background:#d4d0c8;border:1px solid #888;border-top-color:#fff;border-left-color:#fff;padding:1px 5px;}
+
+/* JANELA BASE */
+.os-win{position:absolute;background:#d4d0c8;
+  border:2px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  box-shadow:2px 2px 0 #000;display:none;z-index:20;user-select:none;cursor:default;}
+.os-win.open{display:block;}
+.win-tb{height:20px;background:linear-gradient(90deg,#000080 0%,#1080d0 100%);
+  display:flex;align-items:center;padding:0 3px 0 5px;gap:3px;}
+.win-tb-title{flex:1;color:#fff;font-size:10px;font-family:'Courier New',monospace;white-space:nowrap;overflow:hidden;}
+.win-x{width:14px;height:12px;background:#d4d0c8;
+  border:1px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  color:#000;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-family:monospace;line-height:1;}
+.win-x:hover{background:#cc0000;color:#fff;}
+.win-menu{border-bottom:1px solid #808080;padding:1px 4px;font-size:9px;
+  font-family:'Courier New',monospace;color:#000;display:flex;gap:8px;}
+.win-menu span{padding:1px 4px;cursor:pointer;}
+.win-menu span:hover{background:#000080;color:#fff;}
+.win-body{padding:6px;background:#fff;min-height:75px;border-top:1px solid #888;
+  display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;}
+.win-status{font-size:8.5px;font-family:'Courier New',monospace;color:#000;
+  border-top:1px solid #808080;padding:2px 6px;background:#d4d0c8;}
+.f-icon{width:62px;display:flex;flex-direction:column;align-items:center;
+  padding:4px;cursor:pointer;border-radius:1px;}
+.f-icon:hover{background:rgba(0,0,128,.12);}
+.f-icon-img{width:34px;height:34px;pointer-events:none;}
+.f-icon-lbl{font-size:8.5px;font-family:'Courier New',monospace;color:#000;text-align:center;margin-top:3px;pointer-events:none;}
+
+/* ══════════════════════════════════════
+   ENDERMAIL (roxo)
+══════════════════════════════════════ */
+#win-mail{
+  position:absolute;top:4px;left:0;
+  width:556px;height:322px;
+  background:#120018;
+  border:2px solid #9900ee;border-bottom-color:#5500aa;border-right-color:#5500aa;
+  box-shadow:0 0 22px rgba(140,0,255,.3),2px 2px 0 #000;
+  display:none;z-index:25;user-select:none;flex-direction:column;
+}
+#win-mail.open{display:flex;}
+
+.em-tb{height:22px;flex-shrink:0;
+  background:linear-gradient(90deg,#350055 0%,#8800dd 55%,#5500bb 100%);
+  display:flex;align-items:center;padding:0 5px;border-bottom:1px solid #7700cc;}
+.em-logo{flex:1;font-size:13px;color:#e8bbff;font-family:'VT323',monospace;letter-spacing:2px;}
+.em-logo b{color:#ff88ff;text-shadow:0 0 8px #ff00ff;}
+.em-x{width:14px;height:13px;background:#1a0028;border:1px solid #9900ee;
+  color:#cc88ff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:monospace;}
+.em-x:hover{background:#cc0000;color:#fff;border-color:#ff0000;}
+
+.em-body{display:flex;flex:1;overflow:hidden;}
+
+/* Coluna esquerda */
+.em-left{width:108px;flex-shrink:0;background:#0d0016;border-right:1px solid #440088;
+  display:flex;flex-direction:column;}
+.em-actions{padding:5px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid #330060;}
+
+.em-btn{padding:3px 5px;font-size:8.5px;font-family:'Courier New',monospace;
+  background:linear-gradient(180deg,#260040,#180030);
+  border:1px solid #7700cc;border-bottom-color:#3d0088;border-right-color:#3d0088;
+  color:#cc88ff;cursor:pointer;text-align:left;display:flex;align-items:center;gap:3px;white-space:nowrap;}
+.em-btn:hover{background:linear-gradient(180deg,#420060,#2c0050);color:#ff99ff;}
+.em-btn:active{border-color:#3d0088;border-bottom-color:#7700cc;border-right-color:#7700cc;}
+.em-btn.dis{opacity:.32;cursor:not-allowed;}
+.em-btn.dis:hover{background:linear-gradient(180deg,#260040,#180030);color:#cc88ff;}
+
+.em-folders{padding:5px;flex:1;display:flex;flex-direction:column;gap:1px;}
+.em-fold{font-size:8.5px;font-family:'Courier New',monospace;color:#aa66dd;
+  padding:3px 4px;cursor:pointer;display:flex;align-items:center;gap:3px;}
+.em-fold:hover{background:rgba(139,0,255,.2);color:#dd99ff;}
+.em-fold.act{background:rgba(100,0,180,.38);color:#ffaaff;border-left:2px solid #aa00ff;}
+
+/* Lista emails */
+.em-list{width:166px;flex-shrink:0;background:#100018;border-right:1px solid #440088;overflow-y:auto;}
+.em-list::-webkit-scrollbar{width:5px;background:#0a0012;}
+.em-list::-webkit-scrollbar-thumb{background:#440088;}
+
+.em-item{padding:5px 6px;border-bottom:1px solid #220035;cursor:pointer;}
+.em-item:hover{background:rgba(130,0,230,.18);}
+.em-item.sel{background:rgba(80,0,150,.45);border-left:2px solid #bb00ff;}
+.em-from{font-size:9px;color:#ff88ff;font-family:'Courier New',monospace;font-weight:bold;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.em-dt{font-size:7.5px;color:#773399;font-family:'Courier New',monospace;margin:1px 0;}
+.em-subj{font-size:8px;color:#cc88ee;font-family:'Courier New',monospace;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic;}
+.em-item.unread .em-from{color:#ffaaff;text-shadow:0 0 6px rgba(255,100,255,.35);}
+.em-item.unread .em-subj{color:#ffddff;}
+
+/* Vista email */
+.em-view{flex:1;background:#0a0012;overflow-y:auto;display:flex;flex-direction:column;}
+.em-view::-webkit-scrollbar{width:5px;background:#080010;}
+.em-view::-webkit-scrollbar-thumb{background:#440088;}
+.em-vhdr{padding:7px 9px;border-bottom:1px solid #2c0050;background:linear-gradient(180deg,#160028,#0a0012);flex-shrink:0;}
+.em-vmeta{font-size:8.5px;font-family:'Courier New',monospace;color:#aa66cc;line-height:1.75;}
+.em-vmeta .lbl{color:#5c2288;}
+.em-vmeta .val{color:#dd99ff;}
+.em-vmeta .subj-line{color:#ff99ff;font-size:10px;font-weight:bold;margin-top:2px;display:block;}
+.em-vbody{padding:9px 11px;flex:1;font-size:9.5px;font-family:'Courier New',monospace;
+  color:#cc99ee;line-height:1.7;}
+.em-vbody p{margin-bottom:9px;}
+.em-empty{flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-family:'Courier New',monospace;color:#280044;}
+
+/* ══════════════════════════════════════
+   DOCUMENTO REGISTOS
+══════════════════════════════════════ */
+#win-reg{position:absolute;top:18px;left:76px;width:415px;
+  background:#f5f0e8;
+  border:2px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  box-shadow:3px 3px 0 #000;display:none;z-index:22;}
+#win-reg.open{display:block;}
+.reg-ruler{height:15px;background:linear-gradient(180deg,#e8e4dc,#d8d4cc);
+  border-bottom:1px solid #aaa;display:flex;align-items:center;padding:0 8px;
+  font-size:7px;font-family:'Courier New',monospace;color:#777;gap:14px;}
+.reg-body{background:#fff;min-height:170px;padding:16px 20px;
+  font-size:11px;font-family:'Courier New',monospace;color:#1a1a1a;line-height:1.9;
+  border:1px solid #ccc;margin:3px;}
+.reg-body .reg-date{font-size:8px;color:#888;text-align:right;margin-bottom:6px;}
+.reg-body .reg-title{font-size:12px;font-weight:bold;color:#111;margin-bottom:8px;
+  border-bottom:1px solid #ddd;padding-bottom:4px;letter-spacing:1px;}
+.reg-body p{margin-bottom:8px;}
+
+/* ARQUIVOS */
+#win-arq{top:30px;left:82px;width:278px;}
+
+/* MODAL */
+#modal-pass{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:262px;background:#d4d0c8;
+  border:2px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  box-shadow:3px 3px 0 #000;z-index:35;display:none;}
+#modal-pass.open{display:block;}
+.modal-tb{height:20px;background:linear-gradient(90deg,#7a0000 0%,#bb1010 100%);
+  display:flex;align-items:center;padding:0 3px 0 5px;}
+.modal-tb-title{flex:1;color:#fff;font-size:10px;font-family:'Courier New',monospace;}
+.modal-body{padding:9px;}
+.modal-msg{display:block;font-size:9.5px;font-family:'Courier New',monospace;color:#000;margin-bottom:4px;}
+.modal-input{width:100%;padding:3px 6px;font-size:11px;font-family:'Courier New',monospace;
+  background:#fff;border:1px solid #808080;border-top-color:#000;border-left-color:#000;
+  outline:none;margin-bottom:4px;letter-spacing:3px;}
+.modal-err{min-height:11px;font-size:9px;font-family:'Courier New',monospace;color:#880000;margin-bottom:5px;}
+.modal-btns{display:flex;justify-content:flex-end;gap:5px;}
+.os-btn{background:#d4d0c8;border:2px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  font-size:10px;font-family:'Courier New',monospace;padding:2px 12px;cursor:pointer;color:#000;}
+.os-btn:hover{background:#e0ddd6;}
+.os-btn:active{border-top-color:#808080;border-left-color:#808080;border-bottom-color:#fff;border-right-color:#fff;}
+
+/* CURSOR */
+#cur{position:absolute;width:14px;height:14px;border:1.5px solid rgba(255,255,255,.7);
+  border-radius:50%;pointer-events:none;z-index:65;transform:translate(-50%,-50%);display:none;
+  box-shadow:0 0 4px rgba(255,255,255,.3);}
+#cur::before,#cur::after{content:'';position:absolute;background:rgba(255,255,255,.6);}
+#cur::before{width:1px;height:6px;left:50%;top:50%;transform:translate(-50%,-50%);}
+#cur::after{width:6px;height:1px;left:50%;top:50%;transform:translate(-50%,-50%);}
+
+/* PAINEL */
+.monitor-panel{display:flex;align-items:center;padding:6px 14px 0;gap:8px;}
+.monitor-brand{font-size:9px;color:#252525;font-family:'Share Tech Mono',monospace;letter-spacing:3px;text-transform:uppercase;}
+.mon-controls{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.adj-btn{width:6px;height:10px;background:linear-gradient(180deg,#2e2e2e,#1e1e1e);border:none;border-radius:1px;cursor:pointer;}
+#power-led{width:7px;height:7px;border-radius:50%;background:#2a0000;box-shadow:0 0 3px #440000;transition:all .6s;}
+#power-led.on{background:#00dd00;box-shadow:0 0 9px #00ff00,0 0 4px #00ff00;animation:ledp 3.5s ease-in-out infinite;}
+@keyframes ledp{0%,100%{opacity:1;}50%{opacity:.55;}}
+#power-btn{width:26px;height:26px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#3c3c3c 0%,#1e1e1e 100%);
+  border:none;cursor:pointer;position:relative;
+  box-shadow:inset 0 1px 3px rgba(255,255,255,.07),0 3px 6px rgba(0,0,0,.85),0 0 0 1px #0f0f0f;
+  transition:transform .1s;}
+#power-btn::after{content:'⏻';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  color:#404040;font-size:14px;transition:color .5s;}
+#power-btn:hover::after{color:#88ccff;}
+#power-btn.on::after{color:#66aaee;}
+#power-btn:active{transform:scale(.92);}
+.mon-neck{width:130px;height:18px;background:linear-gradient(180deg,#1e1e1e,#181818);
+  clip-path:polygon(12% 0%,88% 0%,97% 100%,3% 100%);}
+.mon-foot{width:230px;height:13px;background:linear-gradient(180deg,#1c1c1c,#141414);
+  border-radius:0 0 10px 10px;box-shadow:0 5px 20px rgba(0,0,0,.85);}
+</style>
+</head>
+<body>
+
+<div class="scene"></div>
+<div class="grain"></div>
+<div class="vignette"></div>
+<div class="particles" id="particles"></div>
+
+<div class="desk"><div class="keyboard"></div></div>
+
+<div class="monitor-wrap" id="monWrap">
+  <div class="mon-glow"></div>
+  <div class="monitor-body">
+    <div class="screen-bezel">
+      <div class="screen" id="screen">
+        <div class="crt"></div>
+        <div id="cur"></div>
+
+        <!-- OFF -->
+        <div class="s-state on" id="s-off">
+          <div style="width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;">
+            <div class="off-dot"></div>
+          </div>
+        </div>
+
+        <!-- BOOT -->
+        <div class="s-state" id="s-boot"></div>
+
+        <!-- DESKTOP -->
+        <div class="s-state" id="s-desk">
+          <canvas id="wallpaper" width="590" height="368"></canvas>
+          <div class="desktop">
+
+            <!-- ÍCONES -->
+            <div class="icon-col">
+
+              <div class="d-icon" id="di-mail" ondblclick="openApp('mail')">
+                <svg class="d-icon-img" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                  <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#9b00ff"/><stop offset="100%" stop-color="#5500bb"/>
+                  </linearGradient></defs>
+                  <rect x="1" y="7" width="38" height="27" rx="3" fill="url(#mg)" stroke="#7700bb" stroke-width="1"/>
+                  <polyline points="1,7 20,21 39,7" fill="none" stroke="#dd88ff" stroke-width="2"/>
+                  <line x1="1" y1="34" x2="14" y2="20" stroke="#6600aa" stroke-width="1.5"/>
+                  <line x1="39" y1="34" x2="26" y2="20" stroke="#6600aa" stroke-width="1.5"/>
+                  <circle cx="29" cy="11" r="6" fill="#dd00ff" stroke="#bb00ee" stroke-width="1"/>
+                  <text x="29" y="14.5" fill="#fff" font-size="7.5" text-anchor="middle" font-family="monospace" font-weight="bold">@</text>
+                </svg>
+                <span class="d-icon-lbl">Endermail</span>
+              </div>
+
+              <div class="d-icon" id="di-reg" ondblclick="openApp('reg')">
+                <svg class="d-icon-img" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="5" y="2" width="25" height="34" rx="1" fill="#f8f4ea" stroke="#ccc" stroke-width="1"/>
+                  <polygon points="23,2 30,9 23,9" fill="#e0d8c8" stroke="#bbb" stroke-width="1"/>
+                  <line x1="8" y1="15" x2="27" y2="15" stroke="#aaa" stroke-width="1"/>
+                  <line x1="8" y1="19" x2="27" y2="19" stroke="#aaa" stroke-width="1"/>
+                  <line x1="8" y1="23" x2="27" y2="23" stroke="#aaa" stroke-width="1"/>
+                  <line x1="8" y1="27" x2="21" y2="27" stroke="#ccc" stroke-width="1"/>
+                  <text x="15.5" y="11" fill="#888" font-size="4.5" font-family="monospace" text-anchor="middle" font-weight="bold">REGISTOS</text>
+                </svg>
+                <span class="d-icon-lbl">Doc. Registos</span>
+              </div>
+
+              <div class="d-icon" id="di-arq" ondblclick="openApp('arq')">
+                <svg class="d-icon-img" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="14" width="36" height="22" rx="2" fill="#f0b030" stroke="#c89020" stroke-width="1"/>
+                  <rect x="2" y="9" width="15" height="7" rx="2 2 0 0" fill="#f5c040" stroke="#c89020" stroke-width="1"/>
+                  <rect x="2" y="14" width="36" height="22" rx="2" fill="#f5c040" stroke="#c89020" stroke-width=".5"/>
+                </svg>
+                <span class="d-icon-lbl">Arquivos</span>
+              </div>
+
+            </div><!-- /icon-col -->
+
+            <!-- ══ ENDERMAIL ══ -->
+            <div id="win-mail">
+              <div class="em-tb">
+                <span class="em-logo">✉ <b>Ender</b>mail</span>
+                <button class="em-x" onclick="closeApp('mail')">✕</button>
+              </div>
+              <div class="em-body">
+
+                <div class="em-left">
+                  <div class="em-actions">
+                    <button class="em-btn dis">✉ Novo</button>
+                    <button class="em-btn dis">↩ Responder</button>
+                    <button class="em-btn dis">→ Reenviar</button>
+                    <button class="em-btn dis">🗑 Apagar</button>
+                  </div>
+                  <div class="em-folders">
+                    <div class="em-fold act" onclick="selFold(this)">📥 Caixa entrada</div>
+                    <div class="em-fold" onclick="selFold(this)">📤 Enviado</div>
+                    <div class="em-fold" onclick="selFold(this)">📋 Rascunhos</div>
+                    <div class="em-fold" onclick="selFold(this)">⚠ Spam</div>
+                    <div class="em-fold" onclick="selFold(this)">🗑 Lixo</div>
+                  </div>
+                </div>
+
+                <div class="em-list" id="em-list"></div>
+
+                <div class="em-view" id="em-view">
+                  <div class="em-empty">← Seleciona um email</div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ══ REGISTOS ══ -->
+            <div id="win-reg" class="os-win">
+              <div class="win-tb">
+                <span style="margin-right:3px;font-size:10px">📄</span>
+                <span class="win-tb-title">Documento de Registos — Notepad</span>
+                <button class="win-x" onclick="closeApp('reg')">✕</button>
+              </div>
+              <div class="win-menu">
+                <span>Ficheiro</span><span>Editar</span><span>Formatar</span><span>Ver</span>
+              </div>
+              <div class="reg-ruler">
+                <span>·1</span><span>·5</span><span>·10</span><span>·15</span><span>·20</span><span>·25</span>
+              </div>
+              <div class="reg-body">
+                <div class="reg-date">Última modificação: 10/08/2025 · 23:44</div>
+                <div class="reg-title">— REGISTO PESSOAL —</div>
+                <p>Sera que ele vai aguentar da doença,<br>sera que devo ajudar?</p>
+              </div>
+              <div class="win-status">1 linha(s) · 1 ficheiro aberto · SYSCORP OS</div>
+            </div>
+
+            <!-- ══ ARQUIVOS ══ -->
+            <div class="os-win" id="win-arq" style="top:30px;left:82px;width:278px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">📁</span>
+                <span class="win-tb-title">Arquivos</span>
+                <button class="win-x" onclick="closeApp('arq')">✕</button>
+              </div>
+              <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Ver</span></div>
+              <div class="win-body">
+                <div class="f-icon" onclick="openPass(1)">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="1" y="7" width="13" height="6" rx="2 2 0 0" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="11" y="19" width="12" height="9" rx="1" fill="#383838"/>
+                    <path d="M13 19 v-3.5 a4 4 0 0 1 8 0 v3.5" fill="none" stroke="#282828" stroke-width="2.8" stroke-linecap="round"/>
+                    <circle cx="17" cy="23.5" r="2" fill="#aaa"/>
+                    <rect x="16.2" y="23.5" width="1.6" height="2.8" fill="#aaa"/>
+                  </svg>
+                  <span class="f-icon-lbl">Pasta_01</span>
+                </div>
+                <div class="f-icon" onclick="openPass(2)">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="1" y="7" width="13" height="6" rx="2 2 0 0" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="11" y="19" width="12" height="9" rx="1" fill="#383838"/>
+                    <path d="M13 19 v-3.5 a4 4 0 0 1 8 0 v3.5" fill="none" stroke="#282828" stroke-width="2.8" stroke-linecap="round"/>
+                    <circle cx="17" cy="23.5" r="2" fill="#aaa"/>
+                    <rect x="16.2" y="23.5" width="1.6" height="2.8" fill="#aaa"/>
+                  </svg>
+                  <span class="f-icon-lbl">Pasta_02</span>
+                </div>
+              </div>
+              <div class="win-status">2 objeto(s) — acesso restrito</div>
+            </div>
+
+            <!-- MODAL SENHA -->
+            <div id="modal-pass">
+              <div class="modal-tb">
+                <span class="modal-tb-title">🔒 Acesso Restrito</span>
+                <button class="win-x" style="background:#7a0000;color:#fff;" onclick="closePass()">✕</button>
+              </div>
+              <div class="modal-body">
+                <span class="modal-msg">⚠ Esta pasta está protegida por senha.</span>
+                <span class="modal-msg">Código de acesso:</span>
+                <input type="password" class="modal-input" id="pass-in" placeholder="••••••••"
+                       onkeydown="if(event.key==='Enter')tryPass()">
+                <div class="modal-err" id="pass-err"></div>
+                <div class="modal-btns">
+                  <button class="os-btn" onclick="closePass()">Cancelar</button>
+                  <button class="os-btn" onclick="tryPass()">OK</button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /desktop -->
+          <div class="taskbar">
+            <button class="tb-start">▶ Início</button>
+            <span class="tb-clock" id="tb-clk">00:00</span>
+          </div>
+        </div><!-- /s-desk -->
+
+      </div><!-- /screen -->
+    </div><!-- /bezel -->
+
+    <div class="monitor-panel">
+      <span class="monitor-brand">SYSCORP</span>
+      <div class="mon-controls">
+        <button class="adj-btn"></button>
+        <button class="adj-btn"></button>
+        <div id="power-led"></div>
+        <button id="power-btn" onclick="doPower()"></button>
+      </div>
+    </div>
+  </div><!-- /monitor-body -->
+  <div class="mon-neck"></div>
+  <div class="mon-foot"></div>
+</div><!-- /monitor-wrap -->
+
+<script>
+/* ════════════════════════════════════════════
+   DATABASE DE EMAILS
+   Para adicionar novos emails, basta adicionar
+   um novo objeto ao array EMAILS abaixo.
+════════════════════════════════════════════ */
+const EMAILS = [
+  {
+    id: 1,
+    from: 'UserFriend3000',
+    date: '10/8/2025 às 10:35',
+    subject: 'Como estás foxy',
+    unread: true,
+    body: [
+      'Oi foxy, queres jogar alguma coisa ando cansado e não sei se ainda tenho muito tempo mas queres?',
+      'Se puderes chamar o Gaybriel e o Gavin agradecia gostaria muito!',
+      'Encontrei um jogo novo se chamada Minecraft podemos testar não?'
+    ]
+  }
+  /* Adiciona próximos emails aqui:
+  ,{
+    id: 2,
+    from: '???',
+    date: '3/3/2026 às 08:23',
+    subject: 'Como estás',
+    unread: true,
+    body: ['...']
+  }
+  */
+];
+
+let STATE = 'off';
+let passTarget = 0;
+
+/* Partículas */
+(function(){
+  const c = document.getElementById('particles');
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');
+    const sz=1+Math.random()*2;
+    Object.assign(p.style,{
+      position:'absolute',left:Math.random()*100+'%',
+      width:sz+'px',height:sz+'px',
+      background:`rgba(255,255,255,${.08+Math.random()*.3})`,
+      borderRadius:'50%',
+      animation:`rise ${7+Math.random()*22}s ${Math.random()*18}s linear infinite`
+    });
+    c.appendChild(p);
+  }
+})();
+
+/* Cursor */
+const SCR=document.getElementById('screen');
+const CUR=document.getElementById('cur');
+SCR.addEventListener('mousemove',e=>{
+  if(STATE!=='desktop')return;
+  const r=SCR.getBoundingClientRect();
+  CUR.style.display='block';
+  CUR.style.left=(e.clientX-r.left)+'px';
+  CUR.style.top=(e.clientY-r.top)+'px';
+});
+SCR.addEventListener('mouseleave',()=>CUR.style.display='none');
+
+/* Boot lines */
+const BOOT=[
+  {t:'SYSCORP BIOS v2.1.3',c:'#bbb',d:0},
+  {t:'Copyright (C) 1997-2003 SysCorp Inc.',c:'#888',d:80},
+  {t:'',c:'',d:160},
+  {t:'CPU  : Intel Pentium II 400MHz',c:'#999',d:220},
+  {t:'RAM  : 65536 KB                     OK',c:'#999',d:310},
+  {t:'CACHE: L2 512KB                     OK',c:'#999',d:390},
+  {t:'',c:'',d:460},
+  {t:'Detecting storage...',c:'#888',d:520},
+  {t:'  [IDE-0] QUANTUM FIREBALL 4.3GB    OK',c:'#777',d:780},
+  {t:'  [IDE-1] Not found',c:'#555',d:940},
+  {t:'',c:'',d:1040},
+  {t:'Loading SYSCORP OS...',c:'#aaa',d:1120},
+  {t:'BAR',c:'#666',d:1240,bar:true},
+  {t:'',c:'',d:3050},
+  {t:'Checking filesystem integrity...',c:'#888',d:3150},
+  {t:'Mounting volumes...',c:'#888',d:3460},
+  {t:'Starting services...',c:'#888',d:3750},
+  {t:'',c:'',d:4150},
+  {t:'>> AVISO: 1 FICHEIRO(S) CORROMPIDO(S)',c:'#ff3333',d:4380},
+  {t:'>> ACESSO NÃO AUTORIZADO REGISTADO — 03:47',c:'#ff3333',d:4780},
+  {t:'>> INTEGRIDADE DO SISTEMA: 73%',c:'#ffaa22',d:5180},
+  {t:'',c:'',d:5580},
+  {t:'SYSCORP OS — Pronto.',c:'#aaa',d:5780},
+];
+
+function doPower(){
+  if(STATE!=='off')return;
+  STATE='booting';
+  document.getElementById('power-btn').classList.add('on');
+  document.getElementById('power-led').classList.add('on');
+  document.getElementById('monWrap').classList.add('powered');
+  setS('s-boot'); runBoot();
+}
+function setS(id){
+  document.querySelectorAll('.s-state').forEach(e=>e.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+function runBoot(){
+  const box=document.getElementById('s-boot'); box.innerHTML='';
+  /* Descomenta para usar vídeo real:
+  const v=document.createElement('video');
+  v.src='video.mp4'; v.autoplay=true; v.muted=true; v.playsInline=true;
+  v.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+  v.onended=flashToDesk; box.appendChild(v); return;
+  */
+  BOOT.forEach(line=>{
+    setTimeout(()=>{
+      if(line.bar){
+        const el=document.createElement('div');
+        el.style.cssText='font-family:VT323,monospace;font-size:13px;color:#666;white-space:pre;';
+        el.textContent='[                    ]   0%';
+        box.appendChild(el);
+        let p=0;
+        const iv=setInterval(()=>{
+          p++;
+          el.textContent='['+'█'.repeat(p)+' '.repeat(20-p)+'] '+String(Math.round(p/20*100)).padStart(3,' ')+'%';
+          if(p>=20)clearInterval(iv);
+        },85);
+      }else{
+        const s=document.createElement('span');
+        s.style.cssText=`display:block;font-family:VT323,monospace;font-size:13px;color:${line.c||'#999'};white-space:pre;line-height:1.55;`;
+        s.textContent=line.t;
+        box.appendChild(s); box.scrollTop=box.scrollHeight;
+      }
+    },line.d);
+  });
+  setTimeout(flashToDesk,6600);
+}
+function flashToDesk(){
+  const b=document.getElementById('s-boot');
+  [0,130,210,270,320,370].forEach((d,i)=>setTimeout(()=>b.style.visibility=i%2?'visible':'hidden',d));
+  setTimeout(showDesktop,480);
+}
+function showDesktop(){
+  STATE='desktop';
+  generateWallpaper();
+  renderEmails();
+  setS('s-desk');
+  const d=document.getElementById('s-desk');
+  d.style.opacity='0'; let o=0;
+  const fi=setInterval(()=>{o=Math.min(1,o+.09);d.style.opacity=o;if(o>=1)clearInterval(fi);},35);
+  updateClock(); setInterval(updateClock,30000);
+}
+function generateWallpaper(){
+  const cv=document.getElementById('wallpaper');
+  const ctx=cv.getContext('2d'); const B=22;
+  const pal=['#FF6B6B','#FF8E53','#FFC857','#A8E063','#56CCF2','#2F80ED','#9B51E0',
+             '#F2994A','#EB5757','#27AE60','#2D9CDB','#BB6BD9','#F2C94C','#6FCF97',
+             '#F68084','#F7971E','#FFD200','#21D4FD','#08AEEA','#2AF598','#FE9A8B',
+             '#FEAC5E','#C779D0','#4BC0C8','#FF6B9D'];
+  for(let y=0;y<cv.height;y+=B)
+    for(let x=0;x<cv.width;x+=B){
+      ctx.fillStyle=pal[Math.floor(Math.random()*pal.length)];
+      ctx.fillRect(x,y,B,B);
+    }
+}
+
+/* Abrir apps — duplo clique */
+function openApp(app){
+  document.querySelectorAll('.d-icon').forEach(i=>i.classList.remove('sel'));
+  if(app==='mail') document.getElementById('win-mail').classList.add('open');
+  else if(app==='reg') document.getElementById('win-reg').classList.add('open');
+  else if(app==='arq') document.getElementById('win-arq').classList.add('open');
+}
+function closeApp(app){
+  if(app==='mail') document.getElementById('win-mail').classList.remove('open');
+  else if(app==='reg') document.getElementById('win-reg').classList.remove('open');
+  else if(app==='arq') document.getElementById('win-arq').classList.remove('open');
+}
+
+/* Renderizar lista de emails */
+function renderEmails(){
+  const list=document.getElementById('em-list'); list.innerHTML='';
+  EMAILS.forEach(em=>{
+    const div=document.createElement('div');
+    div.className='em-item'+(em.unread?' unread':'');
+    div.dataset.id=em.id;
+    div.innerHTML=`
+      <div class="em-from">${em.from}</div>
+      <div class="em-dt">${em.date}</div>
+      <div class="em-subj">${em.subject}</div>
+    `;
+    div.onclick=()=>viewEmail(em.id);
+    list.appendChild(div);
+  });
+}
+
+/* Ver email selecionado */
+function viewEmail(id){
+  const em=EMAILS.find(e=>e.id===id); if(!em)return;
+  em.unread=false;
+  document.querySelectorAll('.em-item').forEach(el=>el.classList.remove('sel','unread'));
+  const el=document.querySelector(`.em-item[data-id="${id}"]`);
+  if(el){el.classList.add('sel');el.classList.remove('unread');}
+  document.getElementById('em-view').innerHTML=`
+    <div class="em-vhdr">
+      <div class="em-vmeta">
+        <span><span class="lbl">De: </span><span class="val">${em.from}</span></span><br>
+        <span><span class="lbl">Data: </span><span class="val">${em.date}</span></span><br>
+        <span class="subj-line">${em.subject}</span>
+      </div>
+    </div>
+    <div class="em-vbody">${em.body.map(p=>`<p>${p}</p>`).join('')}</div>
+  `;
+}
+
+/* Pasta highlight */
+function selFold(el){
+  document.querySelectorAll('.em-fold').forEach(f=>f.classList.remove('act'));
+  el.classList.add('act');
+}
+
+/* Senha */
+function openPass(n){
+  passTarget=n;
+  document.getElementById('pass-in').value='';
+  document.getElementById('pass-err').textContent='';
+  document.getElementById('modal-pass').classList.add('open');
+  setTimeout(()=>document.getElementById('pass-in').focus(),60);
+}
+function closePass(){document.getElementById('modal-pass').classList.remove('open');}
+function tryPass(){
+  const v=document.getElementById('pass-in').value;
+  if(!v){document.getElementById('pass-err').textContent='Erro: campo vazio.';return;}
+  document.getElementById('pass-err').textContent='⛔ Acesso negado. Senha incorreta.';
+  document.getElementById('pass-in').value='';
+  SCR.style.filter='brightness(2) sepia(1) hue-rotate(290deg) saturate(3)';
+  setTimeout(()=>SCR.style.filter='',180);
+}
+
+/* Relógio */
+function updateClock(){
+  const n=new Date();
+  document.getElementById('tb-clk').textContent=
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+}
+
+/* Deselect */
+document.getElementById('s-desk').addEventListener('mousedown',e=>{
+  if(!e.target.closest('.d-icon')&&!e.target.closest('#win-mail')&&
+     !e.target.closest('#win-reg')&&!e.target.closest('#win-arq')&&
+     !e.target.closest('#modal-pass'))
+    document.querySelectorAll('.d-icon').forEach(i=>i.classList.remove('sel'));
+});
+
+/* Glitch horror */
+setInterval(()=>{
+  if(Math.random()<.07){
+    document.querySelector('.scene').style.filter='brightness(1.1)';
+    setTimeout(()=>document.querySelector('.scene').style.filter='',55);
+  }
+},3500);
+</script>
+</body>
+</html>
