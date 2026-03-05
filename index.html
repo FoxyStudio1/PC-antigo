@@ -115,9 +115,19 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 }
 
 /* MONITOR */
-.monitor-wrap{position:fixed;bottom:22vh;left:50%;transform:translateX(-50%);z-index:10;
-  display:flex;flex-direction:column;align-items:center;transition:filter 1.5s;}
+.monitor-wrap{
+  position:fixed;bottom:22vh;left:50%;
+  transform:translateX(-50%);
+  transform-origin:center bottom;
+  z-index:10;display:flex;flex-direction:column;align-items:center;transition:filter 1.5s;
+}
 .monitor-wrap.powered{filter:drop-shadow(0 40px 70px rgba(60,100,200,.18));}
+
+/* ── RESPONSIVO (escala dinâmica via JS) ── */
+@media (max-width: 700px) {
+  .desk{ height:30vh; }
+  .paper{ left:calc(50% - 200px); bottom:5px; }
+}
 .mon-glow{position:absolute;inset:-30px;z-index:-1;border-radius:50%;
   background:radial-gradient(ellipse at 50% 50%,rgba(50,90,200,.12),transparent 70%);
   opacity:0;transition:opacity 1.5s;pointer-events:none;}
@@ -361,6 +371,79 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
   clip-path:polygon(12% 0%,88% 0%,97% 100%,3% 100%);}
 .mon-foot{width:230px;height:13px;background:linear-gradient(180deg,#1c1c1c,#141414);
   border-radius:0 0 10px 10px;box-shadow:0 5px 20px rgba(0,0,0,.85);}
+
+/* ── NOTÍCIAS ── */
+#win-news{
+  position:absolute;top:4px;left:0;width:556px;height:322px;
+  background:#f5f0e4;
+  border:2px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  box-shadow:2px 2px 0 #000;display:none;z-index:25;flex-direction:column;
+}
+#win-news.open{display:flex;}
+.news-tb{height:22px;flex-shrink:0;
+  background:linear-gradient(90deg,#8b0000 0%,#c0392b 55%,#8b0000 100%);
+  display:flex;align-items:center;padding:0 5px;border-bottom:2px solid #6a0000;}
+.news-tb-logo{flex:1;font-size:13px;color:#ffe8e8;font-family:'VT323',monospace;letter-spacing:3px;}
+.news-tb-logo b{color:#ffcccc;}
+.news-x{width:14px;height:13px;background:#5a0000;border:1px solid #ff6666;
+  color:#ffaaaa;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:monospace;}
+.news-x:hover{background:#cc0000;color:#fff;}
+.news-menu{height:18px;flex-shrink:0;
+  background:linear-gradient(180deg,#e8e0d0,#d8d0c0);border-bottom:1px solid #bbb;
+  display:flex;align-items:center;padding:0 8px;gap:14px;
+  font-size:8.5px;font-family:'Courier New',monospace;color:#333;}
+.news-menu span{cursor:pointer;padding:1px 4px;}
+.news-menu span:hover{background:#c0392b;color:#fff;}
+.news-body{flex:1;overflow-y:auto;background:#faf6ee;padding:0;}
+.news-body::-webkit-scrollbar{width:14px;}
+.news-body::-webkit-scrollbar-track{background:#d4d0c8;border-left:1px solid #808080;}
+.news-body::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#c0bbb0,#a8a398);
+  border:1px solid #fff;border-bottom-color:#808080;border-right-color:#808080;}
+.news-header{background:#c0392b;padding:6px 10px;text-align:center;border-bottom:3px double #8b0000;}
+.news-header-title{font-family:'VT323',monospace;font-size:22px;color:#fff;letter-spacing:4px;
+  text-shadow:1px 1px 0 #5a0000;}
+.news-header-date{font-size:8px;font-family:'Courier New',monospace;color:#ffcccc;margin-top:1px;}
+.news-article{padding:8px 10px;border-bottom:1px solid #ddd;}
+.news-cat{display:inline-block;background:#c0392b;color:#fff;font-size:7.5px;
+  font-family:'Courier New',monospace;padding:1px 6px;margin-bottom:4px;letter-spacing:1px;text-transform:uppercase;}
+.news-art-title{font-size:11px;font-family:'Courier New',monospace;font-weight:bold;
+  color:#1a0000;line-height:1.3;margin-bottom:6px;border-bottom:1px solid #c0392b;padding-bottom:3px;}
+.news-art-img{width:100%;max-height:90px;object-fit:cover;border:1px solid #ccc;
+  display:block;margin-bottom:6px;image-rendering:auto;}
+.news-art-img-err{width:100%;height:55px;background:#e8e0d0;border:1px solid #ccc;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-family:'Courier New',monospace;color:#999;margin-bottom:6px;}
+.news-art-body{font-size:8.5px;font-family:'Courier New',monospace;color:#333;line-height:1.65;
+  column-count:2;column-gap:10px;}
+.news-art-body p{margin-bottom:5px;break-inside:avoid;}
+.news-art-quote{background:#f0e8d8;border-left:3px solid #c0392b;padding:4px 7px;margin:5px 0;
+  font-style:italic;font-size:8px;font-family:'Courier New',monospace;color:#555;break-inside:avoid;
+  column-span:all;}
+.news-status{height:16px;flex-shrink:0;background:#d4d0c8;border-top:1px solid #808080;
+  font-size:8px;font-family:'Courier New',monospace;color:#333;padding:2px 6px;}
+
+/* ── LIFE PROJECT FULLSCREEN OVERLAY ── */
+/* ── LIFE PROJECT FULLSCREEN OVERLAY ── */
+#life-fs-overlay{
+  display:none;position:fixed;inset:0;z-index:9999;background:#000;
+  flex-direction:column;
+}
+#life-fs-overlay.on{display:flex;}
+#life-fs-topbar{
+  height:28px;flex-shrink:0;
+  background:linear-gradient(90deg,#1a001a 0%,#3d0060 50%,#1a001a 100%);
+  display:flex;align-items:center;padding:0 8px;gap:6px;
+  border-bottom:1px solid #6600bb;
+}
+#life-fs-topbar span{
+  flex:1;color:#cc88ff;font-family:'VT323',monospace;font-size:14px;letter-spacing:1px;
+}
+#life-fs-close{
+  padding:2px 10px;font-family:'Courier New',monospace;font-size:10px;
+  background:#2d0045;border:1px solid #9900ee;color:#cc88ff;cursor:pointer;
+}
+#life-fs-close:hover{background:#cc0000;color:#fff;border-color:#ff0000;}
+#life-fs-iframe{flex:1;width:100%;border:none;}
 </style>
 </head>
 <body>
@@ -438,6 +521,25 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                 <span class="d-icon-lbl">Arquivos</span>
               </div>
 
+
+              <!-- Notícias -->
+              <div class="d-icon" id="di-news" ondblclick="openApp('news')">
+                <svg class="d-icon-img" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="4" width="36" height="33" rx="2" fill="#f5f0e0" stroke="#bbb" stroke-width="1"/>
+                  <rect x="2" y="4" width="36" height="9" rx="2" fill="#c0392b"/>
+                  <rect x="2" y="11" width="36" height="2" fill="#c0392b"/>
+                  <text x="20" y="11.5" fill="#fff" font-size="5.5" text-anchor="middle" font-family="serif" font-weight="bold">SYSCORP NEWS</text>
+                  <rect x="5" y="16" width="14" height="10" rx="1" fill="#d0e8ff" stroke="#aac" stroke-width=".5"/>
+                  <line x1="22" y1="17" x2="36" y2="17" stroke="#bbb" stroke-width="1"/>
+                  <line x1="22" y1="20" x2="36" y2="20" stroke="#bbb" stroke-width="1"/>
+                  <line x1="22" y1="23" x2="33" y2="23" stroke="#bbb" stroke-width="1"/>
+                  <line x1="5" y1="29" x2="36" y2="29" stroke="#ccc" stroke-width=".8"/>
+                  <line x1="5" y1="32" x2="36" y2="32" stroke="#ccc" stroke-width=".8"/>
+                  <line x1="5" y1="35" x2="28" y2="35" stroke="#ccc" stroke-width=".8"/>
+                </svg>
+                <span class="d-icon-lbl">Notícias</span>
+              </div>
+
             </div><!-- /icon-col -->
 
             <!-- ══ ENDERMAIL ══ -->
@@ -488,13 +590,15 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
               </div>
               <div class="reg-scroll">
               <div class="reg-body">
-                <div class="reg-date">Última modificação: 11/08/2025 · 22:17</div>
+                <div class="reg-date">Última modificação: 22/08/2024 · 22:17</div>
                 <div class="reg-title">— REGISTO PESSOAL —</div>
                 <p>Sera que ele vai aguentar da doença,<br>sera que devo ajudar?</p>
                 <br>
                 <p>Finalmente aproveitei o dia e mudei o nome do Kael no Endermail. Já não aparece como UserFriend3000, agora está normal.</p>
                 <p>O dia foi uma bosta. Estou mesmo exausto de tantas aulas de programação. Ainda bem que foi o último dia. Não aguentava mais olhar para código.</p>
                 <p>Vou começar a voltar a postar vídeos no canal. Aliás… melhor ainda.<br>Vou criar um canal só para ensinar a criar jogos. Acho que vou chamar <b>Foxy'Studio</b>.</p>
+                <br>
+                <p>Já faz 3 dias que o Kael já tem a minha casa e não sabe fazer nada a não ser tratar do jogo em vez de passar o tempo comigo, ai ai. Bom pelo menos os pais dele foram 1 semana para Paris, e ele não quis ir para estar comigo e mesmo assim não fala quase nada comigo.</p>
               </div>
               </div><!-- /reg-scroll -->
               <div class="win-status" style="flex-shrink:0;">4 linha(s) · 1 ficheiro aberto · SYSCORP OS</div>
@@ -522,7 +626,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                   </svg>
                   <span class="f-icon-lbl">Galeria_de_fotos</span>
                 </div>
-                <div class="f-icon" onclick="openPass(1)">
+                <div class="f-icon" onclick="openPass('kael')">
                   <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
                     <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
                     <rect x="1" y="7" width="13" height="6" rx="2 2 0 0" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
@@ -531,7 +635,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                     <circle cx="17" cy="23.5" r="2" fill="#aaa"/>
                     <rect x="16.2" y="23.5" width="1.6" height="2.8" fill="#aaa"/>
                   </svg>
-                  <span class="f-icon-lbl">Pasta_01</span>
+                  <span class="f-icon-lbl">Desafio de Kael</span>
                 </div>
                 <div class="f-icon" onclick="openPass(2)">
                   <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
@@ -544,8 +648,20 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                   </svg>
                   <span class="f-icon-lbl">Pasta_02</span>
                 </div>
+                <!-- Nova pasta 1/9/2024 -->
+                <div class="f-icon" onclick="openPass('set2024')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="1" y="7" width="13" height="6" rx="2 2 0 0" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="11" y="19" width="12" height="9" rx="1" fill="#383838"/>
+                    <path d="M13 19 v-3.5 a4 4 0 0 1 8 0 v3.5" fill="none" stroke="#282828" stroke-width="2.8" stroke-linecap="round"/>
+                    <circle cx="17" cy="23.5" r="2" fill="#aaa"/>
+                    <rect x="16.2" y="23.5" width="1.6" height="2.8" fill="#aaa"/>
+                  </svg>
+                  <span class="f-icon-lbl">1/9/2024</span>
+                </div>
               </div>
-              <div class="win-status">3 objeto(s)</div>
+              <div class="win-status">4 objeto(s)</div>
             </div>
 
             <!-- ══ GALERIA DE FOTOS ══ -->
@@ -610,13 +726,212 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
               </div>
               <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Formatar</span></div>
               <div class="reg-body" style="min-height:unset;max-height:200px;overflow-y:auto;margin:3px;font-size:10.5px;line-height:1.8;">
-                <div class="reg-date">15/09/2025</div>
+                <div class="reg-date">15/09/2024</div>
                 <br>
                 <p>Venho escrever isto porque não sei com quem falar. O Kael, que se dedicou tanto no jogo, está horrível. Não consigo lhe dizer isso, ele ficaria muito triste.</p>
                 <p>Foi 1 ano a trabalhar no jogo "Life", mano, um jogo onde és o rei e mandas numa vila cheia de pessoas NPCs. É mau.</p>
                 <p><i>Desculpa Kael</i></p>
               </div>
               <div class="win-status">doc_privado.txt · SYSCORP OS</div>
+            </div>
+
+            <!-- ══ LIFE PROJECT (JOGO) ══ -->
+            <div class="os-win" id="win-lifegame" style="top:2px;left:2px;width:584px;z-index:28;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">🎮</span>
+                <span class="win-tb-title">Life Project — by Kael</span>
+                <button class="win-x" id="life-fs-btn" onclick="toggleLifeFS()" title="Ecrã inteiro"
+                  style="width:20px;margin-right:3px;background:#1a0028;border-color:#9900ee;color:#cc88ff;font-size:10px;">⛶</button>
+                <button class="win-x" onclick="closeApp('lifegame')">✕</button>
+              </div>
+              <div style="background:#000;display:flex;align-items:center;justify-content:center;height:318px;position:relative;overflow:hidden;">
+                <iframe src="life.html" style="width:580px;height:316px;border:none;display:block;"
+                  onerror="" id="life-iframe"></iframe>
+                <div id="life-err" style="display:none;position:absolute;inset:0;background:#0a0a0a;
+                  color:#444;font-family:'Courier New',monospace;font-size:10px;
+                  align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;">
+                  <span style="font-size:18px">🎮</span>
+                  <span>life.html não encontrado na pasta.<br>Coloca o ficheiro life.html<br>na mesma pasta que o index.html</span>
+                  <button class="os-btn" style="margin-top:4px;" onclick="window.open('life.html','_blank')">Abrir noutra aba</button>
+                </div>
+              </div>
+              <div class="win-status">Life Project · Versão alfa · © Kael</div>
+            </div>
+
+                        <!-- ══ DESAFIO DE KAEL ══ -->
+            <div class="os-win" id="win-kael" style="top:38px;left:88px;width:300px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">📁</span>
+                <span class="win-tb-title">Desafio de Kael</span>
+                <button class="win-x" onclick="closeApp('kael')">✕</button>
+              </div>
+              <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Ver</span></div>
+              <div class="win-body">
+                <!-- Life Project (jogo) -->
+                <div class="f-icon" onclick="openLifeGame()">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="3" width="30" height="26" rx="2" fill="#2a6a2a" stroke="#1a4a1a" stroke-width="1"/>
+                    <rect x="3" y="4" width="28" height="18" rx="1" fill="#1a1a2e"/>
+                    <circle cx="17" cy="13" r="5" fill="none" stroke="#44ff44" stroke-width="1.5"/>
+                    <polygon points="15,10 15,16 20,13" fill="#44ff44"/>
+                    <rect x="8" y="26" width="18" height="2" rx="1" fill="#1a4a1a"/>
+                    <rect x="13" y="22" width="8" height="4" fill="#1a4a1a"/>
+                  </svg>
+                  <span class="f-icon-lbl">Life Project</span>
+                </div>
+                <!-- Pasta fotos (trancada) -->
+                <div class="f-icon" onclick="openPass('fotos')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="1" y="7" width="13" height="6" rx="2 2 0 0" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="11" y="19" width="12" height="9" rx="1" fill="#383838"/>
+                    <path d="M13 19 v-3.5 a4 4 0 0 1 8 0 v3.5" fill="none" stroke="#282828" stroke-width="2.8" stroke-linecap="round"/>
+                    <circle cx="17" cy="23.5" r="2" fill="#aaa"/>
+                    <rect x="16.2" y="23.5" width="1.6" height="2.8" fill="#aaa"/>
+                  </svg>
+                  <span class="f-icon-lbl">fotos</span>
+                </div>
+              </div>
+              <div class="win-status">2 objeto(s)</div>
+            </div>
+
+            <!-- ══ PASTA FOTOS ══ -->
+            <div class="os-win" id="win-fotos" style="top:50px;left:102px;width:260px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">📁</span>
+                <span class="win-tb-title">fotos</span>
+                <button class="win-x" onclick="closeApp('fotos')">✕</button>
+              </div>
+              <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Ver</span></div>
+              <div class="win-body">
+                <div class="f-icon" onclick="openImg('CERTIFICADO.jpg','CERTIFICADO.jpg')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="3" width="32" height="28" rx="1" fill="#fffde8" stroke="#ccc" stroke-width="1"/>
+                    <rect x="2" y="4" width="30" height="20" fill="#fff9c4"/>
+                    <circle cx="17" cy="14" r="6" fill="none" stroke="#f0c030" stroke-width="2"/>
+                    <polygon points="17,9 18.2,13 22,13 19,15.5 20,19 17,17 14,19 15,15.5 12,13 15.8,13" fill="#f0c030"/>
+                    <line x1="6" y1="27" x2="28" y2="27" stroke="#ccc" stroke-width="1"/>
+                    <text x="17" y="31" fill="#999" font-size="4" text-anchor="middle" font-family="monospace">CERTIFICADO</text>
+                  </svg>
+                  <span class="f-icon-lbl">CERTIFICADO.jpg</span>
+                </div>
+                <div class="f-icon" onclick="openImg('Capadojogo.jpg','Capadojogo.jpg')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="3" width="32" height="28" rx="1" fill="#e8f0ff" stroke="#aac" stroke-width="1"/>
+                    <rect x="2" y="4" width="30" height="26" rx="1" fill="#1a1a2e"/>
+                    <text x="17" y="14" fill="#44ff44" font-size="6" text-anchor="middle" font-family="monospace" font-weight="bold">LIFE</text>
+                    <text x="17" y="20" fill="#226622" font-size="4" text-anchor="middle" font-family="monospace">project</text>
+                    <rect x="8" y="23" width="18" height="4" rx="1" fill="#226622"/>
+                    <text x="17" y="26.5" fill="#44ff44" font-size="3.5" text-anchor="middle" font-family="monospace">PLAY</text>
+                  </svg>
+                  <span class="f-icon-lbl">Capadojogo.jpg</span>
+                </div>
+              </div>
+              <div class="win-status">2 objeto(s)</div>
+            </div>
+
+            <!-- VIEWER DE IMAGENS (CERTIFICADO / CAPA) -->
+            <div class="os-win" id="win-imgview" style="top:55px;left:108px;width:350px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">🖼</span>
+                <span class="win-tb-title" id="imgview-title">Imagem — Visualizador</span>
+                <button class="win-x" onclick="closeApp('imgview')">✕</button>
+              </div>
+              <div style="background:#808080;padding:6px;display:flex;align-items:center;justify-content:center;min-height:180px;">
+                <img id="imgview-img" src="" alt=""
+                     style="max-width:330px;max-height:230px;display:block;border:2px solid #fff;border-bottom-color:#444;border-right-color:#444;box-shadow:2px 2px 6px rgba(0,0,0,.6);"
+                     onerror="this.style.display='none';document.getElementById('imgview-err').style.display='flex'">
+                <div id="imgview-err" style="display:none;width:200px;height:120px;background:#000;color:#666;font-family:'Courier New',monospace;font-size:9px;align-items:center;justify-content:center;text-align:center;border:1px solid #333;">
+                  [Imagem não encontrada]
+                </div>
+              </div>
+              <div class="win-status" id="imgview-status">—</div>
+            </div>
+
+            <!-- ══ NOTÍCIAS ══ -->
+            <div id="win-news">
+              <div class="news-tb">
+                <span class="news-tb-logo">📰 <b>SYSCORP</b> NEWS</span>
+                <button class="news-x" onclick="closeApp('news')">✕</button>
+              </div>
+              <div class="news-menu">
+                <span>Início</span><span>Tecnologia</span><span>Mundo</span><span>Desporto</span><span>Cultura</span>
+              </div>
+              <div class="news-body">
+                <div class="news-header">
+                  <div class="news-header-title">SYSCORP NEWS</div>
+                  <div class="news-header-date">Setembro 2024 · A informação que importa</div>
+                </div>
+
+                <!-- Artigo 1 -->
+                <div class="news-article">
+                  <span class="news-cat">📰 Tecnologia</span>
+                  <div class="news-art-title">EnderMail torna-se uma das aplicações de mensagens mais utilizadas pelos jovens</div>
+                  <img src="foto1.png" class="news-art-img" alt="EnderMail"
+                       onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                  <div class="news-art-img-err" style="display:none;">[foto1.png — imagem não encontrada]</div>
+                  <div class="news-art-body">
+                    <p>Criada recentemente em 1/3/2024, a aplicação EnderMail tem crescido rapidamente e já ultrapassou milhões de utilizadores ativos em todo o mundo. A plataforma tem sido especialmente popular entre jovens e estudantes, que procuram uma forma simples e rápida de comunicar.</p>
+                    <p>O EnderMail foi criado com uma ideia simples: misturar a organização de um e-mail com a rapidez de uma mensagem instantânea.</p>
+                    <div class="news-art-quote">"É como um e-mail, mas rápido como uma mensagem."</div>
+                    <p>A aplicação permite enviar mensagens, imagens e ficheiros de forma muito rápida, funcionando de maneira parecida com apps de conversa como as mais populares do mercado. No entanto, o EnderMail destaca-se por ser extremamente leve, funcionando sem problemas mesmo em computadores e dispositivos mais antigos.</p>
+                    <p>Segundo especialistas em tecnologia, essa leveza foi um dos fatores que ajudou o crescimento rápido da plataforma. Em poucos meses, a aplicação passou de um pequeno projeto para milhões de utilizadores ativos, principalmente entre grupos de amigos e estudantes.</p>
+                    <p>Outra novidade anunciada pelos criadores é que o EnderMail deverá chegar em breve aos telemóveis, algo muito esperado pelos utilizadores. Além disso, a equipa também confirmou que está a trabalhar numa nova funcionalidade muito pedida: a criação de grupos de conversa.</p>
+                    <p>Até agora, no entanto, ainda não existe uma data oficial para essas atualizações.</p>
+                    <p>Com o crescimento contínuo e novas funcionalidades a caminho, muitos acreditam que o EnderMail pode tornar-se uma das principais aplicações de comunicação nos próximos anos.</p>
+                  </div>
+                </div>
+
+              </div>
+              <div class="news-status">SYSCORP NEWS · 1 artigo · Edição de Setembro 2024</div>
+            </div>
+
+            <!-- ══ PASTA 1/9/2024 ══ -->
+            <div class="os-win" id="win-set2024" style="top:32px;left:86px;width:280px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">📁</span>
+                <span class="win-tb-title">1/9/2024</span>
+                <button class="win-x" onclick="closeApp('set2024')">✕</button>
+              </div>
+              <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Ver</span></div>
+              <div class="win-body">
+                <div class="f-icon" onclick="openImg('Relatorio.png','Relatorio.png')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="1" width="22" height="30" rx="1" fill="#f8f4ea" stroke="#ccc" stroke-width="1"/>
+                    <polygon points="18,1 24,7 18,7" fill="#e0d8c8" stroke="#bbb" stroke-width="1"/>
+                    <line x1="5" y1="12" x2="20" y2="12" stroke="#aaa" stroke-width="1"/>
+                    <line x1="5" y1="16" x2="20" y2="16" stroke="#aaa" stroke-width="1"/>
+                    <line x1="5" y1="20" x2="20" y2="20" stroke="#aaa" stroke-width="1"/>
+                    <line x1="5" y1="24" x2="14" y2="24" stroke="#ccc" stroke-width="1"/>
+                    <rect x="14" y="18" width="18" height="14" rx="1" fill="#fff0d0" stroke="#c89020" stroke-width="1"/>
+                    <line x1="16" y1="22" x2="30" y2="22" stroke="#c89020" stroke-width=".8"/>
+                    <line x1="16" y1="25" x2="30" y2="25" stroke="#c89020" stroke-width=".8"/>
+                    <line x1="16" y1="28" x2="26" y2="28" stroke="#c89020" stroke-width=".8"/>
+                  </svg>
+                  <span class="f-icon-lbl">Relatorio.png</span>
+                </div>
+                <div class="f-icon" onclick="openImg('RaioX.png','RaioX.png')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="1" width="32" height="32" rx="1" fill="#0a0a14" stroke="#222" stroke-width="1"/>
+                    <ellipse cx="17" cy="16" rx="10" ry="13" fill="none" stroke="rgba(180,200,255,0.5)" stroke-width="1"/>
+                    <ellipse cx="17" cy="10" rx="4" ry="3" fill="none" stroke="rgba(180,200,255,0.4)" stroke-width=".8"/>
+                    <line x1="10" y1="20" x2="24" y2="20" stroke="rgba(150,180,255,0.35)" stroke-width=".8"/>
+                    <line x1="9" y1="24" x2="25" y2="24" stroke="rgba(150,180,255,0.3)" stroke-width=".8"/>
+                    <text x="17" y="32" fill="rgba(100,130,200,0.5)" font-size="3.5" text-anchor="middle" font-family="monospace">RAiO-X</text>
+                  </svg>
+                  <span class="f-icon-lbl">RaioX.png</span>
+                </div>
+                <div class="f-icon" onclick="openImg('foto5,9,2024.jpg','foto5,9,2024.jpg')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="3" width="32" height="28" rx="1" fill="#e8f0ff" stroke="#aac" stroke-width="1"/>
+                    <rect x="2" y="4" width="30" height="26" rx="1" fill="#d0e4ff"/>
+                    <circle cx="10" cy="11" r="3" fill="#ffe066"/>
+                    <polyline points="2,24 10,16 16,20 22,13 32,24" fill="none" stroke="#4477cc" stroke-width="1.5"/>
+                  </svg>
+                  <span class="f-icon-lbl">foto5,9,2024.jpg</span>
+                </div>
+              </div>
+              <div class="win-status">3 objeto(s)</div>
             </div>
 
             <!-- MODAL SENHA -->
@@ -672,7 +987,19 @@ const EMAILS = [
   {
     id: 1,
     from: 'UserFriend3000',
-    date: '10/8/2025 às 10:35',
+    date: '5/7/2024 às 3:00',
+    subject: 'Ajuda',
+    unread: false,
+    body: [
+      'Ajuda Foxy não consigo dormir, hoje é o dia do torneio. Será que vou conseguir tive a pensar no jogo que vou fazer em 5h. Pensei em fazer uma versão do jogo que tou a trabalhar o Life, só que uma versão (teste alfa), ainda não sei bem.',
+      'Bom mas mudando de assunto falta <b>13 dias e 1 mês</b> para meu aniversário, vai ser naquele park onde nos conhecemos e antes que digas: mas o Kael aquilo queimou recentemente, bom eu fui pesquisar e ele já está a recompor em breve já está igual a antes mas algumas árvores ainda tão queimadas mas não tem mal.',
+      'Bom me deseja sorte, tchau'
+    ]
+  },
+  {
+    id: 2,
+    from: 'UserFriend3000',
+    date: '10/8/2024 às 10:35',
     subject: 'Como estás foxy',
     unread: false,
     body: [
@@ -682,11 +1009,22 @@ const EMAILS = [
     ]
   },
   {
-    id: 2,
-    from: 'Gavin',
-    date: '20/8/2025 às 8:00',
-    subject: 'Finalmente Férias',
+    id: 3,
+    from: 'Gaybriel',
+    date: '21/8/2024',
+    subject: 'Minecraft',
     unread: true,
+    body: [
+      'Olha, o Kael já me comprou o jogo e o Gavin também já instalou ent jogamos no dia 23 porque amanhã vou ter torneio de futebol ent não posso jogar.',
+      'Mais uma cena o Kael tá em tua casa até que dia?'
+    ]
+  },
+  {
+    id: 4,
+    from: 'Gavin',
+    date: '20/8/2024 às 8:00',
+    subject: 'Finalmente Férias',
+    unread: false,
     body: [
       'Finalmente estamos de férias.',
       'Sobre o que falámos ontem na escola… aquele jogo que disseste, o Minecraft (acho que é esse o nome 😅), fui ver uns vídeos e até parece fixe. Não pensei que fosse gostar, mas até curti a ideia de poder construir tudo do zero.',
@@ -696,9 +1034,9 @@ const EMAILS = [
     ]
   },
   {
-    id: 3,
+    id: 5,
     from: 'Para Gavin',
-    date: '20/8/2025 às 8:30',
+    date: '20/8/2024 às 8:30',
     subject: 'Serio',
     unread: false,
     sent: true,
@@ -715,6 +1053,19 @@ const EMAILS = [
 
 let STATE = 'off';
 let passTarget = 0;
+
+/* Toque único no mobile — converte ondblclick em ontouchend */
+if('ontouchstart' in window){
+  document.querySelectorAll('[ondblclick]').forEach(el=>{
+    const fn = el.getAttribute('ondblclick');
+    el.addEventListener('touchend', e => {
+      e.preventDefault();
+      // eslint-disable-next-line no-new-func
+      new Function(fn)();
+    }, {passive:false});
+  });
+  // observer para ícones criados dinamicamente (não há nenhum por agora)
+}
 
 /* Partículas */
 (function(){
@@ -744,6 +1095,15 @@ SCR.addEventListener('mousemove',e=>{
   CUR.style.top=(e.clientY-r.top)+'px';
 });
 SCR.addEventListener('mouseleave',()=>CUR.style.display='none');
+SCR.addEventListener('touchmove',e=>{
+  if(STATE!=='desktop')return;
+  const r=SCR.getBoundingClientRect();
+  const t=e.touches[0];
+  CUR.style.display='block';
+  CUR.style.left=(t.clientX-r.left)+'px';
+  CUR.style.top=(t.clientY-r.top)+'px';
+},{passive:true});
+SCR.addEventListener('touchend',()=>setTimeout(()=>CUR.style.display='none',800));
 
 /* Boot lines */
 const BOOT=[
@@ -851,7 +1211,35 @@ function openApp(app){
   else if(app==='reg') document.getElementById('win-reg').classList.add('open');
   else if(app==='arq') document.getElementById('win-arq').classList.add('open');
   else if(app==='galeria') document.getElementById('win-galeria').classList.add('open');
+  else if(app==='news') document.getElementById('win-news').classList.add('open');
 }
+function toggleLifeFS(){
+  const overlay = document.getElementById('life-fs-overlay');
+  const fsIframe = document.getElementById('life-fs-iframe');
+  const btn = document.getElementById('life-fs-btn');
+  const isOn = overlay.classList.contains('on');
+  if(!isOn){
+    fsIframe.src = 'life.html';
+    overlay.classList.add('on');
+    btn.textContent = '⛶';
+    btn.title = 'Sair do ecrã inteiro';
+    // Try native fullscreen
+    if(overlay.requestFullscreen) overlay.requestFullscreen().catch(()=>{});
+  } else {
+    overlay.classList.remove('on');
+    fsIframe.src = '';
+    btn.textContent = '⛶';
+    btn.title = 'Ecrã inteiro';
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  if(!document.fullscreenElement){
+    document.getElementById('life-fs-overlay').classList.remove('on');
+    document.getElementById('life-fs-iframe').src='';
+  }
+});
+
 function closeApp(app){
   if(app==='mail') document.getElementById('win-mail').classList.remove('open');
   else if(app==='reg') document.getElementById('win-reg').classList.remove('open');
@@ -859,9 +1247,42 @@ function closeApp(app){
   else if(app==='galeria') document.getElementById('win-galeria').classList.remove('open');
   else if(app==='foto') document.getElementById('win-foto').classList.remove('open');
   else if(app==='privada') document.getElementById('win-privada').classList.remove('open');
+  else if(app==='kael') document.getElementById('win-kael').classList.remove('open');
+  else if(app==='fotos') document.getElementById('win-fotos').classList.remove('open');
+  else if(app==='imgview') document.getElementById('win-imgview').classList.remove('open');
+  else if(app==='news') document.getElementById('win-news').classList.remove('open');
+  else if(app==='set2024') document.getElementById('win-set2024').classList.remove('open');
+  else if(app==='lifegame'){ document.getElementById('win-lifegame').classList.remove('open');
+    const ifr=document.getElementById('life-iframe'); if(ifr) ifr.src=ifr.src; }
 }
 function openFoto(){
   document.getElementById('win-foto').classList.add('open');
+}
+function openLifeGame(){
+  const w = document.getElementById('win-lifegame');
+  w.classList.add('open');
+  // Tenta detetar se o iframe carregou; se não, mostra botão externo
+  const ifr = document.getElementById('life-iframe');
+  const err = document.getElementById('life-err');
+  ifr.style.display = 'block'; err.style.display = 'none';
+  ifr.onload = function(){
+    try{
+      // Se a página carregou vazia pode ser erro de ficheiro
+      if(ifr.contentDocument && ifr.contentDocument.body &&
+         ifr.contentDocument.body.innerHTML.trim()===''){
+        ifr.style.display='none'; err.style.display='flex';
+      }
+    }catch(e){ /* cross-origin, assume ok */ }
+  };
+  ifr.onerror = function(){ ifr.style.display='none'; err.style.display='flex'; };
+}
+function openImg(src, name){
+  document.getElementById('imgview-img').src = src;
+  document.getElementById('imgview-img').style.display = 'block';
+  document.getElementById('imgview-err').style.display = 'none';
+  document.getElementById('imgview-title').textContent = name + ' — Visualizador';
+  document.getElementById('imgview-status').textContent = name + ' · imagem JPEG';
+  document.getElementById('win-imgview').classList.add('open');
 }
 
 /* Renderizar lista de emails */
@@ -919,9 +1340,16 @@ function tryPass(){
   const v=document.getElementById('pass-in').value;
   if(!v){document.getElementById('pass-err').textContent='Erro: campo vazio.';return;}
   if(passTarget==='privada' && v==='0107'){
-    closePass();
-    document.getElementById('win-privada').classList.add('open');
-    return;
+    closePass(); document.getElementById('win-privada').classList.add('open'); return;
+  }
+  if(passTarget==='kael' && v==='5724'){
+    closePass(); document.getElementById('win-kael').classList.add('open'); return;
+  }
+  if(passTarget==='set2024' && v==='13245'){
+    closePass(); document.getElementById('win-set2024').classList.add('open'); return;
+  }
+  if(passTarget==='fotos' && v==='2024'){
+    closePass(); document.getElementById('win-fotos').classList.add('open'); return;
   }
   document.getElementById('pass-err').textContent='⛔ Acesso negado. Senha incorreta.';
   document.getElementById('pass-in').value='';
@@ -941,9 +1369,28 @@ document.getElementById('s-desk').addEventListener('mousedown',e=>{
   if(!e.target.closest('.d-icon')&&!e.target.closest('#win-mail')&&
      !e.target.closest('#win-reg')&&!e.target.closest('#win-arq')&&
      !e.target.closest('#win-galeria')&&!e.target.closest('#win-foto')&&!e.target.closest('#win-privada')&&
+     !e.target.closest('#win-kael')&&!e.target.closest('#win-fotos')&&!e.target.closest('#win-news')&&!e.target.closest('#win-set2024')&&!e.target.closest('#win-imgview')&&!e.target.closest('#win-lifegame')&&
      !e.target.closest('#modal-pass'))
     document.querySelectorAll('.d-icon').forEach(i=>i.classList.remove('sel'));
 });
+
+/* Escala dinâmica do monitor para caber no ecrã */
+function scaleMonitor(){
+  const wrap = document.getElementById('monWrap');
+  const bodyW = document.body.clientWidth;
+  const bodyH = document.body.clientHeight;
+  const monW = 700;   // largura total aprox com sombras
+  const monH = 520;   // altura total aprox
+  const desk = document.querySelector('.desk');
+  const deskH = desk ? desk.clientHeight : 0;
+  const availH = bodyH - deskH - 20;
+  const scaleX = Math.min(1, bodyW / monW);
+  const scaleY = Math.min(1, availH / monH);
+  const scale = Math.min(scaleX, scaleY);
+  wrap.style.transform = `translateX(-50%) scale(${scale})`;
+}
+scaleMonitor();
+window.addEventListener('resize', scaleMonitor);
 
 /* Glitch horror */
 setInterval(()=>{
@@ -953,5 +1400,14 @@ setInterval(()=>{
   }
 },3500);
 </script>
+<!-- LIFE PROJECT FULLSCREEN OVERLAY -->
+<div id="life-fs-overlay">
+  <div id="life-fs-topbar">
+    <span>🎮 Life Project — by Kael</span>
+    <button id="life-fs-close" onclick="toggleLifeFS()">✕ Sair do ecrã inteiro</button>
+  </div>
+  <iframe id="life-fs-iframe" src=""></iframe>
+</div>
+
 </body>
 </html>
