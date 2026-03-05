@@ -1259,22 +1259,7 @@ function openFoto(){
   document.getElementById('win-foto').classList.add('open');
 }
 function openLifeGame(){
-  const w = document.getElementById('win-lifegame');
-  w.classList.add('open');
-  // Tenta detetar se o iframe carregou; se não, mostra botão externo
-  const ifr = document.getElementById('life-iframe');
-  const err = document.getElementById('life-err');
-  ifr.style.display = 'block'; err.style.display = 'none';
-  ifr.onload = function(){
-    try{
-      // Se a página carregou vazia pode ser erro de ficheiro
-      if(ifr.contentDocument && ifr.contentDocument.body &&
-         ifr.contentDocument.body.innerHTML.trim()===''){
-        ifr.style.display='none'; err.style.display='flex';
-      }
-    }catch(e){ /* cross-origin, assume ok */ }
-  };
-  ifr.onerror = function(){ ifr.style.display='none'; err.style.display='flex'; };
+  window.open('life.html','_blank');
 }
 function openImg(src, name){
   document.getElementById('imgview-img').src = src;
