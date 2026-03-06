@@ -1438,33 +1438,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Detetar DevTools abertas via debugger timing trick
-(function devToolsGuard(){
-  let warned = false;
-  function check(){
-    const start = performance.now();
-    // Quando DevTools está aberto com breakpoints ativos, o debugger demora muito mais
-    (function(){ }).constructor('debugger')();
-    const elapsed = performance.now() - start;
-    const open = elapsed > 100;
-    if(open && !warned){
-      warned = true;
-      Object.keys(_P).forEach(k => _P[k] = btoa(Math.random().toString()));
-      const d = document.createElement('div');
-      d.id = '_sec_overlay';
-      d.style.cssText = 'position:fixed;inset:0;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;';
-      d.innerHTML = '<span style="color:#ff3333;font-family:VT323,monospace;font-size:32px;letter-spacing:4px;">⚠ ACESSO NEGADO</span><span style="color:#888;font-family:Courier New,monospace;font-size:12px;">Ferramentas de programador detetadas.</span>';
-      document.body.appendChild(d);
-    }
-    if(!open && warned){
-      warned = false;
-      const ov = document.getElementById('_sec_overlay');
-      if(ov) ov.remove();
-    }
-  }
-  setInterval(check, 1500);
-})();
-
 /* Glitch horror */
 setInterval(()=>{
   if(Math.random()<.07){
