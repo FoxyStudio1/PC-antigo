@@ -1268,16 +1268,24 @@ function openLifeGame(){
   w.classList.add('open');
   const ifr = document.getElementById('life-iframe');
   const err = document.getElementById('life-err');
-  ifr.style.display = 'block'; err.style.display = 'none';
-  ifr.onload = function(){
-    try{
-      if(ifr.contentDocument && ifr.contentDocument.body &&
-         ifr.contentDocument.body.innerHTML.trim()===''){
-        ifr.style.display='none'; err.style.display='flex';
-      }
-    }catch(e){}
-  };
-  ifr.onerror = function(){ ifr.style.display='none'; err.style.display='flex'; };
+  ifr.style.display = 'none';
+  err.style.display = 'none';
+
+  // Carrega o life.html via fetch e injeta como blob — funciona local e no GitHub
+  fetch('life.html')
+    .then(r => {
+      if(!r.ok) throw new Error('not found');
+      return r.text();
+    })
+    .then(html => {
+      const blob = new Blob([html], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      ifr.src = url;
+      ifr.style.display = 'block';
+    })
+    .catch(() => {
+      err.style.display = 'flex';
+    });
 }
 function openImg(src, name){
   document.getElementById('imgview-img').src = src;
@@ -1473,9 +1481,6 @@ setInterval(()=>{
   </div>
   <iframe id="life-fs-iframe" src=""></iframe>
 </div>
-
-</body>
-</html>
 
 </body>
 </html>
