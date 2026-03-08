@@ -18,6 +18,219 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 .particles{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden;}
 @keyframes rise{from{transform:translateY(100vh);opacity:0;}8%{opacity:.45;}92%{opacity:.1;}to{transform:translateY(-60px) translateX(15px);opacity:0;}}
 
+/* RADIO */
+.radio-wrap{
+  position:fixed;bottom:0;right:4vw;height:26vh;z-index:6;
+  display:flex;align-items:flex-end;padding-bottom:10px;
+}
+.radio-body{
+  width:80px;
+  background:linear-gradient(160deg,#c8c0a8,#a09878);
+  border-radius:6px 6px 4px 4px;
+  padding:6px 6px 8px;
+  box-shadow:2px 4px 12px rgba(0,0,0,.8),inset 0 1px 2px rgba(255,255,255,.2);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.radio-speaker{
+  width:62px;height:34px;
+  background:#222;border-radius:3px;
+  display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(4,1fr);
+  gap:2px;padding:4px;
+}
+.radio-speaker span{background:#444;border-radius:50%;}
+.radio-dial-row{display:flex;gap:5px;align-items:center;}
+.radio-dial{
+  width:14px;height:14px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#d4c88a,#8a7840);
+  box-shadow:0 1px 4px rgba(0,0,0,.6);
+}
+.radio-dial-sm{
+  width:10px;height:10px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#c0b878,#786830);
+  box-shadow:0 1px 3px rgba(0,0,0,.5);
+}
+.radio-antenna{
+  width:3px;height:36px;
+  background:linear-gradient(180deg,#bbb,#888);
+  border-radius:2px;margin-bottom:2px;
+  transform:rotate(8deg);transform-origin:bottom center;
+}
+.radio-led{
+  width:6px;height:6px;border-radius:50%;
+  background:#cc0000;box-shadow:0 0 5px #ff0000;
+  animation:ledp 1.2s ease-in-out infinite;
+}
+.radio-brand{font-size:6px;font-family:'Courier New',monospace;color:#666;letter-spacing:1px;}
+
+/* TELEMÓVEL */
+.phone-wrap{
+  position:fixed;bottom:0;left:4vw;height:26vh;z-index:6;
+  display:flex;align-items:flex-end;padding-bottom:12px;
+}
+.phone-body{
+  width:68px;height:120px;
+  background:linear-gradient(160deg,#3a3a3a,#181818);
+  border-radius:12px;border:2px solid #555;
+  box-shadow:3px 6px 20px rgba(0,0,0,.95),inset 0 1px 3px rgba(255,255,255,.1),0 0 12px rgba(80,80,255,.08);
+  display:flex;flex-direction:column;align-items:center;
+  padding:6px 5px 8px;gap:5px;cursor:pointer;position:relative;overflow:hidden;
+}
+/* câmara */
+.phone-body::before{
+  content:'';position:absolute;top:7px;left:50%;transform:translateX(-50%);
+  width:8px;height:8px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#444,#111);
+  border:1px solid #666;
+}
+.phone-screen{
+  width:56px;height:86px;background:#000;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;margin-top:8px;
+  border:1px solid #444;
+}
+.phone-screen-off{
+  width:100%;height:100%;background:#060606;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+}
+.phone-btn{
+  width:16px;height:16px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#555,#222);
+  border:1.5px solid #666;box-shadow:0 1px 4px rgba(0,0,0,.8);
+}
+/* Aviso sem bateria */
+.phone-batt-warn{
+  position:absolute;inset:0;background:#000;border-radius:4px;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+}
+.phone-batt-warn.on{display:flex;}
+.phone-batt-icon{font-size:22px;}
+.phone-batt-txt{font-size:7.5px;font-family:'Courier New',monospace;color:#ff4444;text-align:center;line-height:1.4;font-weight:bold;}
+
+/* CHARGING ANIMATION */
+@keyframes charging{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+.phone-charging .phone-screen-off{
+  background:linear-gradient(270deg,#003300,#006600,#003300);
+  background-size:200% 200%;
+  animation:charging 1.5s ease infinite;
+}
+.phone-charge-txt{
+  position:absolute;font-size:6px;font-family:'Courier New',monospace;
+  color:#44ff44;text-align:center;line-height:1.4;
+}
+
+/* SYSCORP START BUTTON */
+.tb-start{
+  height:18px;
+  background:linear-gradient(135deg,#1a1a1a,#000);
+  border:1px solid #555;border-bottom-color:#222;border-right-color:#222;
+  color:#fff;font-size:11px;font-weight:bold;font-family:'Courier New',monospace;
+  padding:0 8px;cursor:pointer;display:flex;align-items:center;gap:3px;
+  min-width:28px;
+}
+.tb-start:hover{background:linear-gradient(135deg,#333,#111);}
+
+/* START MENU */
+#start-menu{
+  position:absolute;bottom:24px;left:0;
+  width:200px;
+  background:#d4d0c8;
+  border:2px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  box-shadow:3px 3px 0 #000;z-index:50;display:none;
+}
+#start-menu.open{display:block;}
+.sm-header{
+  background:linear-gradient(180deg,#000080,#1a1a1a);
+  padding:8px 8px 6px;display:flex;align-items:center;gap:6px;
+  border-bottom:1px solid #000;
+}
+.sm-logo{
+  font-size:18px;font-family:'Courier New',monospace;font-weight:bold;
+  color:#fff;text-shadow:0 0 8px rgba(100,150,255,.5);
+}
+.sm-user{font-size:9px;font-family:'Courier New',monospace;color:#aaa;}
+.sm-sep{height:1px;background:#808080;margin:2px 0;border-top:1px solid #fff;}
+.sm-item{
+  padding:4px 10px;font-size:9.5px;font-family:'Courier New',monospace;
+  color:#000;cursor:pointer;display:flex;align-items:center;gap:7px;
+  white-space:nowrap;
+}
+.sm-item:hover{background:#000080;color:#fff;}
+.sm-item.disabled{color:#888;cursor:not-allowed;}
+.sm-item.disabled:hover{background:transparent;color:#888;}
+.sm-footer{
+  border-top:2px solid #808080;margin-top:2px;padding:3px 4px;
+  display:flex;justify-content:flex-end;
+}
+.sm-off{
+  font-size:8.5px;font-family:'Courier New',monospace;
+  background:#d4d0c8;border:1px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  padding:2px 8px;cursor:pointer;color:#000;
+}
+.sm-off:hover{background:#cc0000;color:#fff;}
+
+/* WALLPAPER SYSCORP */
+.wp-syscorp{
+  position:absolute;inset:0;width:100%;height:100%;
+  background:radial-gradient(ellipse at 50% 40%,#0a0a2a 0%,#000 70%);
+  display:flex;align-items:center;justify-content:center;
+}
+.wp-syscorp-logo{
+  font-size:60px;font-family:'Courier New',monospace;font-weight:bold;
+  color:rgba(255,255,255,0.06);letter-spacing:8px;user-select:none;
+}
+
+/* CONFIGURAÇÕES */
+#win-cfg{
+  position:absolute;top:20px;left:30px;width:340px;
+  background:#d4d0c8;
+  border:2px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  box-shadow:3px 3px 0 #000;display:none;z-index:26;
+}
+#win-cfg.open{display:block;}
+.cfg-body{display:flex;height:200px;}
+.cfg-left{
+  width:110px;background:#f0ece4;border-right:1px solid #aaa;
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.cfg-cat{
+  padding:5px 8px;font-size:9px;font-family:'Courier New',monospace;
+  color:#000;cursor:pointer;display:flex;align-items:center;gap:5px;
+  border-bottom:1px solid #ddd;
+}
+.cfg-cat:hover{background:#000080;color:#fff;}
+.cfg-cat.act{background:#000080;color:#fff;}
+.cfg-right{flex:1;padding:8px;overflow-y:auto;background:#fff;}
+.cfg-section{display:none;}
+.cfg-section.on{display:block;}
+.cfg-title{font-size:9px;font-family:'Courier New',monospace;font-weight:bold;
+  color:#000;border-bottom:1px solid #ccc;padding-bottom:3px;margin-bottom:6px;}
+.cfg-row{margin-bottom:6px;}
+.cfg-label{font-size:8.5px;font-family:'Courier New',monospace;color:#333;display:block;margin-bottom:3px;}
+.cfg-opt{
+  display:flex;align-items:center;gap:5px;padding:3px 5px;cursor:pointer;
+  font-size:8.5px;font-family:'Courier New',monospace;color:#000;
+  border:1px solid transparent;
+}
+.cfg-opt:hover{background:#e8e4dc;border-color:#aaa;}
+.cfg-opt.sel{background:#000080;color:#fff;}
+.cfg-opt input[type=radio]{accent-color:#000080;}
+.cfg-device{
+  border:1px solid #aaa;padding:5px;margin-bottom:5px;background:#f8f8f8;
+}
+.cfg-device-name{font-size:8.5px;font-family:'Courier New',monospace;font-weight:bold;color:#000;}
+.cfg-device-status{font-size:7.5px;font-family:'Courier New',monospace;color:#666;margin:2px 0;}
+.cfg-accept{
+  font-size:8px;font-family:'Courier New',monospace;
+  background:#d4d0c8;border:1px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
+  padding:2px 8px;cursor:pointer;color:#000;margin-top:3px;
+}
+.cfg-accept:hover{background:#000080;color:#fff;}
+.cfg-accept:disabled{opacity:.5;cursor:not-allowed;}
+
 /* MESA */
 .desk{position:fixed;bottom:0;left:0;right:0;height:26vh;
   background:linear-gradient(180deg,#0f0804 0%,#080502 100%);border-top:1px solid #1c0e06;z-index:5;}
@@ -381,8 +594,10 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
   background:#f5f0e4;
   border:2px solid #fff;border-bottom-color:#808080;border-right-color:#808080;
   box-shadow:2px 2px 0 #000;display:none;z-index:25;flex-direction:column;
+  overflow:hidden;
 }
 #win-news.open{display:flex;}
+.news-body{flex:1;min-height:0;overflow-y:scroll;background:#faf6ee;padding:0;}
 .news-tb{height:22px;flex-shrink:0;
   background:linear-gradient(90deg,#8b0000 0%,#c0392b 55%,#8b0000 100%);
   display:flex;align-items:center;padding:0 5px;border-bottom:2px solid #6a0000;}
@@ -397,7 +612,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
   font-size:8.5px;font-family:'Courier New',monospace;color:#333;}
 .news-menu span{cursor:pointer;padding:1px 4px;}
 .news-menu span:hover{background:#c0392b;color:#fff;}
-.news-body{flex:1;overflow-y:auto;background:#faf6ee;padding:0;}
+
 .news-body::-webkit-scrollbar{width:14px;}
 .news-body::-webkit-scrollbar-track{background:#d4d0c8;border-left:1px solid #808080;}
 .news-body::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#c0bbb0,#a8a398);
@@ -455,6 +670,45 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 <div class="grain"></div>
 <div class="vignette"></div>
 <div class="particles" id="particles"></div>
+
+<!-- RÁDIO -->
+<div class="radio-wrap">
+  <div class="radio-body">
+    <div class="radio-antenna"></div>
+    <div class="radio-speaker">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="radio-dial-row">
+      <div class="radio-dial"></div>
+      <div class="radio-led"></div>
+      <div class="radio-dial-sm"></div>
+    </div>
+    <div class="radio-brand">SYSCORP FM</div>
+  </div>
+  <div id="radio-play-btn" onclick="startRadio()" style="
+    cursor:pointer;font-size:7px;font-family:'Courier New',monospace;
+    color:#aaa;background:#111;border:1px solid #444;padding:2px 5px;
+    border-radius:2px;margin-top:1px;">▶ PLAY</div>
+  <audio id="radio-audio" src="Radio1.mp3" loop></audio>
+</div>
+
+<!-- TELEMÓVEL -->
+<div class="phone-wrap">
+  <div class="phone-body" id="phone-body" onclick="phoneTap()">
+    <div class="phone-screen" id="phone-screen">
+      <div class="phone-screen-off" id="phone-screen-off"></div>
+      <div class="phone-batt-warn" id="phone-batt">
+        <span class="phone-batt-icon">🪫</span>
+        <span class="phone-batt-txt">Sem<br>Bateria</span>
+      </div>
+      <div class="phone-charge-txt" id="phone-charge-txt" style="display:none;"></div>
+    </div>
+    <div class="phone-btn"></div>
+  </div>
+</div>
 
 <div class="desk">
   <div class="keyboard"></div>
@@ -593,7 +847,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
               </div>
               <div class="reg-scroll">
               <div class="reg-body">
-                <div class="reg-date">Última modificação: 22/08/2024 · 22:17</div>
+                <div class="reg-date">Última modificação: 23/08/2024 · 23:55</div>
                 <div class="reg-title">— REGISTO PESSOAL —</div>
                 <p>Sera que ele vai aguentar da doença,<br>sera que devo ajudar?</p>
                 <br>
@@ -602,6 +856,13 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                 <p>Vou começar a voltar a postar vídeos no canal. Aliás… melhor ainda.<br>Vou criar um canal só para ensinar a criar jogos. Acho que vou chamar <b>Foxy'Studio</b>.</p>
                 <br>
                 <p>Já faz 3 dias que o Kael já tem a minha casa e não sabe fazer nada a não ser tratar do jogo em vez de passar o tempo comigo, ai ai. Bom pelo menos os pais dele foram 1 semana para Paris, e ele não quis ir para estar comigo e mesmo assim não fala quase nada comigo.</p>
+                <br>
+                <div class="reg-title" style="margin-top:8px;">— 23/8/2024 —</div>
+                <p>O Kael anda completamente viciado no "Life". Ele está aqui em minha casa para passar tempo comigo, mas quase nem fala. Passa o tempo todo no computador a trabalhar no jogo.</p>
+                <p>Nem veio jogar com os amigos, nem com o próprio melhor amigo.</p>
+                <p>Juro que se amanhã ele não me recompensar, eu desisto. Caguei para o joguinho dele.</p>
+                <p>Às vezes até vejo ele a falar com o jogo… COM UMA MÁQUINA.<br>Isso é meio estranho.</p>
+                <p>Mas pronto… no final do dia ele veio finalmente ter comigo e ajudou a construir a casa no Minecraft.</p>
               </div>
               </div><!-- /reg-scroll -->
               <div class="win-status" style="flex-shrink:0;">4 linha(s) · 1 ficheiro aberto · SYSCORP OS</div>
@@ -640,7 +901,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                   </svg>
                   <span class="f-icon-lbl">Desafio de Kael</span>
                 </div>
-                <div class="f-icon" onclick="openPass(2)">
+                <div class="f-icon" onclick="openPass('clips')">
                   <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
                     <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
                     <rect x="1" y="7" width="13" height="6" rx="2 2 0 0" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
@@ -649,7 +910,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                     <circle cx="17" cy="23.5" r="2" fill="#aaa"/>
                     <rect x="16.2" y="23.5" width="1.6" height="2.8" fill="#aaa"/>
                   </svg>
-                  <span class="f-icon-lbl">Pasta_02</span>
+                  <span class="f-icon-lbl">clipes de nós</span>
                 </div>
                 <!-- Nova pasta 1/9/2024 -->
                 <div class="f-icon" onclick="openPass('set2024')">
@@ -698,8 +959,20 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                   </svg>
                   <span class="f-icon-lbl">Privada</span>
                 </div>
+                <!-- Pasta Discussão -->
+                <div class="f-icon" onclick="openPass('discussao')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="11" width="32" height="21" rx="2" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="1" y="7" width="13" height="6" rx="2 2 0 0" fill="#f0a828" stroke="#b87010" stroke-width="1"/>
+                    <rect x="11" y="19" width="12" height="9" rx="1" fill="#383838"/>
+                    <path d="M13 19 v-3.5 a4 4 0 0 1 8 0 v3.5" fill="none" stroke="#282828" stroke-width="2.8" stroke-linecap="round"/>
+                    <circle cx="17" cy="23.5" r="2" fill="#aaa"/>
+                    <rect x="16.2" y="23.5" width="1.6" height="2.8" fill="#aaa"/>
+                  </svg>
+                  <span class="f-icon-lbl">Discussão</span>
+                </div>
               </div>
-              <div class="win-status">2 objeto(s)</div>
+              <div class="win-status">3 objeto(s)</div>
             </div>
 
             <!-- VIEWER DA FOTO -->
@@ -868,24 +1141,26 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 
                 <!-- Artigo 1 -->
                 <div class="news-article">
-                  <span class="news-cat">📰 Tecnologia</span>
-                  <div class="news-art-title">EnderMail torna-se uma das aplicações de mensagens mais utilizadas pelos jovens</div>
-                  <img src="foto1.png" class="news-art-img" alt="EnderMail"
+                  <span class="news-cat">📰 Tecnologia / Internet</span>
+                  <div class="news-art-title">Os canais mais populares da internet em 2024</div>
+                  <img src="foto1.png" class="news-art-img" alt="Canais internet"
                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                   <div class="news-art-img-err" style="display:none;">[foto1.png — imagem não encontrada]</div>
                   <div class="news-art-body">
-                    <p>Criada recentemente em 1/3/2024, a aplicação EnderMail tem crescido rapidamente e já ultrapassou milhões de utilizadores ativos em todo o mundo. A plataforma tem sido especialmente popular entre jovens e estudantes, que procuram uma forma simples e rápida de comunicar.</p>
-                    <p>O EnderMail foi criado com uma ideia simples: misturar a organização de um e-mail com a rapidez de uma mensagem instantânea.</p>
-                    <div class="news-art-quote">"É como um e-mail, mas rápido como uma mensagem."</div>
-                    <p>A aplicação permite enviar mensagens, imagens e ficheiros de forma muito rápida, funcionando de maneira parecida com apps de conversa como as mais populares do mercado. No entanto, o EnderMail destaca-se por ser extremamente leve, funcionando sem problemas mesmo em computadores e dispositivos mais antigos.</p>
-                    <p>Segundo especialistas em tecnologia, essa leveza foi um dos fatores que ajudou o crescimento rápido da plataforma. Em poucos meses, a aplicação passou de um pequeno projeto para milhões de utilizadores ativos, principalmente entre grupos de amigos e estudantes.</p>
-                    <p>Outra novidade anunciada pelos criadores é que o EnderMail deverá chegar em breve aos telemóveis, algo muito esperado pelos utilizadores. Além disso, a equipa também confirmou que está a trabalhar numa nova funcionalidade muito pedida: a criação de grupos de conversa.</p>
-                    <p>Até agora, no entanto, ainda não existe uma data oficial para essas atualizações.</p>
-                    <p>Com o crescimento contínuo e novas funcionalidades a caminho, muitos acreditam que o EnderMail pode tornar-se uma das principais aplicações de comunicação nos próximos anos.</p>
+                    <p>Em 2024, vários criadores de conteúdo têm crescido rapidamente na internet. Canais focados em jogos, conversas com a comunidade e tutoriais têm conquistado milhões de visualizações, mostrando que o público procura conteúdos rápidos, interessantes e fáceis de acompanhar.</p>
+                    <p>Entre os canais que mais têm chamado a atenção este ano estão alguns novos criadores que conseguiram crescer muito em pouco tempo.</p>
+                    <p>Um dos canais que tem tido bastante destaque é <b>PixelPlay</b>. O canal é conhecido por trazer gameplays de vários jogos populares, mas com um estilo diferente: o criador testa desafios malucos dentro dos jogos.</p>
+                    <p>Outro canal que tem crescido bastante é <b>TalkZone</b>. Diferente dos canais de jogos, esse canal é focado em conversas sobre internet, tecnologia e histórias curiosas do mundo digital.</p>
+                    <p>Também existe o canal <b>QuickTech</b>, que ficou conhecido por ensinar pequenos truques de tecnologia e informática. Os vídeos são curtos e diretos.</p>
+                    <div class="news-art-quote">Mas um dos canais que mais tem surpreendido recentemente é <b>Foxy'Studio</b>.</div>
+                    <p>O canal tem chamado a atenção porque o seu criador, um jovem programador, ensina pessoas que não sabem programação a criar os seus próprios jogos. Os vídeos são conhecidos por explicar tudo de forma simples, rápida e muito fácil de entender.</p>
+                    <p>Muitos seguidores dizem que os vídeos do Foxy'Studio conseguem explicar programação melhor do que algumas aulas, pois mostram os passos de forma prática e direta.</p>
+                    <p>Outro ponto que ajudou no crescimento do canal é a ligação com a comunidade. O criador costuma fazer vídeos baseados nos pedidos dos próprios seguidores.</p>
+                    <p>Graças a isso, o Foxy'Studio tem crescido rapidamente e já é considerado por muitos como um dos canais educativos de tecnologia mais promissores da internet em 2024.</p>
                   </div>
                 </div>
 
-              </div>
+              </div><!-- /news-body -->
               <div class="news-status">SYSCORP NEWS · 1 artigo · Edição de Setembro 2024</div>
             </div>
 
@@ -937,6 +1212,116 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
               <div class="win-status">3 objeto(s)</div>
             </div>
 
+            <!-- ══ CONFIGURAÇÕES ══ -->
+            <div class="os-win" id="win-cfg" style="top:22px;left:28px;width:340px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">⚙</span>
+                <span class="win-tb-title">Configurações do Sistema</span>
+                <button class="win-x" onclick="closeApp('cfg')">✕</button>
+              </div>
+              <div class="win-menu"><span>Ficheiro</span><span>Ver</span><span>Ajuda</span></div>
+              <div class="cfg-body">
+                <div class="cfg-left">
+                  <div class="cfg-cat act" onclick="cfgTab(this,'cfg-wp')">🖼 Aspeto</div>
+                  <div class="cfg-cat" onclick="cfgTab(this,'cfg-dev')">📱 Dispositivos</div>
+                  <div class="cfg-cat" onclick="cfgTab(this,'cfg-sound')">🔊 Som</div>
+                  <div class="cfg-cat" onclick="cfgTab(this,'cfg-sys')">💻 Sistema</div>
+                </div>
+                <div class="cfg-right">
+                  <!-- Aspeto -->
+                  <div class="cfg-section on" id="cfg-wp">
+                    <div class="cfg-title">Fundo do Ambiente de Trabalho</div>
+                    <div class="cfg-row">
+                      <div class="cfg-opt sel" id="wp-opt-blocks" onclick="setWallpaper('blocks',this)">
+                        🟦 Blocos coloridos (padrão)
+                      </div>
+                      <div class="cfg-opt" id="wp-opt-black" onclick="setWallpaper('black',this)">
+                        ⬛ Fundo preto
+                      </div>
+                      <div class="cfg-opt" id="wp-opt-syscorp" onclick="setWallpaper('syscorp',this)">
+                        🔷 Fundo SYSCORP
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Dispositivos -->
+                  <div class="cfg-section" id="cfg-dev">
+                    <div class="cfg-title">Dispositivos Conectados</div>
+                    <div class="cfg-device">
+                      <div class="cfg-device-name">📱 Telemóvel — Foxy</div>
+                      <div class="cfg-device-status" id="phone-cfg-status">Estado: Sem bateria</div>
+                      <button class="cfg-accept" id="phone-accept-btn" onclick="acceptPhone()">Aceitar artigo de carregamento</button>
+                    </div>
+                  </div>
+                  <!-- Som -->
+                  <div class="cfg-section" id="cfg-sound">
+                    <div class="cfg-title">Configurações de Som</div>
+                    <div class="cfg-label">Rádio SYSCORP FM</div>
+                    <div class="cfg-opt" onclick="toggleRadio(this)">🔊 Tocar / Pausar rádio</div>
+                    <div class="cfg-label" style="margin-top:6px;">Volume</div>
+                    <input type="range" min="0" max="100" value="80" style="width:100%;accent-color:#000080;" oninput="document.getElementById('radio-audio').volume=this.value/100">
+                  </div>
+                  <!-- Sistema -->
+                  <div class="cfg-section" id="cfg-sys">
+                    <div class="cfg-title">Informações do Sistema</div>
+                    <div style="font-size:8.5px;font-family:'Courier New',monospace;color:#333;line-height:1.8;">
+                      <div>Sistema: <b>SYSCORP OS</b></div>
+                      <div>Versão: <b>2.1.3</b></div>
+                      <div>CPU: Intel Pentium II 400MHz</div>
+                      <div>RAM: 65536 KB</div>
+                      <div>Utilizador: <b>Foxy</b></div>
+                      <div>Integridade: <b style="color:#884400;">73%</b></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="win-status">Configurações do Sistema · SYSCORP OS</div>
+            </div>
+
+            <!-- ══ PASTA CIPES DE NÓS (win-clips) ══ -->
+            <div class="os-win" id="win-clips" style="top:40px;left:95px;width:260px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">📁</span>
+                <span class="win-tb-title">clipes de nós</span>
+                <button class="win-x" onclick="closeApp('clips')">✕</button>
+              </div>
+              <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Ver</span></div>
+              <div class="win-body">
+                <div class="f-icon" onclick="openImg('casaM.jpg','casaM.jpg')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="3" width="32" height="28" rx="1" fill="#e8f0ff" stroke="#aac" stroke-width="1"/>
+                    <rect x="2" y="4" width="30" height="26" rx="1" fill="#d0e4ff"/>
+                    <circle cx="10" cy="11" r="3" fill="#ffe066"/>
+                    <polyline points="2,24 10,16 16,20 22,13 32,24" fill="none" stroke="#4477cc" stroke-width="1.5"/>
+                  </svg>
+                  <span class="f-icon-lbl">casaM.jpg</span>
+                </div>
+                <div class="f-icon" onclick="openImg('casaMC.jpg','casaMC.jpg')">
+                  <svg class="f-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="3" width="32" height="28" rx="1" fill="#e8f0ff" stroke="#aac" stroke-width="1"/>
+                    <rect x="2" y="4" width="30" height="26" rx="1" fill="#c4d8f4"/>
+                    <circle cx="10" cy="11" r="3" fill="#ffe066"/>
+                    <polyline points="2,26 8,18 14,22 20,14 32,26" fill="none" stroke="#3366bb" stroke-width="1.5"/>
+                  </svg>
+                  <span class="f-icon-lbl">casaMC.jpg</span>
+                </div>
+              </div>
+              <div class="win-status">2 objeto(s)</div>
+            </div>
+
+            <!-- ══ PASTA DISCUSSÃO (vazia por agora) ══ -->
+            <div class="os-win" id="win-discussao" style="top:44px;left:100px;width:240px;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">📁</span>
+                <span class="win-tb-title">Discussão</span>
+                <button class="win-x" onclick="closeApp('discussao')">✕</button>
+              </div>
+              <div class="win-menu"><span>Ficheiro</span><span>Editar</span><span>Ver</span></div>
+              <div class="win-body" style="min-height:60px;align-items:center;justify-content:center;">
+                <span style="font-size:8.5px;font-family:'Courier New',monospace;color:#888;">Esta pasta está vazia.</span>
+              </div>
+              <div class="win-status">0 objeto(s)</div>
+            </div>
+
             <!-- MODAL SENHA -->
             <div id="modal-pass">
               <div class="modal-tb">
@@ -957,8 +1342,26 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
             </div>
 
           </div><!-- /desktop -->
+          <!-- START MENU -->
+          <div id="start-menu">
+            <div class="sm-header">
+              <div class="sm-logo">S</div>
+              <div class="sm-user">Foxy</div>
+            </div>
+            <div class="sm-item" onclick="openApp('mail');closeStart()">✉ Endermail</div>
+            <div class="sm-item" onclick="openApp('news');closeStart()">📰 Notícias</div>
+            <div class="sm-item" onclick="openApp('reg');closeStart()">📄 Doc. Registos</div>
+            <div class="sm-item" onclick="openApp('arq');closeStart()">📁 Arquivos</div>
+            <div class="sm-sep"></div>
+            <div class="sm-item" onclick="openApp('cfg');closeStart()">⚙ Configurações</div>
+            <div class="sm-item disabled">🎬 Foxy'Studio</div>
+            <div class="sm-footer">
+              <button class="sm-off" onclick="closeStart()">✕ Fechar</button>
+            </div>
+          </div>
+
           <div class="taskbar">
-            <button class="tb-start">▶ Início</button>
+            <button class="tb-start" id="tb-start-btn" onclick="toggleStart()"><b>S</b></button>
             <span class="tb-clock" id="tb-clk">00:00</span>
           </div>
         </div><!-- /s-desk -->
@@ -1049,6 +1452,33 @@ const EMAILS = [
       'Ele falou que compra o jogo para quem ainda não tiver. Disse que vai usar o dinheiro que ganhou naquele torneio da escola — o de fazer o melhor jogo em 5 horas. Ainda não acredito que ele ganhou aquilo tão rápido…',
       'Ele anda mesmo empenhado nesse "projeto". Disse que quer mostrar-nos quando estivermos todos online.',
       'Bom… amanhã jogamos então.'
+    ]
+  }
+  ,{
+    id: 6,
+    from: 'Kael',
+    date: '23/8/2024 às 23:00',
+    subject: 'Boa noite',
+    unread: true,
+    body: [
+      'Oi Foxy, não sei se ainda estás acordado ou se já foste dormir, mas queria dizer que adorei o jogo.',
+      'Desculpa por ter ficado quase o dia todo a trabalhar no Life hoje. Prometo que amanhã vou compensar.',
+      'Mas nas duas horas que jogámos eu adorei o Minecraft (até porque fui eu que sugeri 😅). Gostei muito de construir a nossa casa. Acho que podíamos jogar mais vezes e ir criando o nosso próprio mundo.',
+      'Ah… também preciso falar contigo sobre uma coisa do jogo. Mas talvez deixe isso para o dia 25.',
+      'Boa noite.'
+    ]
+  },
+  {
+    id: 7,
+    from: 'Gavin',
+    date: '23/8/2024 às 12:00',
+    subject: 'Olha Foxy',
+    unread: true,
+    body: [
+      'Olha Foxy,',
+      'Pergunta ao Kael porque ele ainda não está aqui na call connosco. Já estamos a jogar há 3 horas e nada dele aparecer, sendo que foi ele que queria jogar este jogo.',
+      'Sinceramente, ele está a ser mesmo desumilde ultimamente. Parece que anda a deixar toda a gente de lado só por causa do "Life".',
+      'Já começa a irritar um bocado. Para teres noção, até já estou do lado do Gaybriel quando ele diz que o Kael às vezes não sabe ser amigo.'
     ]
   }
   /* Adiciona próximos emails aqui */
@@ -1217,6 +1647,7 @@ function openApp(app){
   else if(app==='arq') document.getElementById('win-arq').classList.add('open');
   else if(app==='galeria') document.getElementById('win-galeria').classList.add('open');
   else if(app==='news') document.getElementById('win-news').classList.add('open');
+  else if(app==='cfg') document.getElementById('win-cfg').classList.add('open');
 }
 function toggleLifeFS(){
   const overlay = document.getElementById('life-fs-overlay');
@@ -1256,6 +1687,9 @@ function closeApp(app){
   else if(app==='fotos') document.getElementById('win-fotos').classList.remove('open');
   else if(app==='imgview') document.getElementById('win-imgview').classList.remove('open');
   else if(app==='news') document.getElementById('win-news').classList.remove('open');
+  else if(app==='cfg') document.getElementById('win-cfg').classList.remove('open');
+  else if(app==='clips') document.getElementById('win-clips').classList.remove('open');
+  else if(app==='discussao') document.getElementById('win-discussao').classList.remove('open');
   else if(app==='set2024') document.getElementById('win-set2024').classList.remove('open');
   else if(app==='lifegame'){ document.getElementById('win-lifegame').classList.remove('open');
     const ifr=document.getElementById('life-iframe'); if(ifr) ifr.src=ifr.src; }
@@ -1348,10 +1782,12 @@ function openPass(n){
 }
 function closePass(){document.getElementById('modal-pass').classList.remove('open');}
 const _P = {
-  privada: '0107',
-  kael:    '5724',
-  set2024: '13245',
-  fotos:   '2024'
+  privada:   '0107',
+  kael:      '5724',
+  set2024:   '13245',
+  fotos:     '2024',
+  clips:     '23824',
+  discussao: '3309'
 };
 
 function tryPass(){
@@ -1359,7 +1795,7 @@ function tryPass(){
   if(!v){document.getElementById('pass-err').textContent='Erro: campo vazio.';return;}
   if(v === _P[passTarget]){
     closePass();
-    const wins = {privada:'win-privada',kael:'win-kael',set2024:'win-set2024',fotos:'win-fotos'};
+    const wins = {privada:'win-privada',kael:'win-kael',set2024:'win-set2024',fotos:'win-fotos',clips:'win-clips',discussao:'win-discussao'};
     if(wins[passTarget]) document.getElementById(wins[passTarget]).classList.add('open');
     return;
   }
@@ -1381,7 +1817,8 @@ document.getElementById('s-desk').addEventListener('mousedown',e=>{
   if(!e.target.closest('.d-icon')&&!e.target.closest('#win-mail')&&
      !e.target.closest('#win-reg')&&!e.target.closest('#win-arq')&&
      !e.target.closest('#win-galeria')&&!e.target.closest('#win-foto')&&!e.target.closest('#win-privada')&&
-     !e.target.closest('#win-kael')&&!e.target.closest('#win-fotos')&&!e.target.closest('#win-news')&&!e.target.closest('#win-set2024')&&!e.target.closest('#win-imgview')&&!e.target.closest('#win-lifegame')&&
+     !e.target.closest('#win-kael')&&!e.target.closest('#win-fotos')&&!e.target.closest('#win-news')&&!e.target.closest('#win-set2024')&&
+     !e.target.closest('#win-cfg')&&!e.target.closest('#win-clips')&&!e.target.closest('#win-discussao')&&!e.target.closest('#win-imgview')&&!e.target.closest('#win-lifegame')&&
      !e.target.closest('#modal-pass'))
     document.querySelectorAll('.d-icon').forEach(i=>i.classList.remove('sel'));
 });
@@ -1436,6 +1873,102 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     return false;
   }
+});
+
+/* ── START MENU ── */
+function toggleStart(){
+  document.getElementById('start-menu').classList.toggle('open');
+}
+function closeStart(){
+  document.getElementById('start-menu').classList.remove('open');
+}
+document.getElementById('s-desk').addEventListener('mousedown', e=>{
+  if(!e.target.closest('#start-menu') && !e.target.closest('#tb-start-btn'))
+    closeStart();
+});
+
+/* ── WALLPAPER ── */
+let currentWp = 'blocks';
+function setWallpaper(type, el){
+  currentWp = type;
+  document.querySelectorAll('.cfg-opt[id^="wp-opt"]').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  const cv = document.getElementById('wallpaper');
+  const syscorp = document.getElementById('wp-syscorp-el');
+  if(type === 'blocks'){
+    cv.style.display = 'block';
+    if(syscorp) syscorp.style.display = 'none';
+    generateWallpaper();
+  } else if(type === 'black'){
+    cv.style.display = 'block';
+    if(syscorp) syscorp.style.display = 'none';
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,cv.width,cv.height);
+  } else if(type === 'syscorp'){
+    cv.style.display = 'none';
+    if(!syscorp){
+      const d = document.createElement('div');
+      d.id = 'wp-syscorp-el';
+      d.className = 'wp-syscorp';
+      d.innerHTML = '<div class="wp-syscorp-logo">SYSCORP</div>';
+      document.getElementById('s-desk').insertBefore(d, document.getElementById('s-desk').firstChild);
+    } else { syscorp.style.display = 'flex'; }
+  }
+}
+
+/* ── PHONE ── */
+let phoneAccepted = false;
+let battWarnTimeout = null;
+function phoneTap(){
+  const warn = document.getElementById('phone-batt');
+  if(phoneAccepted) return; // charging, don't show warning
+  warn.classList.add('on');
+  clearTimeout(battWarnTimeout);
+  battWarnTimeout = setTimeout(()=> warn.classList.remove('on'), 2000);
+}
+function acceptPhone(){
+  phoneAccepted = true;
+  document.getElementById('phone-accept-btn').disabled = true;
+  document.getElementById('phone-cfg-status').textContent = 'Estado: A carregar… (próxima atualização)';
+  const body = document.getElementById('phone-body');
+  const batt = document.getElementById('phone-batt');
+  const chargeTxt = document.getElementById('phone-charge-txt');
+  batt.classList.remove('on');
+  body.classList.add('phone-charging');
+  chargeTxt.style.display = 'block';
+  chargeTxt.textContent = '⚡ A carregar…';
+}
+
+/* ── CFG TABS ── */
+function cfgTab(el, section){
+  document.querySelectorAll('.cfg-cat').forEach(c=>c.classList.remove('act'));
+  document.querySelectorAll('.cfg-section').forEach(s=>s.classList.remove('on'));
+  el.classList.add('act');
+  document.getElementById(section).classList.add('on');
+}
+
+/* ── RADIO ── */
+function startRadio(){
+  const audio = document.getElementById('radio-audio');
+  const btn = document.getElementById('radio-play-btn');
+  audio.play().then(()=>{
+    btn.textContent = '■ STOP';
+    btn.onclick = function(){ audio.pause(); btn.textContent='▶ PLAY'; btn.onclick=startRadio; };
+  }).catch(()=>{ btn.textContent='Erro'; });
+}
+function toggleRadio(el){
+  const audio = document.getElementById('radio-audio');
+  if(audio.paused){ audio.play(); el.textContent='🔊 Tocar / Pausar rádio'; }
+  else { audio.pause(); el.textContent='🔇 Tocar / Pausar rádio'; }
+}
+// Tenta autoplay ao carregar
+window.addEventListener('load', ()=>{
+  const audio = document.getElementById('radio-audio');
+  audio.play().then(()=>{
+    const btn = document.getElementById('radio-play-btn');
+    if(btn){ btn.textContent='■ STOP'; btn.onclick=function(){ audio.pause(); btn.textContent='▶ PLAY'; btn.onclick=startRadio; }; }
+  }).catch(()=>{});
 });
 
 /* Glitch horror */
