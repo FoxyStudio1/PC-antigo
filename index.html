@@ -798,14 +798,17 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
               </div>
 
 
-              <!-- Dados -->
-              <div class="d-icon" id="di-dados" ondblclick="openApp('dados')" style="display:none;">
+            </div><!-- /icon-col -->
+
+            <!-- DADOS — coluna separada, ao lado do EnderMail -->
+            <div id="col-dados" style="position:absolute;top:8px;left:58px;display:none;">
+              <div class="d-icon" id="di-dados" ondblclick="openApp('dados')">
                 <svg class="d-icon-img" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                   <rect x="2" y="8" width="36" height="28" rx="2" fill="#2a2a3a" stroke="#444" stroke-width="1"/>
                   <rect x="2" y="8" width="36" height="8" rx="2" fill="#3a3a5a"/>
                   <rect x="2" y="14" width="36" height="2" fill="#3a3a5a"/>
                   <rect x="6" y="20" width="10" height="3" rx="1" fill="#5555aa"/>
-                  <rect x="6" y="25" width="14" height="3" rx="1" fill="#4444888"/>
+                  <rect x="6" y="25" width="14" height="3" rx="1" fill="#444488"/>
                   <rect x="6" y="30" width="8" height="3" rx="1" fill="#33337a"/>
                   <circle cx="32" cy="22" r="4" fill="none" stroke="#5555aa" stroke-width="1.5"/>
                   <line x1="29" y1="22" x2="35" y2="22" stroke="#5555aa" stroke-width="1"/>
@@ -814,8 +817,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                 </svg>
                 <span class="d-icon-lbl">Dados</span>
               </div>
-
-            </div><!-- /icon-col -->
+            </div>
 
             <!-- ══ ENDERMAIL ══ -->
             <div id="win-mail">
@@ -2204,16 +2206,9 @@ window.addEventListener('orientationchange', ()=>setTimeout(scaleMonitor, 200));
 (function checkDados(){
   const params = new URLSearchParams(window.location.search);
   if(params.get('dados') === '1'){
-    document.getElementById('di-dados').style.display = '';
+    document.getElementById('col-dados').style.display = '';
     const sm = document.getElementById('sm-dados');
     if(sm) sm.style.display = '';
-    // Reposicionar o ícone de Dados ao lado do EnderMail (1ª posição)
-    const col = document.querySelector('.icon-col');
-    const mailIcon = document.getElementById('di-mail');
-    const dadosIcon = document.getElementById('di-dados');
-    if(col && mailIcon && dadosIcon){
-      col.insertBefore(dadosIcon, mailIcon.nextSibling);
-    }
   }
 })();
 
