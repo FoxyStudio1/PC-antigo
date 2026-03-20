@@ -184,7 +184,7 @@
         Palavra-passe correta.<br>
         O ficheiro está pronto para transferência.
       </div>
-      <a class="btn-download" href="Dados.zip" download="Dados.zip" id="btn-dl">
+      <a class="btn-download" href="Dados.zip" download="Dados.zip" id="btn-dl" onclick="unlockAndReturn()">
         ⬇ DESCARREGAR Dados.zip
       </a>
     </div>
@@ -244,6 +244,20 @@ function tryUnlock(){
     inp.value = '';
     setTimeout(()=>inp.classList.remove('error'), 500);
   }
+}
+
+// ── REDIRECT AFTER DOWNLOAD ──
+function unlockAndReturn(){
+  // Abre o download e redireciona o index com ?dados=1
+  setTimeout(()=>{
+    if(window.opener){
+      // Se abriu a partir do index.html, navega lá com o parâmetro
+      window.opener.location.href = 'index.html?dados=1';
+      window.close();
+    } else {
+      window.location.href = 'index.html?dados=1';
+    }
+  }, 800);
 }
 
 // ── BLOCK DEVTOOLS ──

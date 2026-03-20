@@ -697,7 +697,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 
 <!-- TELEMÓVEL -->
 <div class="phone-wrap">
-  <div class="phone-body" id="phone-body" onclick="phoneTap()">
+  <div class="phone-body" id="phone-body" onclick="window.open('telemovel.html','telemovel','width=360,height=680')">
     <div class="phone-screen" id="phone-screen">
       <div class="phone-screen-off" id="phone-screen-off"></div>
       <div class="phone-batt-warn" id="phone-batt">
@@ -799,7 +799,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 
 
               <!-- Dados -->
-              <div class="d-icon" id="di-dados" ondblclick="openApp('dados')">
+              <div class="d-icon" id="di-dados" ondblclick="openApp('dados')" style="display:none;">
                 <svg class="d-icon-img" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                   <rect x="2" y="8" width="36" height="28" rx="2" fill="#2a2a3a" stroke="#444" stroke-width="1"/>
                   <rect x="2" y="8" width="36" height="8" rx="2" fill="#3a3a5a"/>
@@ -1644,7 +1644,7 @@ Depois do torneio:
             <div class="sm-item" onclick="openApp('news');closeStart()">📰 Notícias</div>
             <div class="sm-item" onclick="openApp('reg');closeStart()">📄 Doc. Registos</div>
             <div class="sm-item" onclick="openApp('arq');closeStart()">📁 Arquivos</div>
-            <div class="sm-item" onclick="openApp('dados');closeStart()">🗄 Dados</div>
+            <div class="sm-item" id="sm-dados" onclick="openApp('dados');closeStart()" style="display:none;">🗄 Dados</div>
             <div class="sm-sep"></div>
             <div class="sm-item" onclick="openApp('cfg');closeStart()">⚙ Configurações</div>
             <div class="sm-item disabled">🎬 Foxy'Studio</div>
@@ -2199,6 +2199,23 @@ function scaleMonitor(){
 scaleMonitor();
 window.addEventListener('resize', scaleMonitor);
 window.addEventListener('orientationchange', ()=>setTimeout(scaleMonitor, 200));
+
+// Verificar se pasta Dados foi desbloqueada via link.html
+(function checkDados(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('dados') === '1'){
+    document.getElementById('di-dados').style.display = '';
+    const sm = document.getElementById('sm-dados');
+    if(sm) sm.style.display = '';
+    // Reposicionar o ícone de Dados ao lado do EnderMail (1ª posição)
+    const col = document.querySelector('.icon-col');
+    const mailIcon = document.getElementById('di-mail');
+    const dadosIcon = document.getElementById('di-dados');
+    if(col && mailIcon && dadosIcon){
+      col.insertBefore(dadosIcon, mailIcon.nextSibling);
+    }
+  }
+})();
 
 /* ══ SEGURANÇA ══ */
 
