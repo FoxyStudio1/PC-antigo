@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SYSCORP Mobile</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+  body{
+    background:#000;
+    display:flex;align-items:center;justify-content:center;
+    min-height:100vh;font-family:'Share Tech Mono',monospace;
+    overflow:hidden;
+  }
+
+  /* ══ PHONE SHELL ══ */
+  .phone{
+    width:320px;height:620px;
+    background:linear-gradient(160deg,#1a1a1a,#0a0a0a);
+    border-radius:36px;
+    border:2px solid #333;
+    box-shadow:
+      0 0 0 1px #111,
+      0 20px 60px rgba(0,0,0,.9),
+      inset 0 1px 2px rgba(255,255,255,.08);
+    display:flex;flex-direction:column;align-items:center;
+    padding:12px 8px 16px;
+    position:relative;
+    overflow:hidden;
+  }
+  /* câmara */
+  .phone::before{
+    content:'';position:absolute;top:16px;left:50%;transform:translateX(-50%);
+    width:10px;height:10px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#2a2a2a,#000);
+    border:1px solid #444;z-index:10;
+  }
+  /* botão lateral */
+  .phone-side-btn{
+    position:absolute;right:-3px;top:140px;
+    width:3px;height:50px;
+    background:linear-gradient(180deg,#333,#222,#333);
+    border-radius:0 2px 2px 0;
+  }
+
+  /* ══ SCREEN ══ */
+  .screen{
+    width:300px;height:580px;
+    background:#000;
+    border-radius:28px;
+    overflow:hidden;
+    position:relative;
+    border:1px solid #222;
+  }
+
+  /* ══ STATUS BAR ══ */
+  .status-bar{
+    position:absolute;top:0;left:0;right:0;height:24px;
+    background:rgba(0,0,0,.85);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px;z-index:100;
+  }
+  .status-time{font-size:11px;color:#fff;font-family:'Share Tech Mono',monospace;}
+  .status-icons{display:flex;align-items:center;gap:5px;font-size:10px;color:#fff;}
+
+  /* ══ LOCK SCREEN ══ */
+  #screen-lock{
+    position:absolute;inset:0;z-index:50;
+    background:linear-gradient(160deg,#050510 0%,#000 60%,#050505 100%);
+    display:flex;flex-direction:column;align-items:center;
+    padding-top:50px;gap:0;
+  }
+  .lock-logo{
+    font-family:'VT323',monospace;font-size:36px;
+    color:rgba(255,255,255,.12);letter-spacing:6px;margin-bottom:4px;
+  }
+  .lock-time{
+    font-size:52px;font-family:'VT323',monospace;
+    color:#fff;letter-spacing:2px;text-shadow:0 0 20px rgba(100,100,255,.3);
+  }
+  .lock-date{
+    font-size:12px;color:rgba(255,255,255,.4);
+    font-family:'Share Tech Mono',monospace;margin-bottom:30px;
+  }
+  .lock-notif{
+    width:260px;background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.1);border-radius:12px;
+    padding:10px 14px;margin-bottom:8px;
+  }
+  .lock-notif-app{font-size:9px;color:rgba(255,255,255,.4);margin-bottom:3px;}
+  .lock-notif-txt{font-size:10px;color:rgba(255,255,255,.8);line-height:1.4;}
+  .lock-hint{
+    margin-top:20px;font-size:10px;color:rgba(255,255,255,.25);
+    font-family:'Share Tech Mono',monospace;
+  }
+
+  /* PIN SCREEN */
+  #screen-pin{
+    position:absolute;inset:0;z-index:51;
+    background:linear-gradient(160deg,#050510,#000);
+    display:none;flex-direction:column;align-items:center;
+    padding-top:60px;
+  }
+  #screen-pin.on{display:flex;}
+  .pin-title{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:20px;}
+  .pin-dots{display:flex;gap:14px;margin-bottom:30px;}
+  .pin-dot{
+    width:14px;height:14px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.3);
+    background:transparent;transition:background .15s;
+  }
+  .pin-dot.filled{background:#fff;border-color:#fff;}
+  .pin-dot.error{border-color:#ff4444;background:#ff4444;}
+  .pin-error{font-size:10px;color:#ff4444;height:14px;margin-bottom:8px;}
+  .pin-keypad{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+    width:220px;
+  }
+  .pin-key{
+    height:52px;background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.1);border-radius:50%;
+    color:#fff;font-size:18px;font-family:'VT323',monospace;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:background .1s;
+    user-select:none;
+  }
+  .pin-key:active,.pin-key:hover{background:rgba(255,255,255,.18);}
+  .pin-key.del{font-size:13px;color:rgba(255,255,255,.6);}
+  .pin-key.empty{background:transparent;border:none;cursor:default;}
+
+  /* ══ HOME SCREEN ══ */
+  #screen-home{
+    position:absolute;inset:0;z-index:10;
+    background:linear-gradient(160deg,#05050f 0%,#000 50%,#050508 100%);
+    display:none;flex-direction:column;
+  }
+  #screen-home.on{display:flex;}
+  .home-wallpaper{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse at 20% 30%,rgba(30,0,60,.4),transparent 50%),
+      radial-gradient(ellipse at 80% 70%,rgba(0,20,60,.3),transparent 50%);
+    pointer-events:none;
+  }
+  .home-top{
+    padding:28px 16px 8px;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .home-time{
+    font-size:42px;font-family:'VT323',monospace;color:#fff;
+    text-shadow:0 0 16px rgba(100,100,255,.3);
+  }
+  .home-date{font-size:10px;color:rgba(255,255,255,.35);}
+
+  /* Notificações mini */
+  .home-notif-bar{
+    display:flex;gap:6px;padding:4px 16px;justify-content:center;flex-wrap:wrap;
+  }
+  .home-notif-badge{
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+    border-radius:20px;padding:2px 8px;font-size:8px;color:rgba(255,255,255,.5);
+    cursor:pointer;
+  }
+  .home-notif-badge.unread{
+    background:rgba(80,0,160,.3);border-color:rgba(120,40,220,.4);
+    color:rgba(200,160,255,.8);
+  }
+
+  /* App icons grid */
+  .app-grid{
+    flex:1;display:grid;grid-template-columns:repeat(4,1fr);
+    gap:12px;padding:12px 14px;align-content:start;margin-top:4px;
+  }
+  .app-icon{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    cursor:pointer;
+  }
+  .app-icon-img{
+    width:52px;height:52px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+    box-shadow:0 4px 12px rgba(0,0,0,.6);
+    position:relative;overflow:hidden;
+  }
+  .app-icon-img::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);
+    border-radius:14px;
+  }
+  .app-badge{
+    position:absolute;top:-4px;right:-4px;
+    background:#ff3b30;color:#fff;font-size:8px;
+    width:16px;height:16px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:1.5px solid #000;font-family:'Share Tech Mono',monospace;
+    z-index:2;
+  }
+  .app-icon-lbl{font-size:8.5px;color:rgba(255,255,255,.75);text-align:center;line-height:1.2;}
+
+  /* Dock */
+  .home-dock{
+    margin:0 14px 10px;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:20px;padding:8px;
+    display:flex;justify-content:space-around;
+  }
+
+  /* ══ APP SCREEN (base) ══ */
+  .app-screen{
+    position:absolute;inset:0;z-index:20;
+    display:none;flex-direction:column;
+    background:#0a0a0a;
+    transform:translateX(100%);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
+  }
+  .app-screen.on{display:flex;transform:translateX(0);}
+  .app-header{
+    height:52px;flex-shrink:0;
+    display:flex;align-items:center;padding:0 14px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+    gap:10px;
+  }
+  .app-back{
+    font-size:18px;color:rgba(255,255,255,.6);cursor:pointer;
+    padding:4px;
+  }
+  .app-back:hover{color:#fff;}
+  .app-title{font-size:14px;color:#fff;flex:1;}
+  .app-body{flex:1;overflow-y:auto;padding:12px;}
+  .app-body::-webkit-scrollbar{width:0;}
+
+  /* ══ MENSAGENS ══ */
+  #app-msgs .app-header{background:linear-gradient(135deg,#1a0030,#0a0020);}
+  .msg-contact{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);
+    cursor:pointer;
+  }
+  .msg-contact:hover{background:rgba(255,255,255,.04);}
+  .msg-avatar{
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(135deg,#3d0060,#1a0040);
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;flex-shrink:0;border:1px solid rgba(255,255,255,.1);
+    position:relative;
+  }
+  .msg-avatar-dot{
+    position:absolute;bottom:1px;right:1px;
+    width:9px;height:9px;border-radius:50%;
+    background:#44ff44;border:1.5px solid #0a0a0a;
+  }
+  .msg-info{flex:1;}
+  .msg-name{font-size:11px;color:#fff;margin-bottom:2px;}
+  .msg-preview{font-size:9.5px;color:rgba(255,255,255,.35);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
+  .msg-meta{font-size:8.5px;color:rgba(255,255,255,.25);text-align:right;}
+  .msg-unread-dot{
+    width:8px;height:8px;border-radius:50%;background:#7b2fff;
+    margin-top:4px;margin-left:auto;
+  }
+
+  /* Chat window */
+  #chat-screen{
+    position:absolute;inset:0;z-index:30;
+    background:#070710;display:none;flex-direction:column;
+  }
+  #chat-screen.on{display:flex;}
+  .chat-header{
+    height:56px;flex-shrink:0;padding:0 12px;
+    background:linear-gradient(135deg,#1a0030,#0a0020);
+    display:flex;align-items:center;gap:10px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+  .chat-messages::-webkit-scrollbar{width:0;}
+  .chat-bubble{
+    max-width:200px;padding:8px 12px;border-radius:16px;
+    font-size:10px;line-height:1.5;
+  }
+  .chat-bubble.them{
+    background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);
+    border-bottom-left-radius:4px;align-self:flex-start;
+  }
+  .chat-bubble.me{
+    background:linear-gradient(135deg,#5500aa,#3300aa);color:#fff;
+    border-bottom-right-radius:4px;align-self:flex-end;
+  }
+  .chat-time{font-size:8px;color:rgba(255,255,255,.25);text-align:center;margin:4px 0;}
+  .chat-input-row{
+    height:50px;flex-shrink:0;padding:8px 12px;
+    background:rgba(0,0,0,.8);border-top:1px solid rgba(255,255,255,.07);
+    display:flex;align-items:center;gap:8px;
+  }
+  .chat-input{
+    flex:1;height:32px;background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.1);border-radius:16px;
+    color:#fff;font-size:10px;font-family:'Share Tech Mono',monospace;
+    padding:0 12px;outline:none;
+  }
+  .chat-send{
+    width:32px;height:32px;border-radius:50%;
+    background:linear-gradient(135deg,#5500aa,#3300aa);
+    border:none;color:#fff;font-size:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* ══ CHAMADAS ══ */
+  #app-calls .app-header{background:linear-gradient(135deg,#001a10,#000a08);}
+  .call-item{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);
+  }
+  .call-icon{font-size:18px;width:36px;text-align:center;}
+  .call-info{flex:1;}
+  .call-name{font-size:11px;color:#fff;margin-bottom:2px;}
+  .call-detail{font-size:9px;color:rgba(255,255,255,.3);}
+  .call-time{font-size:8.5px;color:rgba(255,255,255,.25);}
+
+  /* ══ GALERIA ══ */
+  #app-gallery .app-header{background:linear-gradient(135deg,#001020,#000810);}
+  .gallery-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+    padding:2px;
+  }
+  .gallery-thumb{
+    aspect-ratio:1;background:rgba(255,255,255,.06);
+    border-radius:4px;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;overflow:hidden;font-size:24px;
+    position:relative;
+  }
+  .gallery-thumb img{width:100%;height:100%;object-fit:cover;}
+  .gallery-thumb-lbl{
+    position:absolute;bottom:0;left:0;right:0;
+    background:rgba(0,0,0,.6);font-size:7px;
+    color:rgba(255,255,255,.7);padding:2px 4px;
+    font-family:'Share Tech Mono',monospace;
+  }
+
+  /* ══ NOTAS ══ */
+  #app-notes .app-header{background:linear-gradient(135deg,#1a1000,#0a0800);}
+  .note-item{
+    background:rgba(255,200,50,.05);border:1px solid rgba(255,200,50,.1);
+    border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;
+  }
+  .note-item:hover{background:rgba(255,200,50,.08);}
+  .note-title{font-size:11px;color:rgba(255,200,50,.9);margin-bottom:4px;}
+  .note-preview{font-size:9px;color:rgba(255,255,255,.35);line-height:1.4;}
+  .note-date{font-size:8px;color:rgba(255,255,255,.2);margin-top:4px;}
+
+  /* ══ ENDERMAIL MOBILE ══ */
+  #app-endermail .app-header{background:linear-gradient(135deg,#0a001a,#150030);}
+  .em-item{
+    display:flex;gap:10px;padding:10px 14px;
+    border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;
+  }
+  .em-item:hover{background:rgba(255,255,255,.03);}
+  .em-avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,#3d0060,#1a0040);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;flex-shrink:0;border:1px solid rgba(255,255,255,.1);
+  }
+  .em-info{flex:1;min-width:0;}
+  .em-from{font-size:11px;color:#fff;margin-bottom:2px;}
+  .em-subject{font-size:10px;color:rgba(255,255,255,.5);margin-bottom:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .em-preview{font-size:8.5px;color:rgba(255,255,255,.25);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .em-meta{font-size:8px;color:rgba(255,255,255,.2);text-align:right;flex-shrink:0;}
+  .em-unread .em-from{color:#cc88ff;}
+  .em-unread .em-subject{color:rgba(200,160,255,.7);}
+  .em-dot{width:7px;height:7px;border-radius:50%;background:#7b2fff;margin-top:6px;flex-shrink:0;}
+
+  /* Email reader */
+  #email-reader{
+    position:absolute;inset:0;z-index:35;
+    background:#070710;display:none;flex-direction:column;
+  }
+  #email-reader.on{display:flex;}
+  .email-reader-header{
+    padding:14px;background:linear-gradient(135deg,#0a001a,#150030);
+    border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .email-reader-subject{font-size:13px;color:#fff;margin-bottom:6px;}
+  .email-reader-meta{font-size:9px;color:rgba(255,255,255,.35);line-height:1.5;}
+  .email-reader-body{
+    flex:1;overflow-y:auto;padding:14px;
+    font-size:10.5px;color:rgba(255,255,255,.75);line-height:1.7;
+  }
+  .email-reader-body::-webkit-scrollbar{width:0;}
+  .email-reader-body p{margin-bottom:10px;}
+
+  /* ══ ANIMAÇÕES ══ */
+  @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+  .shake{animation:shake .4s ease;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="phone-side-btn"></div>
+  <div class="screen" id="main-screen">
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <span class="status-time" id="status-time">00:00</span>
+      <div class="status-icons">
+        <span id="status-notif" style="display:none;color:#cc88ff;">●</span>
+        <span>📶</span>
+        <span>🔋</span>
+      </div>
+    </div>
+
+    <!-- ══ LOCK SCREEN ══ -->
+    <div id="screen-lock" onclick="showPin()">
+      <div class="lock-logo">SYSCORP</div>
+      <div class="lock-time" id="lock-time">00:00</div>
+      <div class="lock-date" id="lock-date">—</div>
+
+      <div class="lock-notif">
+        <div class="lock-notif-app">💬 Kael · 5/9/2024 · 17:00</div>
+        <div class="lock-notif-txt">Foxy… desculpa. Não tenho muito tempo…</div>
+      </div>
+      <div class="lock-notif">
+        <div class="lock-notif-app">📞 5 chamadas perdidas · Kael · 17:00</div>
+        <div class="lock-notif-txt">Kael tentou ligar 5 vezes</div>
+      </div>
+
+      <div class="lock-hint">Toca para desbloquear</div>
+    </div>
+
+    <!-- ══ PIN SCREEN ══ -->
+    <div id="screen-pin">
+      <div class="pin-title">Introduz o PIN</div>
+      <div class="pin-dots">
+        <div class="pin-dot" id="d0"></div>
+        <div class="pin-dot" id="d1"></div>
+        <div class="pin-dot" id="d2"></div>
+        <div class="pin-dot" id="d3"></div>
+      </div>
+      <div class="pin-error" id="pin-error"></div>
+      <div class="pin-keypad">
+        <div class="pin-key" onclick="pinKey('1')">1</div>
+        <div class="pin-key" onclick="pinKey('2')">2</div>
+        <div class="pin-key" onclick="pinKey('3')">3</div>
+        <div class="pin-key" onclick="pinKey('4')">4</div>
+        <div class="pin-key" onclick="pinKey('5')">5</div>
+        <div class="pin-key" onclick="pinKey('6')">6</div>
+        <div class="pin-key" onclick="pinKey('7')">7</div>
+        <div class="pin-key" onclick="pinKey('8')">8</div>
+        <div class="pin-key" onclick="pinKey('9')">9</div>
+        <div class="pin-key empty"></div>
+        <div class="pin-key" onclick="pinKey('0')">0</div>
+        <div class="pin-key del" onclick="pinDel()">⌫</div>
+      </div>
+    </div>
+
+    <!-- ══ HOME SCREEN ══ -->
+    <div id="screen-home">
+      <div class="home-wallpaper"></div>
+      <div class="home-top">
+        <div class="home-time" id="home-time">00:00</div>
+        <div class="home-date" id="home-date">—</div>
+      </div>
+
+      <div class="home-notif-bar">
+        <div class="home-notif-badge unread" onclick="openApp('endermail')">✉ 2 novos</div>
+        <div class="home-notif-badge unread" onclick="openApp('calls')">📞 1 perdida</div>
+      </div>
+
+      <!-- App grid -->
+      <div class="app-grid">
+
+        <div class="app-icon" onclick="openApp('msgs')">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#5500aa,#2200aa);">
+            💬
+            <div class="app-badge">2</div>
+          </div>
+          <span class="app-icon-lbl">Mensagens</span>
+        </div>
+
+        <div class="app-icon" onclick="openApp('calls')">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#004400,#002200);">
+            📞
+            <div class="app-badge">1</div>
+          </div>
+          <span class="app-icon-lbl">Chamadas</span>
+        </div>
+
+        <div class="app-icon" onclick="openApp('gallery')">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#001a40,#000d20);">
+            🖼
+          </div>
+          <span class="app-icon-lbl">Galeria</span>
+        </div>
+
+        <div class="app-icon" onclick="openApp('notes')">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#2a1800,#140c00);">
+            📝
+          </div>
+          <span class="app-icon-lbl">Notas</span>
+        </div>
+
+        <div class="app-icon" onclick="openApp('endermail')">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#1a0030,#0a0018);">
+            ✉
+            <div class="app-badge">2</div>
+          </div>
+          <span class="app-icon-lbl">EnderMail</span>
+        </div>
+
+        <div class="app-icon">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#0a0a0a,#050505);opacity:.4;">
+            ⚙
+          </div>
+          <span class="app-icon-lbl" style="opacity:.4;">Definições</span>
+        </div>
+
+        <div class="app-icon">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#0a0a0a,#050505);opacity:.4;">
+            📷
+          </div>
+          <span class="app-icon-lbl" style="opacity:.4;">Câmara</span>
+        </div>
+
+        <div class="app-icon">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#0a0a0a,#050505);opacity:.4;">
+            🌐
+          </div>
+          <span class="app-icon-lbl" style="opacity:.4;">Browser</span>
+        </div>
+
+      </div>
+
+      <!-- Dock -->
+      <div class="home-dock">
+        <div class="app-icon" onclick="openApp('msgs')" style="gap:2px;">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#5500aa,#2200aa);width:46px;height:46px;border-radius:12px;font-size:20px;">💬</div>
+        </div>
+        <div class="app-icon" onclick="openApp('calls')" style="gap:2px;">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#004400,#002200);width:46px;height:46px;border-radius:12px;font-size:20px;">📞</div>
+        </div>
+        <div class="app-icon" onclick="openApp('endermail')" style="gap:2px;">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#1a0030,#0a0018);width:46px;height:46px;border-radius:12px;font-size:20px;">✉</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ APP: MENSAGENS ══ -->
+    <div class="app-screen" id="app-msgs">
+      <div class="app-header">
+        <span class="app-back" onclick="closeApp('msgs')">‹</span>
+        <span class="app-title">💬 Mensagens</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;">
+        <div class="msg-contact" onclick="openChat('kael')">
+          <div class="msg-avatar">
+            K
+            <div class="msg-avatar-dot"></div>
+          </div>
+          <div class="msg-info">
+            <div class="msg-name">Kael</div>
+            <div class="msg-preview" style="color:#ff8888;">Adeus, Foxy.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <div class="msg-meta" style="color:#ff8888;">17:00</div>
+            <div class="msg-unread-dot"></div>
+          </div>
+        </div>
+        <div class="msg-contact" onclick="openChat('gavin')">
+          <div class="msg-avatar" style="background:linear-gradient(135deg,#003060,#001840);">G</div>
+          <div class="msg-info">
+            <div class="msg-name">Gavin</div>
+            <div class="msg-preview">ele está a ser mesmo desumilde</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <div class="msg-meta">12:00</div>
+            <div class="msg-unread-dot"></div>
+          </div>
+        </div>
+        <div class="msg-contact" onclick="openChat('gaybriel')">
+          <div class="msg-avatar" style="background:linear-gradient(135deg,#400020,#200010);">Gb</div>
+          <div class="msg-info">
+            <div class="msg-name">Gaybriel</div>
+            <div class="msg-preview">ok ent jogamos no dia 23</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <div class="msg-meta">21/8</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CHAT ══ -->
+    <div id="chat-screen">
+      <div class="chat-header">
+        <span class="app-back" onclick="closeChat()" style="font-size:20px;">‹</span>
+        <div class="msg-avatar" id="chat-avatar" style="width:34px;height:34px;font-size:12px;">K</div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:#fff;" id="chat-name">Kael</div>
+          <div style="font-size:8px;color:rgba(255,255,255,.35);">Online</div>
+        </div>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input-row">
+        <input class="chat-input" placeholder="Mensagem…" id="chat-input" readonly>
+        <button class="chat-send">➤</button>
+      </div>
+    </div>
+
+    <!-- ══ APP: CHAMADAS ══ -->
+    <div class="app-screen" id="app-calls">
+      <div class="app-header">
+        <span class="app-back" onclick="closeApp('calls')">‹</span>
+        <span class="app-title">📞 Chamadas</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;">
+        <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 14px;border-bottom:1px solid rgba(255,255,255,.05);">5 de Setembro de 2024</div>
+        <div class="call-item" style="background:rgba(255,50,50,.05);">
+          <div class="call-icon" style="color:#ff4444;">📞</div>
+          <div class="call-info">
+            <div class="call-name" style="color:#ff8888;">Kael</div>
+            <div class="call-detail" style="color:#ff4444;">5 chamadas não atendidas</div>
+          </div>
+          <div class="call-time" style="color:#ff4444;">17:00</div>
+        </div>
+        <div style="font-size:8px;color:rgba(255,255,255,.2);padding:6px 14px;border-bottom:1px solid rgba(255,255,255,.05);">Agosto de 2024</div>
+        <div class="call-item">
+          <div class="call-icon" style="color:#ff4444;">📞</div>
+          <div class="call-info">
+            <div class="call-name">Gavin</div>
+            <div class="call-detail" style="color:#ff4444;">Chamada perdida</div>
+          </div>
+          <div class="call-time">23/8 · 11:47</div>
+        </div>
+        <div class="call-item">
+          <div class="call-icon" style="color:#44ff44;">📞</div>
+          <div class="call-info">
+            <div class="call-name">Kael</div>
+            <div class="call-detail" style="color:rgba(255,255,255,.3);">Chamada · 14m 32s</div>
+          </div>
+          <div class="call-time">22/8 · 20:15</div>
+        </div>
+        <div class="call-item">
+          <div class="call-icon" style="color:#44ff44;">📞</div>
+          <div class="call-info">
+            <div class="call-name">Gaybriel</div>
+            <div class="call-detail" style="color:rgba(255,255,255,.3);">Chamada · 3m 10s</div>
+          </div>
+          <div class="call-time">21/8 · 18:00</div>
+        </div>
+        <div class="call-item">
+          <div class="call-icon" style="color:#ff4444;">📞</div>
+          <div class="call-info">
+            <div class="call-name">Kael</div>
+            <div class="call-detail" style="color:#ff4444;">Chamada perdida</div>
+          </div>
+          <div class="call-time">20/8 · 03:22</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ APP: GALERIA ══ -->
+    <div class="app-screen" id="app-gallery">
+      <div class="app-header">
+        <span class="app-back" onclick="closeApp('gallery')">‹</span>
+        <span class="app-title">🖼 Galeria</span>
+      </div>
+      <div class="app-body" style="padding:6px;">
+        <div style="font-size:9px;color:rgba(255,255,255,.25);padding:4px 6px 8px;">Agosto 2024</div>
+        <div class="gallery-grid">
+          <div class="gallery-thumb" onclick="viewImg('foto_codigo.jpg','???')">
+            <img src="foto_codigo.jpg" onerror="this.style.display='none';this.parentElement.querySelector('.thumb-icon0').style.display='flex'">
+            <div class="thumb-icon0" style="display:none;font-size:22px;align-items:center;justify-content:center;width:100%;height:100%;background:#111;flex-direction:column;gap:2px;">
+              <span style="font-size:10px;color:#44ff44;font-family:monospace;">8187</span>
+            </div>
+            <div class="gallery-thumb-lbl">foto_codigo.jpg</div>
+          </div>
+          <div class="gallery-thumb" onclick="viewImg('casaM.jpg','Casa MC')">
+            <img src="casaM.jpg" onerror="this.style.display='none';this.parentElement.querySelector('.thumb-icon').style.display='flex'">
+            <div class="thumb-icon" style="display:none;font-size:22px;align-items:center;justify-content:center;width:100%;height:100%;">🏠</div>
+            <div class="gallery-thumb-lbl">casaM.jpg</div>
+          </div>
+          <div class="gallery-thumb" onclick="viewImg('casaMC.jpg','Casa Minecraft')">
+            <img src="casaMC.jpg" onerror="this.style.display='none';this.parentElement.querySelector('.thumb-icon2').style.display='flex'">
+            <div class="thumb-icon2" style="display:none;font-size:22px;align-items:center;justify-content:center;width:100%;height:100%;">🏡</div>
+            <div class="gallery-thumb-lbl">casaMC.jpg</div>
+          </div>
+          <div class="gallery-thumb" onclick="viewImg('Parabéns.jpg','Parabéns')">
+            <img src="Parabéns.jpg" onerror="this.style.display='none';this.parentElement.querySelector('.thumb-icon3').style.display='flex'">
+            <div class="thumb-icon3" style="display:none;font-size:22px;align-items:center;justify-content:center;width:100%;height:100%;">🎉</div>
+            <div class="gallery-thumb-lbl">Parabéns.jpg</div>
+          </div>
+        </div>
+        <!-- IMG VIEWER -->
+        <div id="img-viewer" style="display:none;position:fixed;inset:0;background:#000;z-index:100;flex-direction:column;">
+          <div style="padding:12px;display:flex;align-items:center;gap:10px;background:#0a0a0a;">
+            <span style="color:#fff;font-size:20px;cursor:pointer;" onclick="document.getElementById('img-viewer').style.display='none'">‹</span>
+            <span id="img-viewer-name" style="font-size:11px;color:rgba(255,255,255,.6);">—</span>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px;">
+            <img id="img-viewer-img" src="" style="max-width:100%;max-height:100%;border-radius:8px;"
+              onerror="this.style.display='none';document.getElementById('img-viewer-err').style.display='flex'">
+            <div id="img-viewer-err" style="display:none;color:rgba(255,255,255,.2);font-size:10px;text-align:center;">[Imagem não encontrada]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ APP: NOTAS ══ -->
+    <div class="app-screen" id="app-notes">
+      <div class="app-header">
+        <span class="app-back" onclick="closeApp('notes')">‹</span>
+        <span class="app-title">📝 Notas</span>
+      </div>
+      <div class="app-body">
+        <div class="note-item">
+          <div class="note-title">Canal — ideias</div>
+          <div class="note-preview">Criar canal Foxy'Studio. Ensinar a fazer jogos. Começar com tutoriais simples…</div>
+          <div class="note-date">22/08/2024</div>
+        </div>
+        <div class="note-item">
+          <div class="note-title">Aniversário Kael</div>
+          <div class="note-preview">Park onde nos conhecemos. 13 dias + 1 mês. Algumas árvores ainda queimadas mas ok.</div>
+          <div class="note-date">18/07/2024</div>
+        </div>
+        <div class="note-item">
+          <div class="note-title">Minecraft — planos</div>
+          <div class="note-preview">Construir casa com Kael, Gavin e Gaybriel. Mundo próprio. Jogar dia 23.</div>
+          <div class="note-date">21/08/2024</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ APP: ENDERMAIL MOBILE ══ -->
+    <div class="app-screen" id="app-endermail">
+      <div class="app-header">
+        <span class="app-back" onclick="closeApp('endermail')">‹</span>
+        <span class="app-title">✉ EnderMail</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;" id="em-list">
+        <!-- emails gerados por JS -->
+      </div>
+    </div>
+
+    <!-- EMAIL READER -->
+    <div id="email-reader">
+      <div class="chat-header" style="background:linear-gradient(135deg,#0a001a,#150030);">
+        <span class="app-back" onclick="closeEmailReader()" style="font-size:20px;">‹</span>
+        <span style="font-size:12px;color:#fff;">EnderMail</span>
+      </div>
+      <div class="email-reader-header">
+        <div class="email-reader-subject" id="er-subject">—</div>
+        <div class="email-reader-meta">
+          <span id="er-from"></span> · <span id="er-date"></span>
+        </div>
+      </div>
+      <div class="email-reader-body" id="er-body"></div>
+    </div>
+
+  </div><!-- /screen -->
+</div><!-- /phone -->
+
+<script>
+// ══ RELÓGIO ══
+function updateClock(){
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const t = h+':'+m;
+  const days = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const d = days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()];
+  document.getElementById('status-time').textContent = t;
+  document.getElementById('lock-time').textContent = t;
+  document.getElementById('home-time').textContent = t;
+  document.getElementById('lock-date').textContent = d;
+  document.getElementById('home-date').textContent = d;
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// ══ PIN ══
+const PIN = '1887';
+let pinInput = '';
+
+function showPin(){
+  document.getElementById('screen-lock').style.display = 'none';
+  document.getElementById('screen-pin').classList.add('on');
+  pinInput = '';
+  updateDots();
+}
+
+function pinKey(k){
+  if(pinInput.length >= 4) return;
+  pinInput += k;
+  updateDots();
+  if(pinInput.length === 4) setTimeout(checkPin, 150);
+}
+
+function pinDel(){
+  pinInput = pinInput.slice(0,-1);
+  updateDots();
+  document.getElementById('pin-error').textContent = '';
+}
+
+function updateDots(){
+  for(let i=0;i<4;i++){
+    const d = document.getElementById('d'+i);
+    d.classList.toggle('filled', i < pinInput.length);
+    d.classList.remove('error');
+  }
+}
+
+function checkPin(){
+  if(pinInput === PIN){
+    document.getElementById('screen-pin').classList.remove('on');
+    document.getElementById('screen-home').classList.add('on');
+  } else {
+    for(let i=0;i<4;i++) document.getElementById('d'+i).classList.add('error');
+    document.getElementById('pin-error').textContent = 'PIN incorreto';
+    document.querySelector('.pin-keypad').classList.add('shake');
+    setTimeout(()=>{
+      document.querySelector('.pin-keypad').classList.remove('shake');
+      pinInput=''; updateDots();
+      document.getElementById('pin-error').textContent='';
+    }, 600);
+  }
+}
+
+// ══ APPS ══
+function openApp(name){
+  document.getElementById('app-'+name).classList.add('on');
+  if(name==='endermail') renderEmails();
+}
+function closeApp(name){
+  document.getElementById('app-'+name).classList.remove('on');
+}
+
+// ══ CHAT ══
+const CHATS = {
+  kael: {
+    name:'Kael', avatar:'K',
+    color:'linear-gradient(135deg,#3d0060,#1a0040)',
+    msgs:[
+      {me:false, text:'Oi Foxy, queres jogar?', time:'10:35'},
+      {me:true, text:'Claro! Chamas o Gavin e o Gaybriel?', time:'10:37'},
+      {me:false, text:'Já chamei! Espera só um sec', time:'10:38'},
+      {me:false, text:'Oi Foxy, não sei se ainda estás acordado… mas adorei o jogo hoje 🙂', time:'23:00'},
+      {me:false, text:'Desculpa por ter ficado quase o dia todo no Life. Prometo que amanhã vou compensar.', time:'23:01'},
+      {me:false, text:'Preciso falar contigo sobre uma coisa… mas deixa para o dia 25. Boa noite.', time:'23:02'},
+      {sep:true, label:'5 de Setembro de 2024'},
+      {me:false, text:'Foxy, vou fazer o tratamento hoje. Os médicos avisaram que é arriscado mas é a única opção que temos.', time:'16:50'},
+      {me:false, text:'Se correr mal… sabe que foste o melhor amigo que eu podia ter tido. Obrigado por tudo.', time:'16:50'},
+      {me:false, text:'Foxy… desculpa. Não tenho muito tempo. Eu arrisquei fazer o exame, mas os médicos disseram que, por causa do tratamento, o meu cancro espalhou-se muito rápido. Agora vão tentar um procedimento de emergência… mas disseram que tem poucas chances de dar certo.', time:'17:00'},
+      {me:false, text:'Antes que seja tarde… eu preciso te pedir uma coisa. Tu és o meu melhor amigo. Por isso eu quero deixar o meu jogo contigo. Por favor, guarda ele. Foi a coisa à qual eu dediquei a minha vida inteira. Eu sei que tu vais cuidar dele… e sei que és o único capaz de compreender o que eu criei.', time:'17:00'},
+      {me:false, text:'Adeus, Foxy.', time:'17:00'},
+    ]
+  },
+  gavin: {
+    name:'Gavin', avatar:'G',
+    color:'linear-gradient(135deg,#003060,#001840)',
+    msgs:[
+      {me:false, text:'Onde é que o Kael está? Já são 3 horas a jogar e nada dele aparecer.', time:'12:00'},
+      {me:false, text:'Sinceramente tá a ser desumilde. Só pensa no "Life".', time:'12:01'},
+      {me:true, text:'Ele deve estar ocupado, dá-lhe tempo…', time:'12:05'},
+      {me:false, text:'Já começa a irritar. Até estou do lado do Gaybriel nisso.', time:'12:06'},
+    ]
+  },
+  gaybriel: {
+    name:'Gaybriel', avatar:'Gb',
+    color:'linear-gradient(135deg,#400020,#200010)',
+    msgs:[
+      {me:false, text:'O Kael já me comprou o jogo e o Gavin também já instalou', time:'21/8'},
+      {me:false, text:'Jogamos no dia 23 porque amanhã tenho torneio de futebol', time:'21/8'},
+      {me:true, text:'Ok combinado 👍', time:'21/8'},
+      {me:false, text:'Mais uma cena — o Kael tá em tua casa até que dia?', time:'21/8'},
+    ]
+  }
+};
+
+function openChat(id){
+  const c = CHATS[id];
+  document.getElementById('chat-name').textContent = c.name;
+  document.getElementById('chat-avatar').textContent = c.avatar;
+  document.getElementById('chat-avatar').style.background = c.color;
+  const box = document.getElementById('chat-messages');
+  box.innerHTML = '';
+  c.msgs.forEach(m=>{
+    if(m.sep){
+      const s = document.createElement('div');
+      s.className = 'chat-time';
+      s.textContent = m.label;
+      s.style.cssText='font-size:8px;color:rgba(255,255,255,.25);text-align:center;margin:10px 0 4px;padding:3px 10px;background:rgba(255,255,255,.05);border-radius:10px;display:inline-block;align-self:center;';
+      box.appendChild(s);
+      return;
+    }
+    const b = document.createElement('div');
+    b.className = 'chat-bubble '+(m.me?'me':'them');
+    b.textContent = m.text;
+    if(m.time){
+      const t = document.createElement('div');
+      t.style.cssText='font-size:7px;color:rgba(255,255,255,.25);margin-top:3px;text-align:'+(m.me?'right':'left');
+      t.textContent = m.time;
+      b.appendChild(t);
+    }
+    box.appendChild(b);
+  });
+  document.getElementById('chat-screen').classList.add('on');
+  setTimeout(()=>box.scrollTop = box.scrollHeight, 50);
+}
+
+function closeChat(){
+  document.getElementById('chat-screen').classList.remove('on');
+}
+
+// ══ GALERIA ══
+function viewImg(src, name){
+  const v = document.getElementById('img-viewer');
+  const img = document.getElementById('img-viewer-img');
+  const err = document.getElementById('img-viewer-err');
+  img.src = src; img.style.display='block'; err.style.display='none';
+  document.getElementById('img-viewer-name').textContent = name;
+  v.style.display = 'flex';
+}
+
+// ══ ENDERMAIL ══
+const EMAILS_MOBILE = [
+  {id:1, from:'UserFriend3000', date:'5/7/2024 · 3:00', subject:'Ajuda', unread:false, sent:false,
+   body:['Ajuda Foxy não consigo dormir, hoje é o dia do torneio. Será que vou conseguir tive a pensar no jogo que vou fazer em 5h. Pensei em fazer uma versão do jogo que tou a trabalhar o Life, só que uma versão (teste alfa), ainda não sei bem.','Bom mas mudando de assunto falta 13 dias e 1 mês para meu aniversário, vai ser naquele park onde nos conhecemos.','Bom me deseja sorte, tchau']},
+  {id:2, from:'UserFriend3000', date:'10/8/2024 · 10:35', subject:'Como estás foxy', unread:false, sent:false,
+   body:['Oi foxy, queres jogar alguma coisa ando cansado e não sei se ainda tenho muito tempo mas queres?','Se puderes chamar o Gaybriel e o Gavin agradecia gostaria muito!','Encontrei um jogo novo se chamada Minecraft podemos testar não?']},
+  {id:3, from:'Gaybriel', date:'21/8/2024', subject:'Minecraft', unread:false, sent:false,
+   body:['Olha, o Kael já me comprou o jogo e o Gavin também já instalou ent jogamos no dia 23 porque amanhã vou ter torneio de futebol ent não posso jogar.','Mais uma cena o Kael tá em tua casa até que dia?']},
+  {id:4, from:'Gavin', date:'20/8/2024 · 8:00', subject:'Finalmente Férias', unread:false, sent:false,
+   body:['Finalmente estamos de férias.','Sobre o que falámos ontem na escola… aquele jogo que disseste, o Minecraft, fui ver uns vídeos e até parece fixe.','O Gaybriel ainda está meio chateado com o Kael… diz que ele não fez o trabalho da escola porque estava ocupado a trabalhar no "projeto" dele no jogo.']},
+  {id:5, from:'Para Gavin', date:'20/8/2024 · 8:30', subject:'Serio', unread:false, sent:true,
+   body:['Ele ainda está chateado com isso? Já passou tempo suficiente… o Kael só estava focado no jogo dele.','Vou instalar o Minecraft hoje. O Kael disse que vai usar o dinheiro que ganhou no torneio.','Ele anda mesmo empenhado nesse "projeto". Disse que quer mostrar-nos quando estivermos todos online.']},
+  {id:6, from:'Kael', date:'23/8/2024 · 23:00', subject:'Boa noite', unread:false, sent:false,
+   body:['Oi Foxy, não sei se ainda estás acordado ou se já foste dormir, mas queria dizer que adorei o jogo.','Desculpa por ter ficado quase o dia todo a trabalhar no Life hoje. Prometo que amanhã vou compensar.','Ah… também preciso falar contigo sobre uma coisa do jogo. Mas talvez deixe isso para o dia 25.','Boa noite.']},
+  {id:7, from:'Gavin', date:'23/8/2024 · 12:00', subject:'Olha Foxy', unread:false, sent:false,
+   body:['Olha Foxy,','Pergunta ao Kael porque ele ainda não está aqui na call connosco. Já estamos a jogar há 3 horas e nada dele aparecer.','Sinceramente, ele está a ser mesmo desumilde ultimamente. Parece que anda a deixar toda a gente de lado só por causa do "Life".','Já começa a irritar um bocado.']},
+];
+
+function renderEmails(){
+  const list = document.getElementById('em-list');
+  list.innerHTML = '';
+  EMAILS_MOBILE.forEach(em=>{
+    const d = document.createElement('div');
+    d.className = 'em-item'+(em.unread?' em-unread':'');
+    d.innerHTML = `
+      <div class="em-avatar" style="${em.sent?'background:linear-gradient(135deg,#004080,#002040)':''}">${em.from[0]}</div>
+      <div class="em-info">
+        <div class="em-from" style="${em.sent?'color:rgba(100,180,255,.8)':''}">${em.from}</div>
+        <div class="em-subject">${em.subject}</div>
+        <div class="em-preview">${em.body[0]}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;">
+        <div class="em-meta">${em.date.split(' ')[0]}</div>
+        ${em.unread?'<div class="em-dot"></div>':''}
+      </div>`;
+    d.onclick = ()=>openEmail(em);
+    list.appendChild(d);
+  });
+}
+
+function openEmail(em){
+  document.getElementById('er-subject').textContent = em.subject;
+  document.getElementById('er-from').textContent = 'De: '+em.from;
+  document.getElementById('er-date').textContent = em.date;
+  const body = document.getElementById('er-body');
+  body.innerHTML = em.body.map(p=>`<p>${p}</p>`).join('');
+  document.getElementById('email-reader').classList.add('on');
+}
+
+function closeEmailReader(){
+  document.getElementById('email-reader').classList.remove('on');
+}
+</script>
+</body>
+</html>
