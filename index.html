@@ -640,7 +640,75 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 .news-status{height:16px;flex-shrink:0;background:#d4d0c8;border-top:1px solid #808080;
   font-size:8px;font-family:'Courier New',monospace;color:#333;padding:2px 6px;}
 
+/* ── GLITCH NEWS ── */
+#news-glitch-overlay{
+  position:absolute;inset:0;z-index:200;pointer-events:none;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0);
+}
+#news-glitch-overlay.on{display:flex;}
+.glitch-txt{
+  position:absolute;
+  font-family:'VT323',monospace;
+  color:#ff3333;
+  pointer-events:none;
+  text-shadow:2px 0 #00ffff,-2px 0 #ff00ff;
+  white-space:nowrap;
+  animation:glitchfade .18s ease forwards;
+}
+@keyframes glitchfade{
+  0%{opacity:1;transform:skewX(-8deg) scale(1.1);}
+  60%{opacity:.8;}
+  100%{opacity:0;transform:skewX(4deg) scale(.95);}
+}
+@keyframes newsflicker{
+  0%,100%{filter:brightness(1);}
+  10%{filter:brightness(3) hue-rotate(180deg) saturate(5);}
+  11%{filter:brightness(1);}
+  30%{filter:brightness(2) invert(1);}
+  31%{filter:brightness(1);}
+  55%{filter:brightness(4) hue-rotate(90deg);}
+  56%{filter:brightness(1);}
+  80%{filter:brightness(.3);}
+  81%{filter:brightness(1);}
+}
+.news-glitching{animation:newsflicker .6s ease !important;}
+
 /* ── LIFE PROJECT FULLSCREEN OVERLAY ── */
+/* ── GLITCH NEWS ── */
+#news-glitch-overlay{
+  position:absolute;inset:0;z-index:200;pointer-events:none;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0);
+}
+#news-glitch-overlay.on{display:flex;}
+.glitch-txt{
+  position:absolute;
+  font-family:'VT323',monospace;
+  color:#ff3333;
+  pointer-events:none;
+  text-shadow:2px 0 #00ffff,-2px 0 #ff00ff;
+  white-space:nowrap;
+  animation:glitchfade .18s ease forwards;
+}
+@keyframes glitchfade{
+  0%{opacity:1;transform:skewX(-8deg) scale(1.1);}
+  60%{opacity:.8;}
+  100%{opacity:0;transform:skewX(4deg) scale(.95);}
+}
+@keyframes newsflicker{
+  0%,100%{filter:brightness(1);}
+  10%{filter:brightness(3) hue-rotate(180deg) saturate(5);}
+  11%{filter:brightness(1);}
+  30%{filter:brightness(2) invert(1);}
+  31%{filter:brightness(1);}
+  55%{filter:brightness(4) hue-rotate(90deg);}
+  56%{filter:brightness(1);}
+  80%{filter:brightness(.3);}
+  81%{filter:brightness(1);}
+}
+.news-glitching{animation:newsflicker .6s ease !important;}
+
 /* ── LIFE PROJECT FULLSCREEN OVERLAY ── */
 #life-fs-overlay{
   display:none;position:fixed;inset:0;z-index:9999;background:#000;
@@ -1146,6 +1214,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 
             <!-- ══ NOTÍCIAS ══ -->
             <div id="win-news">
+              <div id="news-glitch-overlay"></div>
               <div class="news-tb">
                 <span class="news-tb-logo">📰 <b>SYSCORP</b> NEWS</span>
                 <button class="news-x" onclick="closeApp('news')">✕</button>
@@ -1246,6 +1315,7 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                   <div class="cfg-cat" onclick="cfgTab(this,'cfg-dev')">📱 Dispositivos</div>
                   <div class="cfg-cat" onclick="cfgTab(this,'cfg-sound')">🔊 Som</div>
                   <div class="cfg-cat" onclick="cfgTab(this,'cfg-sys')">💻 Sistema</div>
+                  <div class="cfg-cat" onclick="cfgTab(this,'cfg-console')">⌨ Consola</div>
                 </div>
                 <div class="cfg-right">
                   <!-- Aspeto -->
@@ -1290,6 +1360,23 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
                       <div>RAM: 65536 KB</div>
                       <div>Utilizador: <b>Foxy</b></div>
                       <div>Integridade: <b style="color:#884400;">73%</b></div>
+                    </div>
+                  </div>
+                  <!-- CONSOLA -->
+                  <div class="cfg-section" id="cfg-console">
+                    <div class="cfg-title">Consola do Computador</div>
+                    <div style="background:#000;border:1px solid #444;padding:6px;margin-bottom:6px;min-height:70px;font-family:'Courier New',monospace;font-size:8.5px;color:#33ff33;overflow-y:auto;max-height:90px;" id="console-output">
+                      <div>SYSCORP OS v2.1.3 — Consola de Sistema</div>
+                      <div>Digite um comando para continuar.</div>
+                      <div>&nbsp;</div>
+                    </div>
+                    <div style="display:flex;gap:4px;align-items:center;">
+                      <span style="font-size:9px;font-family:'Courier New',monospace;color:#33ff33;">C:\&gt;</span>
+                      <input id="console-input" type="text"
+                        style="flex:1;background:#000;border:1px solid #444;color:#33ff33;font-family:'Courier New',monospace;font-size:9px;padding:2px 5px;outline:none;"
+                        placeholder="comando..."
+                        onkeydown="if(event.key==='Enter')runConsole()">
+                      <button class="os-btn" onclick="runConsole()">OK</button>
                     </div>
                   </div>
                 </div>
@@ -1955,7 +2042,10 @@ function openApp(app){
   else if(app==='reg') document.getElementById('win-reg').classList.add('open');
   else if(app==='arq') document.getElementById('win-arq').classList.add('open');
   else if(app==='galeria') document.getElementById('win-galeria').classList.add('open');
-  else if(app==='news') document.getElementById('win-news').classList.add('open');
+  else if(app==='news'){
+    document.getElementById('win-news').classList.add('open');
+    triggerNewsGlitch();
+  }
   else if(app==='cfg') document.getElementById('win-cfg').classList.add('open');
   else if(app==='dados') document.getElementById('win-dados').classList.add('open');
   else if(app==='eliminados') document.getElementById('win-eliminados').classList.add('open');
@@ -2328,6 +2418,92 @@ window.addEventListener('load', ()=>{
     if(btn){ btn.textContent='■ STOP'; btn.onclick=function(){ audio.pause(); btn.textContent='▶ PLAY'; btn.onclick=startRadio; }; }
   }).catch(()=>{});
 });
+
+/* ── NEWS GLITCH ── */
+const GLITCH_MSGS = [
+  'Queres ajuda?',
+  'Porque me fazes isto?',
+  'Me deixa!',
+  '01001100 01101001 01110110 01110010 01100101'
+];
+
+function triggerNewsGlitch(){
+  const win = document.getElementById('win-news');
+  const overlay = document.getElementById('news-glitch-overlay');
+  let flashes = 0;
+  const maxFlashes = 6 + Math.floor(Math.random()*5);
+
+  function flash(){
+    if(flashes >= maxFlashes){ overlay.classList.remove('on'); return; }
+    // flicker the window
+    win.classList.add('news-glitching');
+    setTimeout(()=> win.classList.remove('news-glitching'), 600);
+
+    // spawn random text
+    overlay.classList.add('on');
+    const txt = document.createElement('div');
+    txt.className = 'glitch-txt';
+    txt.textContent = GLITCH_MSGS[Math.floor(Math.random()*GLITCH_MSGS.length)];
+    txt.style.fontSize = (16 + Math.random()*14)+'px';
+    txt.style.top = (15 + Math.random()*60)+'%';
+    txt.style.left = (5 + Math.random()*45)+'%';
+    txt.style.color = Math.random()>.5 ? '#ff3333' : '#00ffcc';
+    txt.style.textShadow = '2px 0 #00ffff,-2px 0 #ff00ff';
+    txt.style.fontWeight = 'bold';
+    txt.style.zIndex = '999';
+    overlay.appendChild(txt);
+    setTimeout(()=> txt.remove(), 500);
+
+    flashes++;
+    setTimeout(flash, 350 + Math.random()*400);
+  }
+  setTimeout(flash, 80);
+}
+
+/* ── CONSOLA ── */
+function runConsole(){
+  const inp = document.getElementById('console-input');
+  const out = document.getElementById('console-output');
+  const cmd = inp.value.trim();
+  inp.value = '';
+
+  const line = document.createElement('div');
+  line.textContent = 'C:\> ' + cmd;
+  out.appendChild(line);
+
+  let resp = '';
+  if(cmd.toLowerCase() === 'livre'){
+    resp = 'Acesso concedido. A abrir ficheiro…';
+    const r = document.createElement('div');
+    r.style.color = '#33ff33';
+    r.textContent = resp;
+    out.appendChild(r);
+    out.scrollTop = out.scrollHeight;
+    setTimeout(()=> window.open('Nunca.html','_blank'), 600);
+    return;
+  } else if(cmd === ''){
+    resp = '';
+  } else if(cmd.toLowerCase() === 'ajuda' || cmd.toLowerCase() === 'help'){
+    resp = 'Comandos disponíveis: ajuda, sistema, utilizador, limpar';
+  } else if(cmd.toLowerCase() === 'sistema'){
+    resp = 'SYSCORP OS v2.1.3 | Integridade: 73% | RAM: 65536 KB';
+  } else if(cmd.toLowerCase() === 'utilizador'){
+    resp = 'Utilizador atual: Foxy | Nível de acesso: 2';
+  } else if(cmd.toLowerCase() === 'limpar'){
+    out.innerHTML = '';
+    return;
+  } else {
+    resp = 'Comando não reconhecido: "' + cmd + '". Tenta "ajuda".';
+  }
+
+  if(resp){
+    const r = document.createElement('div');
+    r.style.color = '#aaffaa';
+    r.textContent = resp;
+    out.appendChild(r);
+  }
+  out.scrollTop = out.scrollHeight;
+}
 
 /* Glitch horror */
 setInterval(()=>{
