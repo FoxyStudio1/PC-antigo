@@ -570,6 +570,9 @@ body{display:flex;align-items:flex-end;justify-content:center;font-family:'Share
 .monitor-brand{font-size:9px;color:#252525;font-family:'Share Tech Mono',monospace;letter-spacing:3px;text-transform:uppercase;}
 .mon-controls{margin-left:auto;display:flex;align-items:center;gap:8px;}
 .adj-btn{width:6px;height:10px;background:linear-gradient(180deg,#2e2e2e,#1e1e1e);border:none;border-radius:1px;cursor:pointer;}
+.adj-btn:hover{background:linear-gradient(180deg,#444,#2a2a2a);}
+.adj-btn-mgr{width:6px;height:10px;background:linear-gradient(180deg,#2e2e2e,#1e1e1e);border:none;border-radius:1px;cursor:pointer;position:relative;}
+.adj-btn-mgr:hover{background:linear-gradient(180deg,#1a1a3a,#0a0a1a);box-shadow:0 0 4px rgba(80,80,255,.4);}
 #power-led{width:7px;height:7px;border-radius:50%;background:#2a0000;box-shadow:0 0 3px #440000;transition:all .6s;}
 #power-led.on{background:#00dd00;box-shadow:0 0 9px #00ff00,0 0 4px #00ff00;animation:ledp 3.5s ease-in-out infinite;}
 @keyframes ledp{0%,100%{opacity:1;}50%{opacity:.55;}}
@@ -1703,6 +1706,25 @@ Depois do torneio:
               <div class="win-status" id="vp-status">—</div>
             </div>
 
+            <!-- ══ MANAGER ══ -->
+            <div class="os-win" id="win-manager" style="top:2px;left:2px;width:584px;z-index:28;">
+              <div class="win-tb">
+                <span style="font-size:11px;margin-right:2px">⚙</span>
+                <span class="win-tb-title">Manager.html</span>
+                <button class="win-x" onclick="closeApp('manager')">✕</button>
+              </div>
+              <div style="background:#000;position:relative;height:316px;">
+                <iframe id="manager-iframe" src="" style="width:580px;height:316px;border:none;display:block;"></iframe>
+                <div id="manager-err" style="display:none;position:absolute;inset:0;background:#0a0a0a;
+                  color:#444;font-family:'Courier New',monospace;font-size:10px;
+                  align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;">
+                  <span style="font-size:18px;">⚙</span>
+                  <span>Manager.html não encontrado.<br>Coloca o ficheiro na mesma pasta que o index.html</span>
+                </div>
+              </div>
+              <div class="win-status">Manager · SYSCORP OS</div>
+            </div>
+
             <!-- MODAL SENHA -->
             <div id="modal-pass">
               <div class="modal-tb">
@@ -1755,7 +1777,7 @@ Depois do torneio:
       <span class="monitor-brand">SYSCORP</span>
       <div class="mon-controls">
         <button class="adj-btn"></button>
-        <button class="adj-btn"></button>
+        <button class="adj-btn-mgr" id="mgr-btn" onclick="openManager()" title="Manager"></button>
         <div id="power-led"></div>
         <button id="power-btn" onclick="doPower()"></button>
       </div>
@@ -2080,6 +2102,22 @@ document.addEventListener('fullscreenchange',()=>{
   }
 });
 
+function openManager(){
+  const w = document.getElementById('win-manager');
+  const ifr = document.getElementById('manager-iframe');
+  const err = document.getElementById('manager-err');
+  w.classList.add('open');
+  ifr.style.display = 'block';
+  err.style.display = 'none';
+  fetch('Manager.html')
+    .then(r=>{ if(!r.ok) throw new Error(); return r.text(); })
+    .then(html=>{
+      const blob = new Blob([html],{type:'text/html'});
+      ifr.src = URL.createObjectURL(blob);
+    })
+    .catch(()=>{ ifr.style.display='none'; err.style.display='flex'; });
+}
+
 function openLinkPage(e){
   e.preventDefault();
   window.open('link.html','_blank');
@@ -2126,6 +2164,10 @@ function closeApp(app){
   else if(app==='clips') document.getElementById('win-clips').classList.remove('open');
   else if(app==='discussao') document.getElementById('win-discussao').classList.remove('open');
   else if(app==='set2024') document.getElementById('win-set2024').classList.remove('open');
+  else if(app==='manager'){
+    document.getElementById('win-manager').classList.remove('open');
+    const ifr=document.getElementById('manager-iframe'); if(ifr) ifr.src='';
+  }
   else if(app==='lifegame'){ document.getElementById('win-lifegame').classList.remove('open');
     const ifr=document.getElementById('life-iframe'); if(ifr) ifr.src=ifr.src; }
 }
@@ -2256,7 +2298,7 @@ document.getElementById('s-desk').addEventListener('mousedown',e=>{
      !e.target.closest('#win-galeria')&&!e.target.closest('#win-foto')&&!e.target.closest('#win-privada')&&
      !e.target.closest('#win-kael')&&!e.target.closest('#win-fotos')&&!e.target.closest('#win-news')&&!e.target.closest('#win-set2024')&&
      !e.target.closest('#win-cfg')&&!e.target.closest('#win-clips')&&!e.target.closest('#win-discussao')&&
-     !e.target.closest('#win-dados')&&!e.target.closest('#win-videoplayer')&&!e.target.closest('#win-eliminados')&&!e.target.closest('#win-arqdados')&&!e.target.closest('#win-lifescript')&&!e.target.closest('#win-lifeproject')&&!e.target.closest('#win-imgview')&&!e.target.closest('#win-lifegame')&&
+     !e.target.closest('#win-dados')&&!e.target.closest('#win-videoplayer')&&!e.target.closest('#win-manager')&&!e.target.closest('#win-eliminados')&&!e.target.closest('#win-arqdados')&&!e.target.closest('#win-lifescript')&&!e.target.closest('#win-lifeproject')&&!e.target.closest('#win-imgview')&&!e.target.closest('#win-lifegame')&&
      !e.target.closest('#modal-pass'))
     document.querySelectorAll('.d-icon').forEach(i=>i.classList.remove('sel'));
 });

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSCORP_MANAGER</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(circle, #0a1a0a 0%, #000 80%);
+        }
+
+        .logo {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 120px;
+            color: #0f0;
+            margin-bottom: 40px;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            user-select: none;
+        }
+
+        .terminal-container {
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .input-line {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #0f0;
+            background: transparent;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 24px;
+            text-align: center;
+            padding: 10px 0;
+            outline: none;
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.1);
+        }
+
+        .input-line::placeholder {
+            color: rgba(0, 255, 0, 0.3);
+        }
+
+        .enter-btn {
+            margin-top: 30px;
+            background-color: transparent;
+            color: #0f0;
+            border: 2px solid #0f0;
+            padding: 10px 40px;
+            font-size: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .enter-btn:hover {
+            background-color: #0f0;
+            color: #000;
+            box-shadow: 0 0 20px #0f0;
+        }
+
+        .overlay-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            padding: 40px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 100;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        .script-line {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background-color: #0f0;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px 15px;
+            cursor: pointer;
+            background: transparent;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .close-btn:hover {
+            background: #0f0;
+            color: #000;
+        }
+
+        .choice-buttons {
+            margin-top: 30px;
+        }
+
+        .choice-btn {
+            background: transparent;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px 30px;
+            margin: 0 10px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .choice-btn:hover {
+            background: #0f0;
+            color: #000;
+        }
+
+        #error-msg {
+            color: #f00;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo" id="main-logo">S</div>
+
+    <div class="terminal-container" id="main-ui">
+        <input type="text" id="command-input" class="input-line" placeholder="SYSCORP_MANAGER" autofocus autocomplete="off">
+        <div id="error-msg">ERRO: COMANDO INVÁLIDO</div>
+        <br>
+        <button class="enter-btn" id="btn-enter">ENTER</button>
+    </div>
+
+    <div id="output-panel" class="overlay-panel">
+        <button class="close-btn" id="btn-close">FECHAR [X]</button>
+        <div id="output-content"></div>
+        <div id="choice-container" class="choice-buttons" style="display:none;">
+            <button class="choice-btn" id="btn-sim">SIM</button>
+            <button class="choice-btn" id="btn-nao">NÃO</button>
+        </div>
+        <span class="cursor" id="main-cursor"></span>
+    </div>
+
+    <script>
+        const input = document.getElementById('command-input');
+        const errorMsg = document.getElementById('error-msg');
+        const panel = document.getElementById('output-panel');
+        const content = document.getElementById('output-content');
+        const choiceContainer = document.getElementById('choice-container');
+        const cursor = document.getElementById('main-cursor');
+        const mainUI = document.getElementById('main-ui');
+        const mainLogo = document.getElementById('main-logo');
+
+        document.getElementById('btn-enter').addEventListener('click', processCommand);
+        document.getElementById('btn-close').addEventListener('click', closePanel);
+        document.getElementById('btn-sim').addEventListener('click', () => handleKaelChoice(true));
+        document.getElementById('btn-nao').addEventListener('click', () => handleKaelChoice(false));
+        
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                processCommand();
+            }
+        });
+
+        function processCommand() {
+            const cmd = input.value.trim().toLowerCase();
+            errorMsg.style.display = 'none';
+
+            if (cmd === 'antivirus') {
+                startScript([
+                    "> INICIALIZANDO SYSCORP_ANTIVIRUS_CORE...",
+                    "> ACEDENDO AO KERNEL DO SISTEMA...",
+                    "> [ERRO] MÓDULO DE ANTIVÍRUS NÃO ENCONTRADO.",
+                    "> POR FAVOR, INSIRA O SOFTWARE DE ANTIVÍRUS.",
+                    "------------------------------------------------",
+                    "THREATS DETECTED: 0",
+                    "WARNING: SYSTEM VULNERABLE. NO ANTIVIRUS INSTALLED.",
+                    "..."
+                ]);
+            } else if (cmd === 'ip') {
+                startScript(["IP DETECTADO: 0067188767"]);
+            } else if (cmd === 'atualizar') {
+                startScript(["A VERIFICAR ATUALIZAÇÕES...", "NENHUMA DISPONÍVEL"]);
+            } else if (cmd === 'kael') {
+                startKaelInteraction();
+            } else if (cmd === 'endermail' || cmd === 'ender') {
+                startScript([
+                    "> ACEDENDO AO ENDERMAIL SERVER...",
+                    "> LOGIN: ANONYMOUS_USER",
+                    "> STATUS: SEM CONTA DETECTADA",
+                    "------------------------------------------------",
+                    "CAIXA DE ENTRADA (0 MENSAGENS)",
+                    "------------------------------------------------",
+                    "> AVISO: O Endermail está a funcionar em modo de visualização.",
+                    "> Crie uma conta para enviar mensagens.",
+                    "..."
+                ]);
+            } else if (cmd !== "") {
+                errorMsg.style.display = 'block';
+                input.value = '';
+                setTimeout(() => {
+                    errorMsg.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        function closePanel() {
+            panel.style.display = 'none';
+            mainUI.style.display = 'block';
+            mainLogo.style.display = 'block';
+            content.innerHTML = '';
+            choiceContainer.style.display = 'none';
+            cursor.style.display = 'inline-block';
+            input.value = '';
+            input.focus();
+        }
+
+        function startScript(lines) {
+            panel.style.display = 'block';
+            mainUI.style.display = 'none';
+            mainLogo.style.display = 'none';
+            content.innerHTML = '';
+            
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'script-line';
+                    div.textContent = lines[i];
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 150);
+                }
+            }
+            addLine();
+        }
+
+        function startKaelInteraction() {
+            panel.style.display = 'block';
+            mainUI.style.display = 'none';
+            mainLogo.style.display = 'none';
+            content.innerHTML = '';
+            
+            const div = document.createElement('div');
+            div.className = 'script-line';
+            div.textContent = "DETETADA PASTA APAGADA: Antigo_kael. Deseja recuperar?";
+            content.appendChild(div);
+            
+            choiceContainer.style.display = 'block';
+            cursor.style.display = 'none';
+        }
+
+        function handleKaelChoice(wantsToRecover) {
+            choiceContainer.style.display = 'none';
+            const div = document.createElement('div');
+            div.className = 'script-line';
+            
+            if (wantsToRecover) {
+                div.textContent = "> A iniciar processo de recuperação...\n> AVISO: O sistema irá instalar em breve e ficará assim.";
+                content.appendChild(div);
+            } else {
+                closePanel();
+            }
+        }
+    </script>
+</body>
+</html>
