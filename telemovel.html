@@ -520,11 +520,11 @@
           <span class="app-icon-lbl" style="opacity:.4;">Definições</span>
         </div>
 
-        <div class="app-icon">
-          <div class="app-icon-img" style="background:linear-gradient(135deg,#0a0a0a,#050505);opacity:.4;">
-            📷
+        <div class="app-icon" onclick="openEmojiJump()">
+          <div class="app-icon-img" style="background:linear-gradient(135deg,#1a2200,#0a1100);position:relative;">
+            🐸
           </div>
-          <span class="app-icon-lbl" style="opacity:.4;">Câmara</span>
+          <span class="app-icon-lbl">Emoji Jump</span>
         </div>
 
         <div class="app-icon">
@@ -557,11 +557,19 @@
         <span class="app-title">💬 Mensagens</span>
       </div>
       <div style="flex:1;overflow-y:auto;">
-        <div class="msg-contact" onclick="openChat('kael')">
-          <div class="msg-avatar">
-            K
-            <div class="msg-avatar-dot"></div>
+        <div class="msg-contact" onclick="openChat('syscorp')" style="background:rgba(0,100,80,.07);border-bottom:1px solid rgba(0,255,180,.06);">
+          <div class="msg-avatar" style="background:linear-gradient(135deg,#003322,#001a11);font-size:11px;color:#00ffaa;border:1px solid rgba(0,255,150,.2);">⚙</div>
+          <div class="msg-info">
+            <div class="msg-name" style="color:#00ffaa;">SYSCORP_SYSTEM</div>
+            <div class="msg-preview">Novo Update disponível. Comandos…</div>
           </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <div class="msg-meta" style="color:#00ffaa;">agora</div>
+            <div class="msg-unread-dot" style="background:#00ffaa;"></div>
+          </div>
+        </div>
+        <div class="msg-contact" onclick="openChat('kael')">
+          <div class="msg-avatar" style="opacity:.6;">K</div>
           <div class="msg-info">
             <div class="msg-name">Kael</div>
             <div class="msg-preview" style="color:#ff8888;">Adeus, Foxy.</div>
@@ -602,13 +610,13 @@
         <div class="msg-avatar" id="chat-avatar" style="width:34px;height:34px;font-size:12px;">K</div>
         <div style="flex:1;">
           <div style="font-size:11px;color:#fff;" id="chat-name">Kael</div>
-          <div style="font-size:8px;color:rgba(255,255,255,.35);">Online</div>
+          <div style="font-size:8px;" id="chat-status">Online</div>
         </div>
       </div>
       <div class="chat-messages" id="chat-messages"></div>
       <div class="chat-input-row">
         <input class="chat-input" placeholder="Mensagem…" id="chat-input" readonly>
-        <button class="chat-send">➤</button>
+        <button class="chat-send" id="chat-send-btn">➤</button>
       </div>
     </div>
 
@@ -762,6 +770,52 @@
       <div class="email-reader-body" id="er-body"></div>
     </div>
 
+    <!-- EMOJI JUMP GAME -->
+    <div id="game-viewer" style="display:none;position:absolute;inset:0;z-index:98;
+      background:#000;flex-direction:column;">
+      <!-- Loading screen -->
+      <div id="game-loading" style="position:absolute;inset:0;background:#0a1100;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:2;">
+        <div style="font-size:48px;animation:bounce .7s ease-in-out infinite alternate;">🐸</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:14px;color:#88ff44;letter-spacing:2px;">EMOJI JUMP</div>
+        <div style="width:180px;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;">
+          <div id="game-progress" style="height:100%;width:0%;background:linear-gradient(90deg,#44ff00,#88ff44);
+            border-radius:3px;transition:width .1s linear;"></div>
+        </div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);font-family:'Share Tech Mono',monospace;" id="game-load-txt">A carregar…</div>
+      </div>
+      <!-- Top bar -->
+      <div style="height:36px;flex-shrink:0;background:#0a1100;
+        border-bottom:1px solid rgba(100,255,0,.1);
+        display:flex;align-items:center;padding:0 10px;gap:8px;z-index:1;">
+        <span style="font-size:18px;color:rgba(100,255,0,.6);cursor:pointer;"
+          onclick="closeEmojiJump()">‹</span>
+        <span style="font-size:11px;color:#88ff44;font-family:'Share Tech Mono',monospace;">🐸 Emoji Jump</span>
+      </div>
+      <iframe id="game-iframe" src="" style="flex:1;border:none;display:block;"
+        onload="if(typeof gameLoaded==='function') gameLoaded()"></iframe>
+    </div>
+
+    <!-- SYSTEM SCRIPT FULLSCREEN -->
+    <div id="system-viewer" style="display:none;position:absolute;inset:0;z-index:99;
+      background:#000;flex-direction:column;">
+      <div style="height:40px;flex-shrink:0;background:#001a0a;
+        border-bottom:1px solid rgba(0,255,100,.15);
+        display:flex;align-items:center;padding:0 12px;gap:8px;">
+        <span style="font-size:18px;color:rgba(0,255,150,.6);cursor:pointer;"
+          onclick="document.getElementById('system-viewer').style.display='none'">‹</span>
+        <span style="font-size:11px;color:#00ffaa;font-family:'Share Tech Mono',monospace;">
+          SYSCORP MSG PROTOCOL — DUMP
+        </span>
+      </div>
+      <pre id="system-viewer-txt" style="
+        flex:1;overflow:auto;padding:12px 10px;margin:0;
+        font-family:'Share Tech Mono',monospace;font-size:9px;
+        color:#00ffaa;line-height:1.6;white-space:pre;
+        background:#000;
+      "></pre>
+    </div>
+
   </div><!-- /screen -->
 </div><!-- /phone -->
 
@@ -843,6 +897,21 @@ function closeApp(name){
 
 // ══ CHAT ══
 const CHATS = {
+  syscorp: {
+    name:'SYSCORP_SYSTEM', avatar:'⚙',
+    color:'linear-gradient(135deg,#003322,#001a11)',
+    avatarColor:'#00ffaa',
+    system: true,
+    msgs:[
+      {me:false, text:'Novo Update. Agora o nosso sistema fez um update nas mensagens onde tem vários comandos que pode usar:', time:'agora', system:true},
+      {me:false, text:'-/limpar — apaga todas as mensagens desta conversa', time:'agora', system:true},
+      {me:false, text:'-/CtrlZ — volta atrás a qualquer comando, especialmente o /limpar', time:'agora', system:true},
+      {me:false, text:'-/Cor [cor] [mensagem] — envia mensagem colorida. Ex: /Cor Blue oi tudo bem', time:'agora', system:true},
+      {me:false, text:'-/Time — mostra as horas em que a pessoa esteve online', time:'agora', system:true},
+      {me:false, text:'-/SYSTEM — mostra o script interno da mensagem', time:'agora', system:true},
+      {me:false, text:'-/Off — fica offline', time:'agora', system:true},
+    ]
+  },
   kael: {
     name:'Kael', avatar:'K',
     color:'linear-gradient(135deg,#3d0060,#1a0040)',
@@ -854,11 +923,11 @@ const CHATS = {
       {me:false, text:'Desculpa por ter ficado quase o dia todo no Life. Prometo que amanhã vou compensar.', time:'23:01'},
       {me:false, text:'Preciso falar contigo sobre uma coisa… mas deixa para o dia 25. Boa noite.', time:'23:02'},
       {sep:true, label:'5 de Setembro de 2024'},
-      {me:false, text:'Foxy, vou fazer o tratamento hoje. Os médicos avisaram que é arriscado mas é a única opção que temos.', time:'16:50'},
-      {me:false, text:'Se correr mal… sabe que foste o melhor amigo que eu podia ter tido. Obrigado por tudo.', time:'16:50'},
+      {me:false, text:'Foxy, vou fazer o tratamento hoje. Os médicos avisaram que é arriscado mas é a única opção que temos.', time:'16:50', _system:'Virus.Exe Send | Origin: 0x4B61656C | Intercepted: TRUE'},
+      {me:false, text:'Se correr mal… sabe que foste o melhor amigo que eu podia ter tido. Obrigado por tudo.', time:'16:50', _system:'Virus.Exe Send | Origin: 0x4B61656C | Intercepted: TRUE'},
       {me:false, text:'Foxy… desculpa. Não tenho muito tempo. Eu arrisquei fazer o exame, mas os médicos disseram que, por causa do tratamento, o meu cancro espalhou-se muito rápido. Agora vão tentar um procedimento de emergência… mas disseram que tem poucas chances de dar certo.', time:'17:00'},
       {me:false, text:'Antes que seja tarde… eu preciso te pedir uma coisa. Tu és o meu melhor amigo. Por isso eu quero deixar o meu jogo contigo. Por favor, guarda ele. Foi a coisa à qual eu dediquei a minha vida inteira. Eu sei que tu vais cuidar dele… e sei que és o único capaz de compreender o que eu criei.', time:'17:00'},
-      {me:false, text:'Adeus, Foxy.', time:'17:00'},
+      {me:false, text:'Adeus, Foxy.', time:'17:00', _system:'Virus.Exe Send | Origin: 0x4B61656C | Intercepted: TRUE | Signature: CORRUPTED'},
     ]
   },
   gavin: {
@@ -883,24 +952,69 @@ const CHATS = {
   }
 };
 
+let currentChatId = null;
+let chatHistory = {}; // backup for /CtrlZ
+let isOffline = false;
+let onlineTime = null;
+
 function openChat(id){
+  currentChatId = id;
   const c = CHATS[id];
   document.getElementById('chat-name').textContent = c.name;
-  document.getElementById('chat-avatar').textContent = c.avatar;
-  document.getElementById('chat-avatar').style.background = c.color;
+  const av = document.getElementById('chat-avatar');
+  av.textContent = c.avatar;
+  av.style.background = c.color;
+  if(c.avatarColor) av.style.color = c.avatarColor;
+  else av.style.color = '#fff';
+
+  // Enable input in all chats
+  const inp = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('chat-send-btn');
+  inp.removeAttribute('readonly');
+  inp.placeholder = 'Escreve um comando… (ex: /SYSTEM)';
+  sendBtn.onclick = ()=>sendChatMsg();
+  inp.onkeydown = e=>{ if(e.key==='Enter') sendChatMsg(); };
+
+  // Status
+  const statusEl = document.getElementById('chat-status');
+  if(id === 'kael'){
+    statusEl.textContent = 'Offline';
+    statusEl.style.color = '#ff4444';
+  } else if(id === 'syscorp'){
+    statusEl.textContent = '● Sistema ativo';
+    statusEl.style.color = '#00ffaa';
+  } else {
+    statusEl.textContent = 'Online';
+    statusEl.style.color = 'rgba(255,255,255,.35)';
+  }
+
+  renderChatMsgs(id);
+  document.getElementById('chat-screen').classList.add('on');
+  onlineTime = new Date();
+}
+
+function renderChatMsgs(id){
+  const c = CHATS[id];
   const box = document.getElementById('chat-messages');
   box.innerHTML = '';
-  c.msgs.forEach(m=>{
+  (c.msgs||[]).forEach(m=>{
     if(m.sep){
       const s = document.createElement('div');
-      s.className = 'chat-time';
-      s.textContent = m.label;
       s.style.cssText='font-size:8px;color:rgba(255,255,255,.25);text-align:center;margin:10px 0 4px;padding:3px 10px;background:rgba(255,255,255,.05);border-radius:10px;display:inline-block;align-self:center;';
+      s.textContent = m.label;
       box.appendChild(s);
       return;
     }
     const b = document.createElement('div');
+    if(m._style){
+      b.style.cssText = m._style;
+      b.textContent = m.text;
+      box.appendChild(b);
+      return;
+    }
     b.className = 'chat-bubble '+(m.me?'me':'them');
+    if(m.color) b.style.background = m.color;
+    if(m.system) b.style.cssText += ';background:rgba(0,255,150,.06);border:1px solid rgba(0,255,150,.12);color:rgba(0,255,180,.85);';
     b.textContent = m.text;
     if(m.time){
       const t = document.createElement('div');
@@ -910,12 +1024,224 @@ function openChat(id){
     }
     box.appendChild(b);
   });
-  document.getElementById('chat-screen').classList.add('on');
-  setTimeout(()=>box.scrollTop = box.scrollHeight, 50);
+  setTimeout(()=>box.scrollTop=box.scrollHeight,50);
+}
+
+function sendChatMsg(){
+  const inp = document.getElementById('chat-input');
+  const raw = inp.value.trim();
+  inp.value = '';
+  if(!raw) return;
+  const c = CHATS[currentChatId];
+  const now = new Date();
+  const timeStr = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+
+  // COMMANDS
+  if(raw.startsWith('/')){
+    const parts = raw.split(' ');
+    const cmd = parts[0].toLowerCase();
+
+    if(cmd==='/limpar'){
+      chatHistory[currentChatId] = JSON.parse(JSON.stringify(c.msgs));
+      c.msgs = [];
+      renderChatMsgs(currentChatId);
+      sysReply('Mensagens eliminadas. Usa /CtrlZ para recuperar.');
+      return;
+    }
+    if(cmd==='/ctrlz'){
+      if(chatHistory[currentChatId]){
+        c.msgs = chatHistory[currentChatId];
+        chatHistory[currentChatId] = null;
+        renderChatMsgs(currentChatId);
+        sysReply('Ação revertida com sucesso.');
+      } else {
+        sysReply('Nada para reverter.');
+      }
+      return;
+    }
+    if(cmd==='/cor'){
+      const color = parts[1]||'white';
+      const msg = parts.slice(2).join(' ');
+      if(!msg){ sysReply('Uso: /Cor [cor] [mensagem]'); return; }
+      const colorMap = {
+        blue:'linear-gradient(135deg,#0033aa,#0022aa)',
+        red:'linear-gradient(135deg,#aa0000,#660000)',
+        green:'linear-gradient(135deg,#004400,#002200)',
+        yellow:'linear-gradient(135deg,#555500,#333300)',
+        purple:'linear-gradient(135deg,#440088,#220044)',
+        orange:'linear-gradient(135deg,#663300,#331100)',
+        pink:'linear-gradient(135deg,#660044,#330022)',
+      };
+      c.msgs.push({me:true,text:msg,time:timeStr,color:colorMap[color.toLowerCase()]||colorMap.blue});
+      renderChatMsgs(currentChatId);
+      return;
+    }
+    if(cmd==='/time'){
+      const diff = onlineTime ? Math.floor((new Date()-onlineTime)/60000) : 0;
+      sysReply('Online há '+diff+' minuto(s). Última atividade: '+timeStr+'.');
+      return;
+    }
+    if(cmd==='/system'){
+      const isKael = currentChatId === 'kael';
+      const now2 = new Date();
+      const ts = String(now2.getHours()).padStart(2,'0')+':'+String(now2.getMinutes()).padStart(2,'0')+':'+String(now2.getSeconds()).padStart(2,'0');
+      const rnd  = ()=>Math.floor(Math.random()*0xFFFFFF).toString(16).padStart(6,'0').toUpperCase();
+      const rndN = ()=>Math.floor(Math.random()*9000000000+1000000000).toString();
+      const rndPort = ()=>Math.floor(Math.random()*60000+1024);
+      const rndPID  = ()=>Math.floor(Math.random()*9000+1000);
+      const ipOrigin = isKael
+        ? 'Virus.Exe'
+        : rndN();
+      const anomaly = isKael
+        ? ['   ┌─────────────────────────────────────────────┐',
+           '   │ !! INTRUSION SIGNATURE FOUND              !!│',
+           '   │                                             │',
+           '   │  Virus.Exe Send                            │',
+           '   │  Origin    : 0x4B61656C                    │',
+           '   │  Intercepted: TRUE                         │',
+           '   │  Signature : VIRUS.EXE.VARIANT_K           │',
+           '   │  Action    : INTERCEPTED (not blocked)     │',
+           '   │  Vector    : MSG_PAYLOAD_INJECTION          │',
+           '   └─────────────────────────────────────────────┘']
+        : ['   Scan        : DEEP_SCAN v3.1',
+           '   Threats     : 0 DETECTED',
+           '   Status      : CLEAN'];
+
+      const script = [
+        '╔══════════════════════════════════════════════════╗',
+        '║       SYSCORP MSG PROTOCOL v4.2 — DUMP           ║',
+        '╚══════════════════════════════════════════════════╝',
+        '',
+        '>> HEADER:',
+        '   Timestamp   : '+ts,
+        '   MsgID       : MSG-'+rnd()+'-'+rndPID(),
+        '   Protocol    : ENDR/2.1 over TCP',
+        '   Checksum    : 0x'+rnd(),
+        '   Session     : SES-'+rnd(),
+        '',
+        '>> ROUTING TABLE:',
+        '   Node_A      : 192.168.'+Math.floor(Math.random()*9+1)+'.'+Math.floor(Math.random()*254+1)+':'+rndPort(),
+        '   Node_B      : 10.0.'+Math.floor(Math.random()*9)+'.'+Math.floor(Math.random()*254+1)+':'+rndPort(),
+        '   Relay       : SYSCORP_RELAY_07',
+        '   Hops        : '+Math.floor(Math.random()*3+3),
+        '   Latency     : '+Math.floor(Math.random()*40+8)+'ms',
+        '',
+        '>> ENCRYPTION:',
+        '   Cipher      : AES-256-GCM',
+        '   IV          : 0x'+rnd()+rnd(),
+        '   KeyID       : KID-'+rnd(),
+        '   Integrity   : VERIFIED',
+        '',
+        '>> PAYLOAD METADATA:',
+        '   Size        : '+Math.floor(Math.random()*800+200)+' bytes',
+        '   Encoding    : UTF-8',
+        '   Fragments   : 1/1',
+        '   Priority    : NORMAL',
+        '   Delivery    : CONFIRMED',
+        '',
+        '>> SENDER ANALYSIS:',
+        '   Display     : '+CHATS[currentChatId].name,
+        '   UserID      : UID-'+rndPID(),
+        '   DeviceID    : DEV-'+rnd(),
+        '   Platform    : EnderMail Mobile/2.0',
+        '   IP_Origin   : '+ipOrigin,
+        '',
+        '>> PROCESS TABLE:',
+        '   PID '+rndPID()+'  svchost.exe         [NORMAL]',
+        '   PID '+rndPID()+'  endermail.exe        [NORMAL]',
+        '   PID '+rndPID()+'  system_relay.exe     [NORMAL]',
+        '   PID '+rndPID()+'  msg_handler.exe      ['+(isKael?'ANOMALY':'NORMAL')+']',
+        '',
+        '>> ANOMALY DETECTION:',
+        ...anomaly,
+        '',
+        '>> FOOTER:',
+        '   SessionID   : SES-'+rnd()+'-'+rnd(),
+        '   ServerTime  : '+ts,
+        '   Status      : '+(isKael?'DELIVERED_WITH_ANOMALY':'DELIVERED_OK'),
+        '',
+        '══ END OF DUMP ══',
+      ].join('\n');
+
+      openSystemScript(script);
+      return;
+    }
+    if(cmd==='/off'){
+      isOffline = true;
+      sysReply('Ficaste offline. As tuas mensagens não serão entregues.');
+      document.getElementById('chat-name').innerHTML += ' <span style="font-size:8px;color:#ff4444;">[OFFLINE]</span>';
+      return;
+    }
+    sysReply('Comando não reconhecido: "'+raw+'". Os comandos começam com /');
+    return;
+  }
+
+  // Normal message
+  c.msgs.push({me:true, text:raw, time:timeStr});
+  renderChatMsgs(currentChatId);
+}
+
+function openEmojiJump(){
+  const viewer = document.getElementById('game-viewer');
+  const loading = document.getElementById('game-loading');
+  const progress = document.getElementById('game-progress');
+  const loadTxt = document.getElementById('game-load-txt');
+  const iframe = document.getElementById('game-iframe');
+
+  viewer.style.display = 'flex';
+  viewer.style.flexDirection = 'column';
+  loading.style.display = 'flex';
+  iframe.src = '';
+  progress.style.width = '0%';
+
+  const msgs = ['A carregar…','A iniciar motor…','A carregar assets…','Quase pronto…','A iniciar jogo!'];
+  let pct = 0;
+  let step = 0;
+  const interval = setInterval(()=>{
+    pct += Math.random()*18+8;
+    if(pct > 100) pct = 100;
+    progress.style.width = pct+'%';
+    loadTxt.textContent = msgs[Math.min(step, msgs.length-1)];
+    step++;
+    if(pct >= 100){
+      clearInterval(interval);
+      loadTxt.textContent = 'A iniciar jogo!';
+      setTimeout(()=>{
+        loading.style.display = 'none';
+        iframe.src = 'EmojiJump.html';
+      }, 400);
+    }
+  }, 300);
+}
+
+function closeEmojiJump(){
+  const iframe = document.getElementById('game-iframe');
+  iframe.src = '';
+  document.getElementById('game-viewer').style.display = 'none';
+}
+
+function gameLoaded(){
+  // iframe loaded — loading screen already hidden by timer
+}
+
+function openSystemScript(txt){
+  const v = document.getElementById('system-viewer');
+  document.getElementById('system-viewer-txt').textContent = txt;
+  v.style.display = 'flex';
+  v.style.flexDirection = 'column';
+}
+
+function sysReply(txt){
+  const c = CHATS[currentChatId];
+  const now = new Date();
+  const t = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  c.msgs.push({me:false,text:txt,time:t,system:true,_system:'SYSCORP_SYSTEM | Auto-Reply | '+t});
+  renderChatMsgs(currentChatId);
 }
 
 function closeChat(){
   document.getElementById('chat-screen').classList.remove('on');
+  currentChatId = null;
 }
 
 // ══ GALERIA ══
