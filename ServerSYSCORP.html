@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SYSCORP · Portal Interno</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0b0b0b;--bg2:#111;--panel:#161616;--panel2:#1e1e1e;
+  --border:#2c2c2c;--border2:#3a3a3a;
+  --text:#c8c8c8;--dim:#666;--bright:#f0f0f0;--white:#fff;
+  --red:#cc3333;--green:#44aa66;--yellow:#ccaa33;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-weight:300;min-height:100vh;}
+
+/* ── OVERLAY VERSÃO ── */
+#overlay-versao{position:fixed;inset:0;background:rgba(0,0,0,0.94);display:flex;align-items:center;justify-content:center;z-index:8000;}
+.ov-box{width:480px;border:1px solid var(--border2);background:var(--panel);}
+.ov-top{background:#1a0000;border-bottom:1px solid #440000;padding:13px 20px;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--red);letter-spacing:0.12em;}
+.ov-body{padding:28px;}
+.ov-title{font-weight:600;font-size:1.1rem;color:var(--white);margin-bottom:10px;}
+.ov-desc{font-size:0.78rem;color:var(--dim);line-height:1.8;margin-bottom:22px;}
+.ov-desc strong{color:var(--text);}
+.ov-btns{display:flex;gap:10px;}
+.btn-prim{flex:1;background:var(--white);color:#000;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;font-weight:600;letter-spacing:0.1em;border:none;padding:11px;cursor:pointer;transition:opacity .2s;}
+.btn-prim:hover{opacity:.85;}
+.btn-sec{flex:1;background:transparent;color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;border:1px solid var(--border2);padding:11px;cursor:pointer;transition:color .2s;}
+.btn-sec:hover{color:var(--text);}
+.ov-foot{padding:11px 28px;border-top:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:0.56rem;color:var(--dim);}
+
+/* ── REDIRECT ── */
+#redirect-screen{display:none;position:fixed;inset:0;background:#000;z-index:9000;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+#redir-txt{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:#444;letter-spacing:0.15em;}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:5000;transition:opacity .6s,visibility .6s;}
+#login-screen.gone{opacity:0;visibility:hidden;pointer-events:none;}
+.lw{width:380px;}
+.ll-area{text-align:center;margin-bottom:34px;}
+.ll-logo{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:2rem;letter-spacing:.4em;color:var(--white);display:block;}
+.ll-sub{font-family:'IBM Plex Mono',monospace;font-size:0.56rem;color:var(--dim);letter-spacing:.2em;margin-top:6px;}
+.lcard{border:1px solid var(--border);background:var(--panel);}
+.lcard-h{padding:13px 20px;border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:var(--dim);letter-spacing:.15em;}
+.lcard-b{padding:22px 20px;}
+.lbl{font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:var(--dim);letter-spacing:.15em;margin-bottom:5px;}
+.linput{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--bright);padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:.82rem;outline:none;margin-bottom:13px;transition:border-color .2s;}
+.linput:focus{border-color:#888;}
+.lerr{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--red);margin-bottom:9px;display:none;}
+.btn-auth{width:100%;background:var(--white);color:#000;border:none;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.7rem;letter-spacing:.2em;padding:12px;cursor:pointer;transition:opacity .2s;}
+.btn-auth:hover{opacity:.88;}
+.lcard-f{padding:10px 20px;border-top:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--dim);display:flex;justify-content:space-between;}
+.dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin-right:5px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── MAIN ── */
+#main-ui{display:none;min-height:100vh;}
+#main-ui.on{display:block;}
+.topbar{position:fixed;top:0;left:0;right:0;height:50px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:200;}
+.tb-logo{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:.35em;color:var(--white);}
+.tb-nav{display:flex;gap:2px;}
+.tnav{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--dim);padding:5px 14px;border:none;background:transparent;cursor:pointer;transition:color .2s;border-bottom:2px solid transparent;}
+.tnav:hover,.tnav.act{color:var(--white);}
+.tnav.act{border-bottom-color:var(--white);}
+.tb-right{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--dim);text-align:right;line-height:1.6;}
+.tb-right span{color:#aaa;}
+
+.page{display:none;padding:76px 32px 40px;max-width:1060px;margin:0 auto;}
+.page.on{display:block;}
+#page-bios{display:none;padding:76px 32px 40px;max-width:900px;margin:0 auto;}
+#page-bios.on{display:block;}
+
+.ph{margin-bottom:24px;padding-bottom:13px;border-bottom:1px solid var(--border);}
+.ph-title{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:1.25rem;color:var(--white);letter-spacing:.04em;}
+.ph-sub{font-family:'IBM Plex Mono',monospace;font-size:.57rem;color:var(--dim);letter-spacing:.15em;margin-top:5px;}
+
+.leg-bar{background:#110800;border:1px solid #3a1800;padding:9px 14px;margin-bottom:20px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#bb6600;letter-spacing:.05em;}
+.leg-bar::before{content:'⚠ ';} 
+
+/* stat cards */
+.sc4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px;}
+.sc{background:var(--panel);border:1px solid var(--border);padding:17px;}
+.sc-lbl{font-family:'IBM Plex Mono',monospace;font-size:.57rem;color:var(--dim);letter-spacing:.12em;margin-bottom:7px;}
+.sc-val{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:1.5rem;color:var(--white);line-height:1;}
+.sc-val.sm{font-size:1rem;}
+.sc-sub{font-family:'IBM Plex Mono',monospace;font-size:.57rem;color:var(--dim);margin-top:5px;}
+
+/* panels */
+.pnl{background:var(--panel);border:1px solid var(--border);margin-bottom:16px;}
+.pnl-h{padding:10px 15px;border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--dim);letter-spacing:.14em;display:flex;justify-content:space-between;align-items:center;}
+.pnl-b{padding:15px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+.dtable{width:100%;border-collapse:collapse;}
+.dtable th{font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--dim);letter-spacing:.12em;text-align:left;padding:7px 12px;border-bottom:1px solid var(--border);font-weight:400;}
+.dtable td{font-size:.78rem;padding:9px 12px;border-bottom:1px solid #1c1c1c;color:var(--text);}
+.dtable tr:last-child td{border-bottom:none;}
+.dtable tr:hover td{background:rgba(255,255,255,.02);}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:.72rem;}
+
+.btn-reset{background:transparent;border:1px solid var(--border2);color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.12em;padding:9px 20px;cursor:pointer;transition:all .2s;}
+.btn-reset:hover{border-color:var(--red);color:var(--red);}
+
+/* store bars */
+.srow{display:flex;align-items:center;gap:12px;margin-bottom:9px;}
+.sname{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--text);width:180px;flex-shrink:0;}
+.sbar{flex:1;height:4px;background:var(--bg);border:1px solid var(--border);}
+.sfill{height:100%;background:var(--white);}
+.spct{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--dim);width:34px;text-align:right;}
+
+/* messages */
+.msg-notice{background:#0d0d00;border:1px solid #333300;padding:10px 14px;margin-bottom:16px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#777744;letter-spacing:.04em;}
+.msg-notice::before{content:'ℹ  ';}
+.mi{border:1px solid var(--border);background:var(--panel);margin-bottom:8px;cursor:pointer;transition:border-color .2s;}
+.mi:hover{border-color:var(--border2);}
+.mi.unread{border-left:2px solid var(--white);}
+.mi-h{padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-start;}
+.mi-from{font-weight:600;font-size:.82rem;color:var(--white);}
+.mi-date{font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--dim);}
+.mi-prev{padding:0 14px 12px;font-size:.73rem;color:var(--dim);line-height:1.5;}
+.mi-body{padding:14px;border-top:1px solid var(--border);font-size:.77rem;color:var(--text);line-height:1.8;display:none;background:rgba(255,255,255,.015);font-style:italic;}
+.mi-body.open{display:block;}
+.mtag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.53rem;padding:2px 6px;border:1px solid;margin-left:7px;vertical-align:middle;}
+.tag-c{color:var(--dim);border-color:var(--border2);}
+.tag-t{color:#4488cc;border-color:#224466;}
+
+/* files */
+.fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.fc{background:var(--panel);border:1px solid var(--border);padding:16px 13px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
+.fc:hover{border-color:var(--border2);}
+.fc.locked{opacity:.55;}
+.fc.unlocked{border-color:#223322;}
+.fc.unlocked:hover{border-color:var(--green);background:rgba(68,170,102,.04);}
+.fc-icon{font-size:1.6rem;margin-bottom:7px;}
+.fc-name{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--text);line-height:1.5;margin-bottom:5px;}
+.fc-cnt{font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--dim);}
+.lbadge{position:absolute;top:8px;right:8px;font-size:.7rem;opacity:.45;}
+.ebadge{position:absolute;top:8px;right:8px;font-family:'IBM Plex Mono',monospace;font-size:.5rem;color:var(--red);letter-spacing:.05em;}
+
+/* modals */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.77);display:none;align-items:center;justify-content:center;z-index:1000;}
+.modal.open{display:flex;}
+.mbox{width:360px;background:var(--panel);border:1px solid var(--border2);}
+.mbox-h{background:#120000;border-bottom:1px solid #330000;padding:11px 16px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--red);letter-spacing:.12em;}
+.mbox-b{padding:22px 20px;}
+.mbox-t{font-size:.84rem;font-weight:600;color:var(--white);margin-bottom:8px;}
+.mbox-d{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--dim);line-height:1.8;}
+.mbox-f{padding:11px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;}
+.btn-cl{background:var(--panel2);border:1px solid var(--border2);color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;padding:7px 18px;cursor:pointer;}
+.btn-cl:hover{color:var(--text);}
+
+/* BIOS terminal */
+.bios-hdr{background:#001100;border:1px solid #003300;padding:12px 17px;}
+.bios-hdr-t{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--green);letter-spacing:.15em;}
+.bios-hdr-v{font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:#336633;letter-spacing:.1em;margin-top:3px;}
+.bios-warn{background:#110800;border:1px solid #442200;border-top:none;padding:7px 17px;margin-bottom:14px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:#cc5500;letter-spacing:.05em;}
+.terminal{background:#020402;border:1px solid #1a2a1a;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:#33dd33;line-height:1.7;min-height:400px;max-height:500px;overflow-y:auto;padding:15px;}
+.t-dim{color:#336633;}.t-err{color:var(--red);}.t-warn{color:#cc8800;}.t-w{color:var(--white);}.t-c{color:#33cccc;}
+.cursor{display:inline-block;width:7px;height:12px;background:#33dd33;animation:blink 1s infinite;vertical-align:middle;}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.term-irow{display:flex;align-items:center;gap:8px;background:#020402;border:1px solid #1a2a1a;border-top:none;padding:9px 15px;}
+.term-prompt{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:#336633;white-space:nowrap;}
+#term-input{flex:1;background:transparent;border:none;outline:none;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:#33dd33;caret-color:#33dd33;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY VERSÃO -->
+<div id="overlay-versao">
+  <div class="ov-box">
+    <div class="ov-top">⚠ &nbsp;AVISO DE SISTEMA — PORTAL DESATUALIZADO</div>
+    <div class="ov-body">
+      <div class="ov-title">Este portal foi atualizado.</div>
+      <div class="ov-desc">
+        O <strong>Portal Interno SYSCORP</strong> foi migrado para uma nova versão em <strong>15 de Março de 2018</strong>.<br><br>
+        Esta versão <strong>(v1.4 — 2010)</strong> encontra-se descontinuada e pode conter informações desatualizadas. O acesso completo a ficheiros, mensagens e funcionalidades está disponível apenas na nova versão.<br><br>
+        Recomendamos que aceda à nova versão para uma experiência completa.
+      </div>
+      <div class="ov-btns">
+        <button class="btn-prim" onclick="goNew()">ACEDER À NOVA VERSÃO →</button>
+        <button class="btn-sec" onclick="stay()">Continuar nesta versão</button>
+      </div>
+    </div>
+    <div class="ov-foot">Portal SYSCORP v1.4 · © SYSCORP Corporation 2010 · Versão descontinuada</div>
+  </div>
+</div>
+
+<!-- REDIRECT -->
+<div id="redirect-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:9000;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div id="redir-txt" style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:#444;letter-spacing:.15em;">A REDIRECIONAR PARA SYSCORP PORTAL v3.2...</div>
+  <div style="width:280px;height:2px;background:#111;"><div id="redir-bar" style="height:100%;background:#fff;width:0%;transition:width .1s;"></div></div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="lw">
+    <div class="ll-area">
+      <span class="ll-logo">SYSCORP</span>
+      <div class="ll-sub">PORTAL INTERNO · VERSÃO 1.4 · 2010</div>
+    </div>
+    <div class="lcard">
+      <div class="lcard-h">AUTENTICAÇÃO DE UTILIZADOR</div>
+      <div class="lcard-b">
+        <div class="lbl">ENDEREÇO DE E-MAIL</div>
+        <input class="linput" id="li-u" type="text" autocomplete="off" placeholder="utilizador@endermail.com">
+        <div class="lbl">PALAVRA-PASSE</div>
+        <input class="linput" id="li-p" type="password" placeholder="••••••••••••">
+        <div class="lerr" id="li-err">✗ &nbsp;Credenciais inválidas. Tente novamente.</div>
+        <button class="btn-auth" onclick="doLogin()">ENTRAR</button>
+      </div>
+      <div class="lcard-f">
+        <span><span class="dot"></span>SISTEMA OPERACIONAL</span>
+        <span>SYSCORP NET © 2010</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN UI -->
+<div id="main-ui">
+  <div class="topbar">
+    <div class="tb-logo">SYSCORP</div>
+    <div class="tb-nav">
+      <button class="tnav act" onclick="nav('menu',this)">MENU PRINCIPAL</button>
+      <button class="tnav" onclick="nav('msg',this)">MENSAGENS</button>
+      <button class="tnav" onclick="nav('files',this)">ARQUIVOS</button>
+    </div>
+    <div class="tb-right"><span>INFORMATICO10</span><br>Portal v1.4 · 2010–2018</div>
+  </div>
+
+  <!-- MENU PRINCIPAL -->
+  <div class="page on" id="page-menu">
+    <div class="ph">
+      <div class="ph-title">Menu Principal</div>
+      <div class="ph-sub">SYSCORP PORTAL INTERNO · DADOS 2010–2018 · VERSÃO DESCONTINUADA</div>
+    </div>
+    <div class="leg-bar">Esta versão contém dados do período 2010–2018. Algumas informações podem estar desatualizadas. Aceda à nova versão para dados em tempo real.</div>
+
+    <div class="sc4">
+      <div class="sc"><div class="sc-lbl">UTILIZADORES GLOBAIS</div><div class="sc-val">312M</div><div class="sc-sub">▲ +18% vs 2017</div></div>
+      <div class="sc"><div class="sc-lbl">RECEITA ANUAL (2017)</div><div class="sc-val sm">€ 14,8 MIL M.</div><div class="sc-sub">↑ recorde histórico</div></div>
+      <div class="sc"><div class="sc-lbl">QUOTA DE MERCADO (OS)</div><div class="sc-val">61%</div><div class="sc-sub">referência 2018 Q1</div></div>
+      <div class="sc"><div class="sc-lbl">PAÍSES COM PRESENÇA</div><div class="sc-val">74</div><div class="sc-sub">expansão ativa</div></div>
+    </div>
+
+    <div class="g2">
+      <div class="pnl">
+        <div class="pnl-h"><span>TABELA DE PREÇOS — LINHA SYSCORP (2018)</span><span style="font-size:.53rem;color:#333;">DADOS ARQUIVADOS</span></div>
+        <div class="pnl-b">
+          <table class="dtable">
+            <thead><tr><th>MODELO</th><th>TIPO</th><th>PREÇO (€)</th><th>STOCK</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">SYSCORP X3</td><td>Desktop</td><td class="mono" style="color:var(--white);">€ 649</td><td style="color:var(--green);">✔ Disponível</td></tr>
+              <tr><td class="mono">SYSCORP X3 PRO</td><td>Desktop</td><td class="mono" style="color:var(--white);">€ 899</td><td style="color:var(--green);">✔ Disponível</td></tr>
+              <tr><td class="mono">SYSCORP X4</td><td>Laptop</td><td class="mono" style="color:var(--white);">€ 1.199</td><td style="color:var(--green);">✔ Disponível</td></tr>
+              <tr><td class="mono">SYSCORP X4 SLIM</td><td>Laptop</td><td class="mono" style="color:var(--white);">€ 1.449</td><td style="color:var(--yellow);">⚠ Limitado</td></tr>
+              <tr><td class="mono">SYSCORP X5 SERVER</td><td>Servidor</td><td class="mono" style="color:var(--white);">€ 4.200</td><td style="color:var(--green);">✔ Disponível</td></tr>
+              <tr><td class="mono">SYSCORP OS LIC.</td><td>Software</td><td class="mono" style="color:var(--white);">€ 89 /ano</td><td style="color:var(--green);">✔ Digital</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="pnl">
+        <div class="pnl-h"><span>LOJAS COM MAIS VENDAS (2017)</span></div>
+        <div class="pnl-b">
+          <div class="srow"><div class="sname">SYSCORP STORE LISBOA</div><div class="sbar"><div class="sfill" style="width:92%"></div></div><div class="spct">92%</div></div>
+          <div class="srow"><div class="sname">SYSCORP ONLINE STORE</div><div class="sbar"><div class="sfill" style="width:88%"></div></div><div class="spct">88%</div></div>
+          <div class="srow"><div class="sname">SYSCORP STORE PORTO</div><div class="sbar"><div class="sfill" style="width:78%"></div></div><div class="spct">78%</div></div>
+          <div class="srow"><div class="sname">SYSCORP STORE MADRID</div><div class="sbar"><div class="sfill" style="width:74%"></div></div><div class="spct">74%</div></div>
+          <div class="srow"><div class="sname">MEDIA MARKT (PARCEIRO)</div><div class="sbar"><div class="sfill" style="width:61%"></div></div><div class="spct">61%</div></div>
+          <div class="srow"><div class="sname">WORTEN (PARCEIRO)</div><div class="sbar"><div class="sfill" style="width:55%"></div></div><div class="spct">55%</div></div>
+          <div class="srow"><div class="sname">FNAC (PARCEIRO)</div><div class="sbar"><div class="sfill" style="width:48%"></div></div><div class="spct">48%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pnl">
+      <div class="pnl-h"><span>CRESCIMENTO DE UTILIZADORES (2010–2018)</span></div>
+      <div class="pnl-b">
+        <table class="dtable">
+          <thead><tr><th>ANO</th><th>UTILIZADORES</th><th>CRESCIMENTO</th><th>SYSCORP OS QUOTA</th><th>RECEITA</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">2010</td><td>12,4 M</td><td>—</td><td>18%</td><td>€ 1,2 mil M.</td></tr>
+            <tr><td class="mono">2011</td><td>28,1 M</td><td style="color:var(--green);">▲ +127%</td><td>24%</td><td>€ 2,7 mil M.</td></tr>
+            <tr><td class="mono">2012</td><td>51,7 M</td><td style="color:var(--green);">▲ +84%</td><td>31%</td><td>€ 4,9 mil M.</td></tr>
+            <tr><td class="mono">2013</td><td>88,3 M</td><td style="color:var(--green);">▲ +71%</td><td>38%</td><td>€ 7,1 mil M.</td></tr>
+            <tr><td class="mono">2014</td><td>134 M</td><td style="color:var(--green);">▲ +52%</td><td>44%</td><td>€ 8,8 mil M.</td></tr>
+            <tr><td class="mono">2015</td><td>187 M</td><td style="color:var(--green);">▲ +40%</td><td>50%</td><td>€ 10,4 mil M.</td></tr>
+            <tr><td class="mono">2016</td><td>243 M</td><td style="color:var(--green);">▲ +30%</td><td>55%</td><td>€ 12,0 mil M.</td></tr>
+            <tr><td class="mono">2017</td><td>312 M</td><td style="color:var(--green);">▲ +28%</td><td>61%</td><td>€ 14,8 mil M.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;padding-top:4px;">
+      <button class="btn-reset" onclick="showMod('reset-modal')">⟳ &nbsp;RESET PÁGINA</button>
+    </div>
+  </div>
+
+  <!-- MENSAGENS -->
+  <div class="page" id="page-msg">
+    <div class="ph">
+      <div class="ph-title">Mensagens</div>
+      <div class="ph-sub">CAIXA DE ENTRADA ARQUIVADA · 2010–2018</div>
+    </div>
+    <div class="msg-notice">As suas outras mensagens foram passadas já para a nova versão. Apenas 3 mensagens permanecem nesta versão arquivada.</div>
+
+    <!-- MSG 1 -->
+    <div class="mi unread" onclick="toggleMsg(this)">
+      <div class="mi-h">
+        <div><span class="mi-from">#### <span class="mtag tag-c">CONTABILIDADE</span></span><br><small style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--dim);">Para: contabilidade@syscorp.net</small></div>
+        <div class="mi-date">14 Nov 2017 · 10:32</div>
+      </div>
+      <div class="mi-prev">Assunto: Revisão de preços Q4 2017 — linha X3 e X4</div>
+      <div class="mi-body">
+        Bom dia,<br><br>
+        Venho por este meio solicitar uma revisão urgente dos preços praticados na linha X3 e X4 para o quarto trimestre de 2017.<br><br>
+        Após análise dos dados de Outubro, verificamos que o SYSCORP X3 está com margem inferior ao previsto (actualmente em 12%, meta era 18%). Sugiro que se considere um ajuste no preço de custo ou, em alternativa, uma subida de €50 no PVP sem impacto nas promoções de Natal.<br><br>
+        O X4 SLIM continua a ter boa aceitação — pode manter-se o preço mas devemos antecipar uma promoção para Dezembro antes que o stock fique bloqueado em armazém.<br><br>
+        Aguardo confirmação para proceder à atualização dos sistemas.<br><br>
+        Cumprimentos,<br><span style="color:#aaa;">####</span>
+      </div>
+    </div>
+
+    <!-- MSG 2 -->
+    <div class="mi unread" onclick="toggleMsg(this)">
+      <div class="mi-h">
+        <div><span class="mi-from">#### <span class="mtag tag-c">CONTABILIDADE</span></span><br><small style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--dim);">Para: contabilidade@syscorp.net</small></div>
+        <div class="mi-date">02 Mar 2018 · 15:47</div>
+      </div>
+      <div class="mi-prev">Assunto: Novos preços aprovados — entrada em vigor 01/04/2018</div>
+      <div class="mi-body">
+        Boa tarde,<br><br>
+        Conforme acordado na reunião de 28 de Fevereiro, envio em baixo a tabela de preços aprovada para entrar em vigor a 1 de Abril de 2018:<br><br>
+        &nbsp;&nbsp;— SYSCORP X3 → €649 (sem alteração)<br>
+        &nbsp;&nbsp;— SYSCORP X3 PRO → €899 (+€50 vs. anterior)<br>
+        &nbsp;&nbsp;— SYSCORP X4 → €1.199 (sem alteração)<br>
+        &nbsp;&nbsp;— SYSCORP X4 SLIM → €1.449 (+€50 vs. anterior)<br>
+        &nbsp;&nbsp;— SYSCORP X5 SERVER → €4.200 (+€200 vs. anterior)<br>
+        &nbsp;&nbsp;— Licença SYSCORP OS → €89/ano (sem alteração)<br><br>
+        Por favor confirme a actualização no sistema de facturação antes do final do mês.<br><br>
+        Nota: estes valores não devem ser comunicados externamente antes da data de entrada em vigor.<br><br>
+        Cumprimentos,<br><span style="color:#aaa;">####</span>
+      </div>
+    </div>
+
+    <!-- MSG 3 -->
+    <div class="mi" onclick="toggleMsg(this)">
+      <div class="mi-h">
+        <div><span class="mi-from">#### → Tiago <span class="mtag tag-t">INFORMÁTICA</span></span><br><small style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--dim);">Para: tiago.silva@syscorp.net</small></div>
+        <div class="mi-date">19 Jan 2018 · 09:14</div>
+      </div>
+      <div class="mi-prev">Assunto: URGENTE — Consola sem segurança, precisa de atenção</div>
+      <div class="mi-body">
+        Tiago,<br><br>
+        Precisava de falar contigo sobre a consola dos monitores (SYSCORP BIOS v2.1.3). Reparei que continua sem qualquer tipo de proteção — qualquer um com acesso à rede interna consegue entrar e executar scripts sem autenticação.<br><br>
+        Já disse isto antes mas ninguém tomou providências. Aquilo está completamente aberto, sem log de atividade sequer. Se cair nas mãos erradas pode ser um problema sério.<br><br>
+        Precisamos urgentemente de implementar autenticação no terminal e restringir os tipos de scripts que podem ser executados. A BIOS v2.1.3 é antiga e tem vulnerabilidades conhecidas.<br><br>
+        Podes tratar disto antes da migração para a nova versão do portal? Depois da migração ninguém vai olhar para isto.<br><br>
+        Obrigado,<br><span style="color:#aaa;">####</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARQUIVOS -->
+  <div class="page" id="page-files">
+    <div class="ph">
+      <div class="ph-title">Arquivos</div>
+      <div class="ph-sub">REPOSITÓRIO DE FICHEIROS INTERNOS · ACESSO RESTRITO</div>
+    </div>
+    <div class="leg-bar">Esta versão do portal não tem acesso completo aos arquivos. A maioria dos ficheiros requer autenticação da nova versão.</div>
+
+    <div class="fgrid">
+      <div class="fc locked" onclick="openLock('Fotos de Produto')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">FOTOS DE PRODUTO</div><div class="fc-cnt">312 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('Scripts de Instalação')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">SCRIPTS DE INSTALAÇÃO</div><div class="fc-cnt">47 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('Scripts de Sistema')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">SCRIPTS DE SISTEMA</div><div class="fc-cnt">203 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('SCRIPTS — PRODUÇÃO')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">SCRIPTS — PRODUÇÃO</div><div class="fc-cnt">88 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('SCRIPTS INTERNOS v2')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">SCRIPTS INTERNOS v2</div><div class="fc-cnt">134 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('SCRIPTS — REDE')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">SCRIPTS — REDE</div><div class="fc-cnt">76 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('Links e Acessos')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">LINKS E ACESSOS</div><div class="fc-cnt">29 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('Acessos Remotos')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">ACESSOS REMOTOS</div><div class="fc-cnt">15 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('Relatórios Financeiros')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">RELATÓRIOS FINANCEIROS</div><div class="fc-cnt">52 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('Fotos — Eventos')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">FOTOS — EVENTOS</div><div class="fc-cnt">891 ficheiros</div></div>
+      <div class="fc locked" onclick="openLock('SCRIPTS — BACKUP')"><div class="lbadge">🔒</div><div class="fc-icon">📁</div><div class="fc-name">SCRIPTS — BACKUP</div><div class="fc-cnt">41 ficheiros</div></div>
+      <!-- UNLOCKED BY BUG -->
+      <div class="fc unlocked" onclick="openBios()"><div class="ebadge">ERRO</div><div class="fc-icon">💻</div><div class="fc-name">Consola dos Monitores<br>SYSCORP BIOS v2.1.3</div><div class="fc-cnt" style="color:var(--green);">⚠ Acesso disponível</div></div>
+    </div>
+    <div style="margin-top:11px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--dim);">11 de 12 pastas bloqueadas · Acesso completo disponível na nova versão do portal</div>
+  </div>
+
+  <!-- BIOS -->
+  <div id="page-bios">
+    <div class="ph">
+      <div class="ph-title">Consola dos Monitores</div>
+      <div class="ph-sub">SYSCORP BIOS v2.1.3 · ACESSO SEM AUTENTICAÇÃO — VULNERABILIDADE CONHECIDA</div>
+    </div>
+    <div class="bios-hdr">
+      <div class="bios-hdr-t">SYSCORP BIOS TERMINAL v2.1.3</div>
+      <div class="bios-hdr-v">Sistema de monitorização interna · Módulo de execução de scripts · Copyright SYSCORP 2011</div>
+    </div>
+    <div class="bios-warn">⚠ ATENÇÃO: Esta consola não tem sistema de autenticação ativo. Qualquer script pode ser executado. Reportar ao departamento de informática.</div>
+    <div class="terminal" id="term-out"></div>
+    <div class="term-irow">
+      <span class="term-prompt">syscorp-bios:~$</span>
+      <input type="text" id="term-input" placeholder="escrever comando ou nome de script..." autocomplete="off" onkeydown="termKey(event)">
+    </div>
+    <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:#334433;line-height:1.8;">
+      Comandos: &nbsp;<b>help</b> &nbsp;·&nbsp; <b>ls</b> &nbsp;·&nbsp; <b>sysinfo</b> &nbsp;·&nbsp; <b>clear</b> &nbsp;·&nbsp; <b>[nome].sysript</b>
+    </div>
+    <div style="margin-top:10px;text-align:right;">
+      <button class="btn-reset" onclick="nav('files',document.querySelectorAll('.tnav')[2])">← VOLTAR AOS ARQUIVOS</button>
+    </div>
+  </div>
+
+</div><!-- /main-ui -->
+
+<!-- LOCK MODAL -->
+<div class="modal" id="lock-modal" onclick="closeMod('lock-modal',event)">
+  <div class="mbox">
+    <div class="mbox-h">⛔ &nbsp;ACESSO NEGADO</div>
+    <div class="mbox-b"><div class="mbox-t" id="lm-name">Pasta</div><div class="mbox-d">Esta versão do portal não tem acesso a esta pasta.<br><br>Para aceder ao conteúdo completo, utilize a nova versão do Portal SYSCORP (v3.2 ou superior).<br><br><span style="color:#440000;">Código de erro: SYS_ACCESS_LEGACY_403</span></div></div>
+    <div class="mbox-f"><button class="btn-cl" onclick="closeMod('lock-modal',null)">FECHAR</button></div>
+  </div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="modal" id="reset-modal" onclick="closeMod('reset-modal',event)">
+  <div class="mbox">
+    <div class="mbox-h">⛔ &nbsp;OPERAÇÃO NÃO DISPONÍVEL</div>
+    <div class="mbox-b"><div class="mbox-t">Reset de Página</div><div class="mbox-d">Esta versão já não tem acesso a esta funcionalidade.<br><br>O reset de página foi desativado nesta versão após a migração de Março de 2018.<br><br><span style="color:#444400;">Código de erro: SYS_FUNC_DEPRECATED_410</span></div></div>
+    <div class="mbox-f"><button class="btn-cl" onclick="closeMod('reset-modal',null)">FECHAR</button></div>
+  </div>
+</div>
+
+<script>
+// overlay
+function goNew(){
+  document.getElementById('overlay-versao').style.display='none';
+  const rd=document.getElementById('redirect-screen');
+  rd.style.display='flex';
+  const bar=document.getElementById('redir-bar'),txt=document.getElementById('redir-txt');
+  let p=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*9;if(p>100)p=100;bar.style.width=p+'%';
+    if(p>=100){clearInterval(iv);
+      txt.textContent='ERRO — LIGAÇÃO RECUSADA · SESSÃO EXPIRADA';txt.style.color='#cc3333';
+      setTimeout(()=>{
+        rd.style.display='none';
+        const ov=document.getElementById('overlay-versao');ov.style.display='flex';
+        ov.querySelector('.ov-title').textContent='Redirecionamento falhou.';
+        ov.querySelector('.ov-desc').innerHTML='Não foi possível estabelecer ligação com a nova versão do portal.<br><br>A sessão expirou ou o servidor da nova versão está temporariamente indisponível.<br><br><strong style="color:var(--red);">Pode continuar a navegar nesta versão arquivada.</strong>';
+        ov.querySelector('.ov-btns').innerHTML='<button class="btn-prim" onclick="stay()">CONTINUAR NESTA VERSÃO</button>';
+      },2200);
+    }
+  },90);
+}
+function stay(){document.getElementById('overlay-versao').style.display='none';}
+
+// login
+function doLogin(){
+  const u=document.getElementById('li-u').value.trim();
+  const p=document.getElementById('li-p').value;
+  const err=document.getElementById('li-err');
+  if(u.toLowerCase()==='informatico10@endermail.com'&&p==='SYSCORP.2000'){
+    err.style.display='none';
+    document.getElementById('login-screen').classList.add('gone');
+    document.getElementById('main-ui').classList.add('on');
+    initTerm();
+  }else{err.style.display='block';document.getElementById('li-p').value='';}
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!document.getElementById('login-screen').classList.contains('gone'))doLogin();});
+
+// nav
+function nav(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('page-bios').classList.remove('on');
+  document.querySelectorAll('.tnav').forEach(b=>b.classList.remove('act'));
+  if(id==='bios'){document.getElementById('page-bios').classList.add('on');}
+  else{const el=document.getElementById('page-'+id);if(el)el.classList.add('on');}
+  if(btn)btn.classList.add('act');
+}
+function openBios(){nav('bios',null);}
+
+// modals
+function showMod(id){document.getElementById(id).classList.add('open');}
+function closeMod(id,e){if(!e||e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');}
+function openLock(name){document.getElementById('lm-name').textContent=name;showMod('lock-modal');}
+
+// messages
+function toggleMsg(el){
+  el.querySelector('.mi-body').classList.toggle('open');
+  el.classList.remove('unread');
+}
+
+// TERMINAL
+const tout=()=>document.getElementById('term-out');
+function tPrint(html,delay=0){
+  return new Promise(r=>setTimeout(()=>{
+    const d=document.createElement('div');d.innerHTML=html;tout().appendChild(d);
+    tout().scrollTop=tout().scrollHeight;r();
+  },delay));
+}
+async function initTerm(){
+  await tPrint('<span class="t-dim">SYSCORP BIOS TERMINAL v2.1.3</span>');
+  await tPrint('<span class="t-dim">Copyright © SYSCORP Corporation 2011.</span>',100);
+  await tPrint('<span class="t-dim">──────────────────────────────────────────────</span>',120);
+  await tPrint('<span class="t-warn">AVISO: Autenticação desativada. Acesso livre.</span>',150);
+  await tPrint('',180);
+  await tPrint('Sistema pronto. Escreva <span class="t-w">help</span> para ver os comandos.',220);
+}
+
+async function termKey(e){
+  if(e.key!=='Enter')return;
+  const inp=document.getElementById('term-input');
+  const cmd=inp.value.trim();inp.value='';
+  if(!cmd)return;
+  await tPrint('<span class="t-dim">syscorp-bios:~$</span> '+esc(cmd));
+  const c=cmd.toLowerCase();
+  if(c==='help'){
+    const ls=['<span class="t-w">Comandos disponíveis:</span>',
+      '  <span class="t-c">help</span>          — mostra esta ajuda',
+      '  <span class="t-c">ls</span>            — lista scripts disponíveis',
+      '  <span class="t-c">sysinfo</span>       — informações do sistema',
+      '  <span class="t-c">clear</span>         — limpa o terminal',
+      '  <span class="t-c">[nome].sysript</span> — executa script SYSCORP',
+      '','Script especial: <span class="t-dim">AntivirusSYSCORP.sysript</span>'];
+    for(const l of ls)await tPrint(l,60);
+  }else if(c==='clear'){tout().innerHTML='';}
+  else if(c==='ls'){
+    const ls=['<span class="t-dim">SYSCORP BIOS · /bios/scripts/</span>','',
+      '  AntivirusSYSCORP.sysript    <span class="t-dim">14.2 KB  2013-04-07</span>',
+      '  MonitorRede.sysript         <span class="t-dim"> 8.7 KB  2012-11-22</span>',
+      '  BackupAuto.sysript          <span class="t-dim">21.1 KB  2014-02-14</span>',
+      '  DiagSistema.sysript         <span class="t-dim"> 6.4 KB  2011-09-03</span>',
+      '','<span class="t-dim">4 scripts encontrados.</span>'];
+    for(const l of ls)await tPrint(l,75);
+  }else if(c==='sysinfo'){
+    const ls=['<span class="t-w">SYSCORP BIOS v2.1.3 — Informações do Sistema</span>',
+      '  Hostname   : <span class="t-c">SYSCORP-BIOS-NODE-04</span>',
+      '  BIOS Ver.  : <span class="t-c">2.1.3-legacy</span>',
+      '  OS         : <span class="t-c">SYSCORP OS 6.2 (2011)</span>',
+      '  CPU        : <span class="t-c">SyCore™ 4 · 2.8GHz</span>',
+      '  RAM        : <span class="t-c">8 GB</span>',
+      '  Auth       : <span class="t-err">DESATIVADA ⚠</span>',
+      '  Ult. acesso: <span class="t-dim">2018-01-19 09:14 — ####</span>'];
+    for(const l of ls)await tPrint(l,80);
+  }else if(c==='antivirussyscorp.sysript'){
+    await runAV();
+  }else if(c.endsWith('.sysript')){
+    await tPrint('<span class="t-err">Erro: "'+esc(cmd)+'" não encontrado ou sem permissão.</span>',100);
+  }else{
+    await tPrint('<span class="t-err">Comando não reconhecido: '+esc(cmd)+'</span>',80);
+    await tPrint('<span class="t-dim">Escreva "help" para ver os comandos disponíveis.</span>',100);
+  }
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+async function runAV(){
+  const intro=['','<span class="t-w">══════════════════════════════════════════════════════</span>',
+    '<span class="t-w"> SYSCORP AntivirusSYSCORP v3.4.1 — Modo Manual</span>',
+    '<span class="t-w"> Copyright © SYSCORP Corporation 2013</span>',
+    '<span class="t-w">══════════════════════════════════════════════════════</span>','',
+    '<span class="t-dim">[INIT]</span> A carregar base de dados de ameaças... <span class="t-c">OK</span>',
+    '<span class="t-dim">[INIT]</span> Definições: <span class="t-c">2018.03.15-r4</span>',
+    '<span class="t-dim">[INIT]</span> Módulo heurístico: <span class="t-c">ATIVO</span>','',
+    '<span class="t-dim">[SCAN]</span> A iniciar análise do sistema...',''];
+  for(const l of intro)await tPrint(l,80);
+
+  const dirs=['/bios/scripts/','/bios/config/','/sys/logs/','/sys/boot/','/sys/drivers/','/sys/network/','/tmp/','/usr/local/bin/','/home/bios/'];
+  for(const d of dirs){
+    const n=Math.floor(Math.random()*80)+10;
+    await tPrint('<span class="t-dim">[SCAN]</span> '+d.padEnd(22)+'  — '+n+' ficheiros',110);
+  }
+  await tPrint('',100);
+  await tPrint('<span class="t-dim">[SCAN]</span> A analisar processos em memória...',220);
+  await tPrint('<span class="t-dim">[SCAN]</span> A verificar registos do sistema...',320);
+  await tPrint('<span class="t-dim">[SCAN]</span> A verificar ligações de rede...',400);
+  await tPrint('',200);
+  await tPrint('<span class="t-warn">══ ANÁLISE CONCLUÍDA · AMEAÇAS DETETADAS ══</span>',300);
+  await tPrint('',100);
+
+  const threats=[
+    {f:'/sys/network/listener_bg.sysript',t:'BACKDOOR.SysNet.v2',s:'CRÍTICO'},
+    {f:'/tmp/.hidden_proc_7741',          t:'TROJAN.Generic.Spy',s:'ALTO'   },
+    {f:'/bios/config/auth_bypass.cfg',    t:'CONFIG.AuthBypass', s:'CRÍTICO'},
+  ];
+  for(const x of threats){
+    await tPrint('<span class="t-err">⚠ AMEAÇA ENCONTRADA</span>',200);
+    await tPrint('  Ficheiro  : <span class="t-warn">'+x.f+'</span>',90);
+    await tPrint('  Tipo      : <span class="t-err">'+x.t+'</span>',90);
+    await tPrint('  Severidade: <span class="t-err">'+x.s+'</span>',90);
+    await tPrint('',70);
+  }
+  await tPrint('<span class="t-w">──────────────────────────────────────────────────────</span>',180);
+  await tPrint(' Ficheiros analisados: <span class="t-c">438</span>',80);
+  await tPrint(' Ameaças encontradas : <span class="t-err">3</span>',80);
+  await tPrint(' Ficheiros limpos    : <span class="t-c">435</span>',80);
+  await tPrint('<span class="t-w">──────────────────────────────────────────────────────</span>',80);
+  await tPrint('',100);
+  await askDelete(threats,0);
+}
+
+async function askDelete(threats,i){
+  if(i>=threats.length){
+    await tPrint('',80);
+    await tPrint('<span class="t-dim">[AVS]</span> Operação concluída. Reinicie o sistema para aplicar as alterações.',200);
+    await tPrint('',80);
+    return;
+  }
+  const x=threats[i];
+  await tPrint('<span class="t-warn">? Deseja apagar "'+x.f+'" ? (s/n)</span>',300);
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;gap:10px;margin:6px 0;';
+  const by=document.createElement('button');
+  by.textContent='s — apagar';
+  by.style.cssText='background:transparent;border:1px solid var(--red);color:var(--red);font-family:"IBM Plex Mono",monospace;font-size:.63rem;padding:5px 14px;cursor:pointer;';
+  const bn=document.createElement('button');
+  bn.textContent='n — ignorar';
+  bn.style.cssText='background:transparent;border:1px solid #334433;color:#336633;font-family:"IBM Plex Mono",monospace;font-size:.63rem;padding:5px 14px;cursor:pointer;';
+  async function choose(yes){
+    wrap.remove();
+    if(yes){
+      await tPrint('<span class="t-dim">[AVS]</span> A apagar '+x.f+'...',100);
+      await tPrint('<span class="t-dim">[AVS]</span> <span class="t-c">Ficheiro eliminado com sucesso.</span>',500);
+    }else{
+      await tPrint('<span class="t-dim">[AVS]</span> Ignorado. O ficheiro permanece no sistema.',100);
+    }
+    await tPrint('',70);
+    await askDelete(threats,i+1);
+  }
+  by.onclick=()=>choose(true);bn.onclick=()=>choose(false);
+  wrap.append(by,bn);tout().appendChild(wrap);tout().scrollTop=tout().scrollHeight;
+}
+</script>
+</body>
+</html>

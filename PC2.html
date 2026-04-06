@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC2 — Sistema Antigo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  background:#111008;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  position:relative;
+  cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='22' viewBox='0 0 16 22'%3E%3Cpath d='M1 1 L1 18 L5 14 L8 21 L10 20 L7 13 L13 13 Z' fill='white' stroke='black' stroke-width='1'/%3E%3C/svg%3E") 0 0, default;
+}
+/* Loading cursor when opening server */
+body.loading{
+  cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M1 1 L1 18 L5 14 L8 21 L10 20 L7 13 L13 13 Z' fill='white' stroke='black' stroke-width='1'/%3E%3Ccircle cx='22' cy='22' r='9' fill='%234488ff' opacity='.9'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 22 22' to='360 22 22' dur='1s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='22' cy='14' r='3' fill='white' opacity='.9'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 22 22' to='360 22 22' dur='1s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/svg%3E") 0 0, wait;
+}
+
+/* Loading overlay */
+#server-loading{
+  display:none;position:absolute;inset:0;background:#050500;
+  align-items:center;justify-content:center;flex-direction:column;gap:10px;
+  z-index:10;
+}
+#server-loading.on{display:flex;}
+.loading-ball{
+  width:28px;height:28px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#88bbff,#2255cc);
+  box-shadow:0 0 12px rgba(80,120,255,.6);
+  animation:spin 1s linear infinite;
+}
+.loading-txt{
+  font-family:'VT323',monospace;font-size:11px;color:#886633;
+  animation:blink 1s step-end infinite;
+}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}
+  0%{transform:rotate(0deg) scale(1);}50%{transform:rotate(180deg) scale(.95);}100%{transform:rotate(360deg) scale(1);}
+}
+
+/* ── PAN SYSTEM ── */
+#view-top{
+  position:fixed;inset:0;z-index:1;
+  transition:transform .8s cubic-bezier(.4,0,.2,1);
+}
+#view-under{
+  position:fixed;top:100%;left:0;right:0;height:100vh;z-index:1;
+  background:linear-gradient(180deg,#0a0800 0%,#060500 100%);
+  transition:transform .8s cubic-bezier(.4,0,.2,1);
+  display:flex;align-items:center;justify-content:center;
+}
+body.panned #view-top{ transform:translateY(-100%); }
+body.panned #view-under{ transform:translateY(-100%); }
+
+/* Arrow hint */
+#pan-hint{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  z-index:200;width:120px;height:32px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;gap:2px;
+  transition:opacity .3s;
+}
+#pan-hint:hover{opacity:.8;}
+#pan-hint .arr{
+  width:0;height:0;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-top:8px solid rgba(200,160,80,.4);
+  animation:arrbounce 1.2s ease-in-out infinite;
+}
+#pan-hint .arr:nth-child(2){ animation-delay:.2s;opacity:.6; }
+#pan-hint .arr:nth-child(3){ animation-delay:.4s;opacity:.3; }
+@keyframes arrbounce{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(4px);}
+}
+/* Up arrow when panned */
+#pan-up-hint{
+  position:fixed;bottom:8px;left:50%;transform:translateX(-50%);
+  z-index:200;width:120px;height:32px;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;gap:2px;
+}
+body.panned #pan-up-hint{display:flex;}
+body.panned #pan-hint{display:none;}
+#pan-up-hint .arru{
+  width:0;height:0;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-bottom:8px solid rgba(200,160,80,.3);
+  animation:arrbounce2 1.2s ease-in-out infinite;
+}
+#pan-up-hint .arru:nth-child(1){ animation-delay:.4s;opacity:.3; }
+#pan-up-hint .arru:nth-child(2){ animation-delay:.2s;opacity:.6; }
+#pan-up-hint .arru:nth-child(3){ opacity:.9; }
+@keyframes arrbounce2{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-4px);}
+}
+
+/* ── UNDER DESK — PC TOWER ── */
+.tower-scene{
+  display:flex;align-items:flex-end;gap:30px;
+  padding-bottom:20px;
+}
+.pc-tower{
+  width:70px;height:130px;
+  background:linear-gradient(160deg,#b8b098,#9a9078,#888060);
+  border-radius:4px;
+  border:2px solid #6a6040;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,.1),
+    inset -2px -2px 5px rgba(0,0,0,.4),
+    3px 4px 14px rgba(0,0,0,.8);
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;
+  padding:10px 6px;gap:6px;
+}
+/* dust on tower */
+.pc-tower::before{
+  content:'';position:absolute;inset:0;border-radius:4px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(80,60,20,.15) 0%, transparent 30%),
+    radial-gradient(circle at 70% 70%, rgba(60,50,10,.12) 0%, transparent 25%);
+  pointer-events:none;
+}
+.tower-brand{
+  font-size:8px;font-family:'VT323',monospace;
+  color:#5a5030;letter-spacing:1px;opacity:.8;
+}
+.tower-drive{
+  width:50px;height:8px;
+  background:#6a6040;border-radius:1px;
+  border:1px solid #4a4020;
+}
+.tower-drive-led{
+  width:4px;height:4px;border-radius:50%;
+  background:#440000;
+  transition:background .3s, box-shadow .3s;
+}
+.tower-power-btn{
+  width:16px;height:16px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#888060,#4a4820);
+  border:2px solid #3a3818;
+  cursor:pointer;
+  box-shadow:0 2px 4px rgba(0,0,0,.6);
+  transition:background .2s, box-shadow .2s;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:auto;
+}
+.tower-power-btn:hover{
+  background:radial-gradient(circle at 35% 30%,#aaa080,#666040);
+  box-shadow:0 0 8px rgba(200,180,100,.3);
+}
+.tower-power-btn.on{
+  background:radial-gradient(circle at 35% 30%,#66ff44,#22aa00);
+  box-shadow:0 0 10px rgba(50,200,0,.6),0 2px 4px rgba(0,0,0,.6);
+}
+.tower-power-icon{
+  font-size:9px;color:rgba(0,0,0,.4);font-weight:bold;
+}
+/* cables under desk */
+.cables{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:200px;pointer-events:none;
+}
+.floor-dust{
+  width:400px;height:20px;
+  background:linear-gradient(0deg,rgba(80,60,20,.15),transparent);
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+}
+
+/* ── DUST OVERLAY ── */
+.dust{
+  position:fixed;inset:0;pointer-events:none;z-index:100;
+  background-image:
+    radial-gradient(ellipse at 20% 40%, rgba(80,60,20,.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 60%, rgba(60,50,15,.06) 0%, transparent 40%);
+}
+.dust::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,.03) 3px, rgba(0,0,0,.03) 4px
+  );
+}
+
+/* ── MONITOR WRAP ── */
+.pc2-wrap{
+  position:fixed;bottom:22vh;left:50%;
+  transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;
+}
+
+/* ── MONITOR ── */
+.pc2-body{
+  width:580px;
+  background:linear-gradient(160deg,#c8bfa0,#b0a882,#a09870);
+  border-radius:6px 6px 0 0;
+  padding:12px 12px 8px;
+  border:3px solid #8a8060;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.15),
+    inset -2px -2px 6px rgba(0,0,0,.3),
+    4px 6px 20px rgba(0,0,0,.8);
+  position:relative;
+}
+/* Dust spots on monitor */
+.pc2-body::before{
+  content:'';position:absolute;inset:0;border-radius:6px;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(80,60,20,.12) 0%, transparent 8%),
+    radial-gradient(circle at 72% 18%, rgba(60,50,10,.10) 0%, transparent 6%),
+    radial-gradient(circle at 40% 80%, rgba(80,60,20,.08) 0%, transparent 10%),
+    radial-gradient(circle at 88% 70%, rgba(60,50,10,.09) 0%, transparent 7%);
+  pointer-events:none;
+}
+
+.pc2-brand{
+  font-family:'VT323',monospace;font-size:11px;color:#6a5a30;
+  text-align:right;margin-bottom:4px;letter-spacing:2px;opacity:.7;
+}
+
+.pc2-screen-frame{
+  background:#1a1810;border:4px solid #5a5038;
+  border-radius:2px;overflow:hidden;position:relative;
+  box-shadow:inset 0 0 20px rgba(0,0,0,.9),inset 0 0 4px rgba(0,0,0,.8);
+}
+
+.pc2-screen{
+  width:100%;height:320px;
+  background:#000;
+  position:relative;overflow:hidden;
+}
+
+/* CRT scanlines */
+.pc2-screen::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 2px,rgba(0,0,0,.12) 2px,rgba(0,0,0,.12) 4px
+  );
+}
+/* Screen dust */
+.pc2-screen::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:51;
+  background:
+    radial-gradient(circle at 30% 45%, rgba(200,180,100,.03) 0%, transparent 20%),
+    radial-gradient(circle at 65% 30%, rgba(200,180,100,.02) 0%, transparent 15%);
+}
+
+/* ── BOOT SEQUENCE ── */
+#boot-screen{
+  position:absolute;inset:0;z-index:20;
+  background:#000;padding:10px;
+  font-family:'VT323',monospace;font-size:13px;
+  color:#888866;line-height:1.5;overflow:hidden;
+}
+#boot-text{white-space:pre-wrap;}
+
+/* ── DESKTOP ── */
+#pc2-desktop{
+  position:absolute;inset:0;z-index:10;
+  display:none;
+  background:#1a1400;
+}
+#pc2-wallpaper{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(160deg,#1a1400 0%,#0d0d00 60%,#050500 100%);
+}
+/* Dust on screen */
+#pc2-wallpaper::after{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(150,120,40,.04) 0%, transparent 25%),
+    radial-gradient(circle at 75% 65%, rgba(120,100,30,.03) 0%, transparent 20%);
+}
+
+/* Icons */
+.pc2-icon-col{
+  position:absolute;top:8px;left:8px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.pc2-icon{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;width:56px;
+}
+.pc2-icon:hover .pc2-icon-img{filter:brightness(1.3);}
+.pc2-icon-img{
+  width:40px;height:40px;
+  image-rendering:pixelated;
+  display:flex;align-items:center;justify-content:center;
+}
+.pc2-icon-lbl{
+  font-size:8px;font-family:'VT323',monospace;
+  color:rgba(200,180,100,.8);text-align:center;
+  text-shadow:1px 1px 2px rgba(0,0,0,.8);
+  line-height:1.2;
+}
+
+/* Taskbar */
+.pc2-taskbar{
+  position:absolute;bottom:0;left:0;right:0;height:20px;
+  background:linear-gradient(180deg,#2a2000,#1a1400);
+  border-top:1px solid #3a3000;
+  display:flex;align-items:center;padding:0 4px;
+}
+.pc2-start{
+  height:14px;padding:0 8px;
+  background:linear-gradient(135deg,#3a2800,#2a1800);
+  border:1px solid #5a4000;color:#ccaa44;
+  font-family:'VT323',monospace;font-size:11px;cursor:pointer;
+}
+.pc2-clock{
+  margin-left:auto;font-size:9px;
+  font-family:'VT323',monospace;color:#aa8822;padding-right:4px;
+}
+
+/* ── OS-WIN for PC2 ── */
+.pc2-win{
+  position:absolute;
+  background:#1a1800;
+  border:2px solid #5a4800;border-bottom-color:#2a2000;border-right-color:#2a2000;
+  box-shadow:2px 2px 0 #000;display:none;flex-direction:column;z-index:30;
+}
+.pc2-win.open{display:flex;}
+.pc2-win-tb{
+  height:20px;flex-shrink:0;
+  background:linear-gradient(90deg,#3a2800,#5a4000,#3a2800);
+  display:flex;align-items:center;padding:0 5px;
+}
+.pc2-win-title{flex:1;font-size:10px;font-family:'VT323',monospace;color:#ddbb66;letter-spacing:1px;}
+.pc2-win-x{
+  width:13px;height:12px;background:#2a1800;border:1px solid #886600;
+  color:#ccaa44;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.pc2-win-x:hover{background:#663300;color:#fff;}
+.pc2-win-menu{
+  height:16px;flex-shrink:0;
+  background:#201800;border-bottom:1px solid #3a2800;
+  display:flex;align-items:center;padding:0 6px;gap:12px;
+  font-size:8px;font-family:'VT323',monospace;color:#886633;
+}
+.pc2-win-body{
+  flex:1;padding:6px;display:flex;flex-wrap:wrap;
+  gap:6px;align-content:flex-start;overflow-y:auto;
+  background:#0d0d00;
+}
+.pc2-win-status{
+  height:14px;flex-shrink:0;background:#201800;border-top:1px solid #3a2800;
+  font-size:8px;font-family:'VT323',monospace;color:#664422;padding:2px 6px;
+}
+
+/* EnderProject window */
+#pc2-win-ender{top:20px;left:20px;width:400px;}
+/* Arquivos window */
+#pc2-win-arq{top:24px;left:24px;width:250px;}
+/* Img viewer */
+#pc2-win-img{top:30px;left:30px;width:320px;}
+/* Server doc */
+#pc2-win-server{top:22px;left:22px;width:520px;}
+
+/* EnderProject (beta Endermail) */
+.ep-header{
+  height:28px;flex-shrink:0;
+  background:linear-gradient(90deg,#2a1400,#3a2000);
+  display:flex;align-items:center;padding:0 8px;gap:8px;
+  border-bottom:1px solid #4a3000;
+}
+.ep-title{font-size:12px;font-family:'VT323',monospace;color:#cc8833;letter-spacing:2px;}
+.ep-folders{
+  width:90px;flex-shrink:0;background:#0a0800;
+  border-right:1px solid #3a2800;
+  font-size:8px;font-family:'VT323',monospace;padding:4px 0;
+}
+.ep-folder{padding:3px 6px;color:#886633;cursor:pointer;}
+.ep-folder:hover,.ep-folder.act{background:#2a1800;color:#ccaa44;}
+.ep-list{flex:1;background:#080800;overflow-y:auto;}
+.ep-item{
+  padding:5px 8px;border-bottom:1px solid rgba(80,60,0,.3);
+  cursor:pointer;
+}
+.ep-item:hover{background:rgba(80,60,0,.2);}
+.ep-from{font-size:9px;font-family:'VT323',monospace;color:#cc9933;}
+.ep-subj{font-size:8px;font-family:'VT323',monospace;color:#886622;}
+
+/* NECK + FOOT */
+.pc2-neck{
+  width:100px;height:14px;
+  background:linear-gradient(180deg,#a09870,#887850);
+  border:2px solid #6a6040;border-top:none;
+}
+.pc2-foot{
+  width:200px;height:10px;
+  background:linear-gradient(180deg,#887850,#706840);
+  border:2px solid #5a5030;border-top:none;
+  border-radius:0 0 4px 4px;
+}
+
+/* DESK */
+.pc2-desk{
+  position:fixed;bottom:0;left:0;right:0;height:26vh;
+  background:linear-gradient(180deg,#1a1008 0%,#100a04 40%,#0a0603 100%);
+  border-top:2px solid #2a1808;
+}
+.pc2-desk::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,#3a2010,#6a4020,#5a3018,#4a2810,#3a2010);
+}
+
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+</style>
+</head>
+<body>
+
+<div id="view-top">
+<div class="dust"></div>
+
+<!-- DESK -->
+<div class="pc2-desk"></div>
+
+<!-- MONITOR -->
+<div class="pc2-wrap" id="pc2-wrap">
+  <div class="pc2-body">
+    <div class="pc2-brand">SYSCORP MODEL B · 1998</div>
+    <div class="pc2-screen-frame">
+      <div class="pc2-screen" id="pc2-screen">
+
+        <!-- BOOT -->
+        <div id="boot-screen" style="display:none;">
+          <div id="boot-text"></div>
+        </div>
+
+        <!-- DESKTOP -->
+        <div id="pc2-desktop">
+          <div id="pc2-wallpaper"></div>
+
+          <!-- Icons -->
+          <div class="pc2-icon-col">
+            <div class="pc2-icon" ondblclick="pc2Open('ender')">
+              <svg class="pc2-icon-img" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="6" width="36" height="28" rx="1" fill="#2a1800" stroke="#664400" stroke-width="1"/>
+                <rect x="2" y="6" width="36" height="10" fill="#3a2200"/>
+                <polyline points="2,6 20,18 38,6" fill="none" stroke="#cc8833" stroke-width="1.5"/>
+                <text x="20" y="32" fill="#664400" font-size="5" text-anchor="middle" font-family="monospace">ENDER PROJECT</text>
+              </svg>
+              <span class="pc2-icon-lbl">EnderProject</span>
+            </div>
+            <div class="pc2-icon" ondblclick="pc2Open('arq')">
+              <svg class="pc2-icon-img" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="14" width="38" height="24" rx="2" fill="#3a2800" stroke="#5a4000" stroke-width="1"/>
+                <rect x="1" y="8" width="16" height="8" rx="2 2 0 0" fill="#3a2800" stroke="#5a4000" stroke-width="1"/>
+              </svg>
+              <span class="pc2-icon-lbl">Arquivos</span>
+            </div>
+          </div>
+
+          <!-- Taskbar -->
+          <div class="pc2-taskbar">
+            <button class="pc2-start">▶ Iniciar</button>
+            <span class="pc2-clock" id="pc2-clock">00:00</span>
+          </div>
+
+          <!-- ══ ENDERPROJECT WINDOW ══ -->
+          <div class="pc2-win" id="pc2-win-ender" style="top:18px;left:18px;width:420px;height:240px;">
+            <div class="pc2-win-tb">
+              <span class="pc2-win-title">✉ EnderProject — BETA v0.3</span>
+              <button class="pc2-win-x" onclick="pc2Close('ender')">✕</button>
+            </div>
+            <div class="ep-header">
+              <span class="ep-title">ENDER PROJECT</span>
+              <span style="font-size:8px;font-family:'VT323',monospace;color:#664400;margin-left:auto;">BETA · Versão pré-lançamento</span>
+            </div>
+            <div style="display:flex;flex:1;overflow:hidden;">
+              <div class="ep-folders">
+                <div class="ep-folder act" onclick="epFolder(this,'inbox')">📥 Entrada</div>
+                <div class="ep-folder" onclick="epFolder(this,'sent')">📤 Enviado</div>
+                <div class="ep-folder" onclick="epFolder(this,'trash')">🗑 Lixo</div>
+              </div>
+              <div class="ep-list" id="ep-list"></div>
+            </div>
+            <div class="pc2-win-status" id="ep-status">EnderProject BETA · 3 mensagens</div>
+          </div>
+
+          <!-- ══ ARQUIVOS WINDOW ══ -->
+          <div class="pc2-win" id="pc2-win-arq" style="top:22px;left:22px;width:240px;">
+            <div class="pc2-win-tb">
+              <span class="pc2-win-title">📁 Arquivos</span>
+              <button class="pc2-win-x" onclick="pc2Close('arq')">✕</button>
+            </div>
+            <div class="pc2-win-menu"><span>Ficheiro</span><span>Editar</span><span>Ver</span></div>
+            <div class="pc2-win-body">
+              <div class="pc2-icon" ondblclick="pc2Open('server')">
+                <svg class="pc2-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="1" width="22" height="30" rx="1" fill="#1a1400" stroke="#4a3800" stroke-width="1"/>
+                  <polygon points="18,1 24,7 18,7" fill="#2a2000" stroke="#4a3800" stroke-width="1"/>
+                  <line x1="5" y1="12" x2="20" y2="12" stroke="#664400" stroke-width="1"/>
+                  <line x1="5" y1="16" x2="18" y2="16" stroke="#664400" stroke-width="1"/>
+                  <line x1="5" y1="20" x2="20" y2="20" stroke="#664400" stroke-width="1"/>
+                  <text x="12" y="30" fill="#664400" font-size="3.5" text-anchor="middle" font-family="monospace">.html</text>
+                </svg>
+                <span class="pc2-icon-lbl">ServerSYSCORP.html</span>
+              </div>
+              <div class="pc2-icon" ondblclick="pc2ViewImg('ILOVEYOU.jpg','ILOVEYOU.jpg')">
+                <svg class="pc2-icon-img" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="1" y="3" width="32" height="28" rx="1" fill="#1a1200" stroke="#4a3800" stroke-width="1"/>
+                  <rect x="2" y="4" width="30" height="26" rx="1" fill="#0d0a00"/>
+                  <circle cx="10" cy="11" r="3" fill="#664400"/>
+                  <polyline points="2,26 8,18 14,22 20,14 32,26" fill="none" stroke="#886622" stroke-width="1.5"/>
+                </svg>
+                <span class="pc2-icon-lbl">ILOVEYOU.jpg</span>
+              </div>
+            </div>
+            <div class="pc2-win-status">2 objeto(s)</div>
+          </div>
+
+          <!-- ══ SERVERSYSCORP VIEWER ══ -->
+          <div class="pc2-win" id="pc2-win-server" style="top:20px;left:20px;width:380px;">
+            <div class="pc2-win-tb">
+              <span class="pc2-win-title">ServerSYSCORP.html</span>
+              <button class="pc2-win-x" id="server-fs-btn" onclick="toggleServerFS()"
+                style="width:20px;margin-right:3px;background:#1a0028;border-color:#9900ee;color:#cc88ff;font-size:10px;">⛶</button>
+              <button class="pc2-win-x" onclick="pc2Close('server')">✕</button>
+            </div>
+            <div style="background:#000;position:relative;height:210px;">
+              <div id="server-loading">
+                <div class="loading-ball"></div>
+                <div class="loading-txt">A carregar...</div>
+              </div>
+              <iframe id="server-iframe" src="" style="width:100%;height:210px;border:none;display:none;"
+                onload="if(typeof serverLoaded==='function') serverLoaded()"></iframe>
+              <div id="server-err" style="display:none;position:absolute;inset:0;
+                background:#050500;color:#664400;font-family:'VT323',monospace;font-size:11px;
+                align-items:center;justify-content:center;flex-direction:column;gap:6px;text-align:center;">
+                <span>ServerSYSCORP.html não encontrado</span>
+                <span style="font-size:9px;opacity:.5;">Coloca o ficheiro na mesma pasta</span>
+              </div>
+            </div>
+            <div class="pc2-win-status">ServerSYSCORP.html · SYSCORP SERVER</div>
+          </div>
+
+          <!-- SERVERSYSCORP FULLSCREEN OVERLAY -->
+          <div id="server-fs-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:#000;flex-direction:column;">
+            <div style="height:26px;flex-shrink:0;background:linear-gradient(90deg,#2a1800,#3a2800);
+              display:flex;align-items:center;padding:0 8px;gap:6px;border-bottom:1px solid #5a4000;">
+              <span style="flex:1;font-family:'VT323',monospace;font-size:13px;color:#ccaa44;letter-spacing:2px;">ServerSYSCORP.html</span>
+              <button onclick="toggleServerFS()" style="font-family:'VT323',monospace;font-size:10px;
+                background:#2a1800;border:1px solid #886600;color:#ccaa44;cursor:pointer;padding:2px 8px;">
+                ✕ Fechar ecrã inteiro
+              </button>
+            </div>
+            <iframe id="server-fs-iframe" src="" style="flex:1;border:none;"></iframe>
+          </div>
+
+          <!-- ══ IMG VIEWER ══ -->
+          <div class="pc2-win" id="pc2-win-img" style="top:26px;left:26px;width:300px;">
+            <div class="pc2-win-tb">
+              <span class="pc2-win-title" id="pc2-img-title">Imagem</span>
+              <button class="pc2-win-x" onclick="pc2Close('img')">✕</button>
+            </div>
+            <div style="background:#080800;padding:6px;display:flex;align-items:center;justify-content:center;min-height:150px;">
+              <img id="pc2-img" src="" style="max-width:280px;max-height:180px;display:block;border:1px solid #4a3800;"
+                onerror="this.style.display='none';document.getElementById('pc2-img-err').style.display='flex'">
+              <div id="pc2-img-err" style="display:none;width:180px;height:100px;
+                background:#050500;color:#664400;font-family:'VT323',monospace;font-size:9px;
+                align-items:center;justify-content:center;text-align:center;border:1px solid #3a2800;">
+                [Imagem não encontrada]
+              </div>
+            </div>
+            <div class="pc2-win-status" id="pc2-img-status">—</div>
+          </div>
+
+        </div><!-- /pc2-desktop -->
+      </div><!-- /pc2-screen -->
+    </div>
+  </div>
+  <div class="pc2-neck"></div>
+  <div class="pc2-foot"></div>
+</div>
+
+</div><!-- /view-top -->
+
+<!-- PAN ARROWS -->
+<div id="pan-hint" onmouseenter="panDown()">
+  <div class="arr"></div>
+  <div class="arr"></div>
+  <div class="arr"></div>
+</div>
+<div id="pan-up-hint" onmouseenter="panUp()">
+  <div class="arru"></div>
+  <div class="arru"></div>
+  <div class="arru"></div>
+</div>
+
+<!-- UNDER DESK VIEW -->
+<div id="view-under">
+  <div class="floor-dust"></div>
+  <div class="tower-scene">
+    <!-- Cables SVG -->
+    <svg width="80" height="80" viewBox="0 0 80 80" style="margin-bottom:10px;opacity:.4;">
+      <path d="M10 80 C10 50 30 40 40 30 C50 20 60 30 70 0" fill="none" stroke="#554422" stroke-width="3" stroke-linecap="round"/>
+      <path d="M20 80 C20 55 35 45 45 35 C55 25 65 35 75 10" fill="none" stroke="#443311" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+
+    <!-- PC TOWER -->
+    <div class="pc-tower" id="tower">
+      <div class="tower-brand">SYSCORP</div>
+      <div class="tower-drive"></div>
+      <div class="tower-drive"></div>
+      <div class="tower-drive-led" id="tower-led"></div>
+      <div class="tower-power-btn" id="tower-power" onclick="towerPower()">
+        <span class="tower-power-icon">⏻</span>
+      </div>
+    </div>
+
+    <!-- More cables -->
+    <svg width="60" height="80" viewBox="0 0 60 80" style="margin-bottom:10px;opacity:.3;">
+      <path d="M5 80 C5 55 20 45 30 30 C40 15 50 25 55 0" fill="none" stroke="#554422" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+</div>
+
+<script>
+// ── CLOCK ──
+function updateClock(){
+  const n = new Date();
+  document.getElementById('pc2-clock').textContent =
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+}
+updateClock(); setInterval(updateClock,10000);
+
+// ── PAN ──
+function panDown(){ document.body.classList.add('panned'); }
+function panUp(){ document.body.classList.remove('panned'); }
+
+// ── TOWER POWER ──
+let powered = false;
+let bootStarted = false;
+function towerPower(){
+  if(powered){ return; } // já ligado
+  powered = true;
+  const btn = document.getElementById('tower-power');
+  const led = document.getElementById('tower-led');
+  btn.classList.add('on');
+  led.style.background = '#00dd00';
+  led.style.boxShadow = '0 0 6px #00ff00';
+  // Pan back up after short delay
+  setTimeout(()=>{ panUp(); }, 800);
+  // Start boot after pan animation
+  setTimeout(()=>{ startBoot(); }, 1800);
+}
+
+// ── BOOT SEQUENCE (2 minutes) ──
+const BOOT_LINES = [
+  {t:0,    txt:'SYSCORP BIOS v1.02 — COPYRIGHT 1998'},
+  {t:800,  txt:'Detetar memória... 32768 KB OK'},
+  {t:1800, txt:'Verificar disco... C:\\ OK'},
+  {t:2800, txt:'Carregar drivers...'},
+  {t:3600, txt:'  [driver] SYSCORP_VGA.SYS ... OK'},
+  {t:4200, txt:'  [driver] SYSCORP_AUD.SYS ... OK'},
+  {t:4800, txt:'  [driver] SYSCORP_NET.SYS ... OK'},
+  {t:5400, txt:'  [driver] SYSCORP_IO.SYS  ... OK'},
+  {t:6200, txt:'Iniciar sistema de ficheiros...'},
+  {t:7000, txt:'  C:\\ — FAT32 — 2.1 GB livre'},
+  {t:8000, txt:'Verificar integridade do sistema...'},
+  {t:9500, txt:'  Ficheiros: OK'},
+  {t:10200,txt:'  Registos: OK'},
+  {t:11000,txt:'  Processos: OK'},
+  {t:12000,txt:'Carregar SYSCORP OS v1.4...'},
+  {t:13500,txt:' '},
+  {t:14000,txt:'  ██░░░░░░░░░░░░░░░░░░░░░  10%'},
+  {t:20000,txt:'  ██████░░░░░░░░░░░░░░░░░  25%'},
+  {t:30000,txt:'  ██████████░░░░░░░░░░░░░  42%'},
+  {t:45000,txt:'  ██████████████░░░░░░░░░  58%'},
+  {t:60000,txt:'  ██████████████████░░░░░  74%'},
+  {t:80000,txt:'  ████████████████████░░░  84%'},
+  {t:95000,txt:'  ███████████████████████  100%'},
+  {t:97000,txt:' '},
+  {t:98000,txt:'Sistema pronto.'},
+  {t:99500,txt:'A iniciar interface gráfica...'},
+  {t:110000,txt:'__DONE__'},
+];
+
+const bootEl = document.getElementById('boot-text');
+function startBoot(){
+  document.getElementById('boot-screen').style.display = 'block';
+  BOOT_LINES.forEach(line=>{
+    setTimeout(()=>{
+      if(line.txt === '__DONE__'){
+        document.getElementById('boot-screen').style.display = 'none';
+        document.getElementById('pc2-desktop').style.display = 'block';
+        renderEP('inbox');
+        return;
+      }
+      bootEl.textContent += line.txt + '\n';
+    }, line.t);
+  });
+}
+
+// ── ENDERPROJECT EMAILS ──
+const EP_EMAILS = {
+  inbox:[
+    {from:'SYSCORP_SYSTEM', subj:'Bem-vindo ao EnderProject BETA',
+     body:'Obrigado por usar o EnderProject BETA. Esta é uma versão experimental anterior ao EnderMail. Algumas funcionalidades podem não estar disponíveis. Versão 0.3.'},
+    {from:'SYSCORP_SYSTEM', subj:'Manutenção agendada — 12/01/2022',
+     body:'O servidor SYSCORP estará em manutenção no dia 12 de Janeiro entre as 02:00 e as 04:00. Durante este período o EnderProject pode não estar disponível.'},
+  ],
+  sent:[],
+  trash:[]
+};
+let epCurrent = 'inbox';
+
+function renderEP(folder){
+  epCurrent = folder;
+  const list = document.getElementById('ep-list');
+  list.innerHTML='';
+  EP_EMAILS[folder].forEach((em,i)=>{
+    const d = document.createElement('div');
+    d.className='ep-item';
+    d.innerHTML='<div class="ep-from">'+em.from+'</div><div class="ep-subj">'+em.subj+'</div>';
+    d.onclick=()=>epRead(folder,i);
+    list.appendChild(d);
+  });
+  document.getElementById('ep-status').textContent='EnderProject BETA · '+EP_EMAILS[folder].length+' mensagem(ns)';
+}
+
+function epRead(folder,i){
+  const em = EP_EMAILS[folder][i];
+  const list = document.getElementById('ep-list');
+  list.innerHTML='';
+  const d=document.createElement('div');
+  d.style.cssText='padding:8px;font-family:VT323,monospace;';
+  d.innerHTML='<div style="font-size:12px;color:#cc9933;border-bottom:1px solid #3a2800;padding-bottom:4px;margin-bottom:8px;">'+em.subj+'</div>'
+    +'<div style="font-size:9px;color:#886622;margin-bottom:8px;">De: '+em.from+'</div>'
+    +'<div style="font-size:10px;color:#aa8833;line-height:1.6;">'+em.body+'</div>'
+    +'<div style="margin-top:10px;"><button onclick="renderEP(\''+folder+'\')" style="font-family:VT323,monospace;font-size:10px;background:#2a1800;border:1px solid #5a4000;color:#cc9933;cursor:pointer;padding:2px 8px;">‹ Voltar</button></div>';
+  list.appendChild(d);
+}
+
+function epFolder(el,folder){
+  document.querySelectorAll('.ep-folder').forEach(f=>f.classList.remove('act'));
+  el.classList.add('act');
+  renderEP(folder);
+}
+
+// ── WINDOWS ──
+function pc2Open(name){
+  document.getElementById('pc2-win-'+name).classList.add('open');
+  if(name==='server'){
+    const ifr=document.getElementById('server-iframe');
+    const loading=document.getElementById('server-loading');
+    const err=document.getElementById('server-err');
+    ifr.style.display='none'; err.style.display='none';
+    loading.classList.add('on');
+    document.body.classList.add('loading');
+    fetch('ServerSYSCORP.html').then(r=>{if(!r.ok)throw new Error();return r.text();})
+      .then(h=>{
+        const b=new Blob([h],{type:'text/html'});
+        ifr.src=URL.createObjectURL(b);
+      })
+      .catch(()=>{
+        loading.classList.remove('on');
+        document.body.classList.remove('loading');
+        err.style.display='flex';
+      });
+  }
+}
+function serverLoaded(){
+  document.getElementById('server-loading').classList.remove('on');
+  document.getElementById('server-iframe').style.display='block';
+  document.body.classList.remove('loading');
+}
+function pc2Close(name){
+  document.getElementById('pc2-win-'+name).classList.remove('open');
+  if(name==='server'){
+    const ifr=document.getElementById('server-iframe');
+    ifr.style.display='none'; ifr.src='';
+    document.getElementById('server-loading').classList.remove('on');
+    document.body.classList.remove('loading');
+  }
+}
+function toggleServerFS(){
+  const overlay=document.getElementById('server-fs-overlay');
+  const fsIfr=document.getElementById('server-fs-iframe');
+  const on=overlay.style.display==='flex';
+  if(!on){
+    fsIfr.src='ServerSYSCORP.html';
+    overlay.style.display='flex';
+    if(overlay.requestFullscreen) overlay.requestFullscreen().catch(()=>{});
+  } else {
+    overlay.style.display='none';
+    fsIfr.src='';
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  if(!document.fullscreenElement){
+    document.getElementById('server-fs-overlay').style.display='none';
+    document.getElementById('server-fs-iframe').src='';
+  }
+});
+function pc2ViewImg(src,name){
+  const img=document.getElementById('pc2-img');
+  const err=document.getElementById('pc2-img-err');
+  img.src=src; img.style.display='block'; err.style.display='none';
+  document.getElementById('pc2-img-title').textContent=name;
+  document.getElementById('pc2-img-status').textContent=name+' · JPEG';
+  pc2Open('img');
+}
+
+// Block right-click
+document.addEventListener('contextmenu',e=>e.preventDefault());
+</script>
+</body>
+</html>
