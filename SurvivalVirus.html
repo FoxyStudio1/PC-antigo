@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Survival Virus: 3 Nights</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=VT323&display=swap" rel="stylesheet">
+<script>
+// sys-integrity-guard v1
+(function(){
+  document.addEventListener('contextmenu',function(e){e.preventDefault();},true);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='F12'||
+       (e.ctrlKey&&e.shiftKey&&['I','J','C','U'].includes(e.key.toUpperCase()))||
+       (e.ctrlKey&&e.key.toLowerCase()==='u')){
+      e.preventDefault();e.stopPropagation();return false;
+    }
+  },true);
+})();
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --red:#ff2200;--amber:#ffaa00;--green:#00ff88;--yellow:#ffee00;
+  --dark:#050200;--brown:#1a0d00;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;user-select:none;-webkit-user-select:none;}
+
+/* SCANLINES + VIGNETTE */
+.scanlines{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:9000;}
+.vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.85) 100%);pointer-events:none;z-index:9001;}
+
+/* RED FLASH */
+#red-flash{position:fixed;inset:0;background:var(--red);opacity:0;pointer-events:none;z-index:8999;transition:opacity 0.08s;}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;display:none;}
+.screen.active{display:block;}
+
+/* ======== INTRO ======== */
+#screen-intro{background:radial-gradient(ellipse at center,#1a0400 0%,#000 100%);}
+#screen-intro.active{display:flex;align-items:center;justify-content:center;}
+#intro-box{display:flex;flex-direction:column;align-items:center;gap:22px;animation:fadeUp 1.1s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+#intro-virus-img{
+  width:min(280px,55vw);height:min(280px,55vw);object-fit:contain;
+  filter:drop-shadow(0 0 30px var(--red)) drop-shadow(0 0 80px #550000);
+  animation:spiderFloat 2.4s ease-in-out infinite;
+}
+@keyframes spiderFloat{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-14px) rotate(2deg);}}
+#intro-speech{
+  background:rgba(10,0,0,0.85);border:2px solid #440000;border-radius:4px;
+  padding:16px 24px;max-width:min(480px,88vw);position:relative;
+}
+#intro-speech::before{content:'▲';position:absolute;top:-18px;left:50%;transform:translateX(-50%);color:#440000;font-size:1.1rem;}
+#intro-typed{font-family:'VT323',monospace;font-size:clamp(1.8rem,4vw,3rem);color:var(--red);
+  letter-spacing:3px;text-shadow:0 0 15px var(--red);min-height:1.2em;}
+#intro-cursor{display:inline-block;width:3px;height:1em;background:var(--red);
+  animation:blink 0.7s steps(1) infinite;vertical-align:middle;margin-left:2px;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+#intro-countdown{font-family:'VT323',monospace;font-size:1rem;color:#332200;letter-spacing:3px;margin-top:4px;}
+#intro-skip{font-family:'VT323',monospace;font-size:0.82rem;color:#221100;letter-spacing:2px;cursor:pointer;
+  padding:4px 12px;border:1px solid #221100;transition:color 0.2s,border-color 0.2s;}
+#intro-skip:hover{color:#554400;border-color:#554400;}
+
+/* ======== MENU ======== */
+#screen-menu{background:linear-gradient(180deg,#0d0600 0%,#160b00 45%,#0a0400 100%);}
+#screen-menu.active{display:flex;align-items:center;justify-content:center;}
+/* Dark floor strips */
+#screen-menu::before{content:'';position:absolute;bottom:0;left:0;right:0;height:30%;
+  background:linear-gradient(180deg,transparent,#050200);}
+#screen-menu::after{content:'';position:absolute;bottom:28%;left:0;right:0;height:2px;
+  background:linear-gradient(to right,transparent,rgba(80,40,0,0.6) 20%,rgba(50,25,0,0.4) 80%,transparent);}
+#menu-content{width:100%;height:100%;position:relative;}
+#menu-title{
+  position:absolute;left:5%;top:50%;transform:translateY(-55%);
+  font-family:'Creepster',cursive;
+  font-size:clamp(2.4rem,7vw,5.8rem);
+  color:var(--red);line-height:1.05;
+  text-shadow:0 0 50px var(--red),0 0 100px #440000,6px 6px 0 #1a0000;
+  z-index:10;max-width:54%;
+  animation:menuTitlePulse 4s ease-in-out infinite;
+}
+@keyframes menuTitlePulse{0%,100%{text-shadow:0 0 50px var(--red),0 0 100px #440000,6px 6px 0 #1a0000;}
+  50%{text-shadow:0 0 70px var(--red),0 0 140px #660000,6px 6px 0 #1a0000,0 0 200px #220000;}}
+#menu-virus{
+  position:absolute;right:4%;top:48%;transform:translateY(-50%);
+  width:clamp(110px,22vw,280px);
+  filter:drop-shadow(0 0 25px var(--red)) drop-shadow(0 0 60px #330000);
+  animation:spiderFloat 3.2s ease-in-out infinite;z-index:10;
+}
+#menu-bottom{position:absolute;bottom:6%;left:0;right:0;
+  display:flex;flex-direction:column;align-items:center;gap:14px;z-index:10;}
+#menu-round-info{font-family:'VT323',monospace;font-size:1.4rem;color:#cc6600;letter-spacing:3px;}
+.menu-btn{
+  font-family:'VT323',monospace;font-size:2.1rem;color:var(--amber);
+  background:rgba(0,0,0,0.88);border:2px solid var(--amber);
+  padding:13px 54px;cursor:pointer;letter-spacing:4px;
+  transition:all 0.18s;position:relative;overflow:hidden;
+}
+.menu-btn::before{content:'';position:absolute;inset:0;background:var(--amber);
+  transform:scaleX(0);transform-origin:left;transition:transform 0.18s;}
+.menu-btn:hover{color:#000;box-shadow:0 0 40px var(--amber);}
+.menu-btn:hover::before{transform:scaleX(1);}
+.menu-btn span{position:relative;z-index:1;}
+
+/* ======== GAME ======== */
+#screen-game{background:#000;overflow:hidden;}
+#screen-game.active{display:block;}
+#office-panorama{position:absolute;inset:0;overflow:hidden;}
+#pano-inner{
+  width:300%;height:100%;display:flex;
+  transform:translateX(-33.333%);
+  transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.pano-section{width:33.333%;height:100%;flex-shrink:0;position:relative;overflow:hidden;}
+
+/* ── LEFT VIEW ── */
+#view-left{background:linear-gradient(160deg,#0e0700,#1a0d00);}
+.wall-bg-l{position:absolute;inset:0;
+  background:linear-gradient(180deg,#120800 0%,#1e1000 35%,#150b00 100%);}
+/* Wall texture lines */
+.wall-bg-l::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 68px,rgba(0,0,0,0.12) 68px,rgba(0,0,0,0.12) 70px);}
+/* Floor */
+.wall-bg-l::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;
+  background:linear-gradient(180deg,#0d0600,#080300);border-top:2px solid #201000;}
+/* Door frame */
+.door-frame{
+  position:absolute;left:50%;top:7%;transform:translateX(-50%);
+  width:min(36%,180px);height:83%;
+  border:10px solid #241200;border-bottom:none;border-radius:6px 6px 0 0;
+  background:#000;box-shadow:inset 0 0 50px #060200,0 0 0 3px #120900,0 0 30px rgba(0,0,0,0.8);
+}
+.door-hallway{position:absolute;inset:0;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 35%,#080300 0%,#000 100%);}
+/* Perspective lines in hallway */
+.door-hallway::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,#040100 0%,#0a0500 25%,#060200 55%,#020100 100%);
+  clip-path:polygon(22% 0%,78% 0%,100% 100%,0% 100%);}
+/* Flashlight beam in hall */
+#left-door-flashlight{
+  position:absolute;inset:0;opacity:0;
+  background:radial-gradient(ellipse 65% 85% at 50% 38%,rgba(255,210,90,0.3) 0%,rgba(255,180,50,0.08) 55%,transparent 80%);
+  transition:opacity 0.2s;pointer-events:none;
+  mix-blend-mode:screen;
+}
+/* Yellow virus in door */
+#left-door-virus{
+  position:absolute;width:60%;max-width:85px;top:20%;left:50%;transform:translateX(-50%);
+  filter:hue-rotate(45deg) saturate(4) brightness(1.5) drop-shadow(0 0 18px #ffcc00) drop-shadow(0 0 40px #aa7700);
+  opacity:0;transition:opacity 0.35s;
+}
+/* Door sliding panel */
+.door-panel{
+  position:absolute;inset:0;z-index:5;
+  background:linear-gradient(180deg,#201200 0%,#160d00 50%,#0e0800 100%);
+  border-left:5px solid #2a1600;border-right:5px solid #2a1600;
+  transform:translateX(0);
+  transition:transform 0.44s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:inset -8px 0 20px rgba(0,0,0,0.5);
+}
+.door-panel.open{transform:translateX(-102%);}
+.door-panel::after{content:'';position:absolute;right:10%;top:48%;
+  width:10px;height:10px;background:#3d2200;border-radius:50%;
+  border:1px solid #5a3400;box-shadow:0 0 4px #000;}
+/* Status */
+#door-status{
+  position:absolute;top:3%;left:50%;transform:translateX(-50%);
+  font-family:'VT323',monospace;font-size:1.05rem;letter-spacing:2px;
+  padding:4px 14px;background:rgba(0,0,0,0.85);border:1px solid #201200;
+  white-space:nowrap;pointer-events:none;
+}
+/* Door button */
+#close-door-btn{
+  position:absolute;bottom:10%;right:6%;
+  font-family:'VT323',monospace;font-size:1.5rem;color:var(--amber);
+  background:rgba(0,0,0,0.85);border:2px solid var(--amber);
+  padding:8px 18px;cursor:pointer;letter-spacing:2px;
+  transition:all 0.18s;z-index:10;
+}
+#close-door-btn:hover{background:var(--amber);color:#000;box-shadow:0 0 25px var(--amber);}
+/* Left flashlight */
+#left-flashlight-btn{position:absolute;bottom:10%;left:6%;z-index:10;}
+
+/* ── CENTER VIEW ── */
+#view-center{background:#080400;}
+/* Corridor */
+#corridor-area{position:absolute;top:0;left:0;right:0;height:58%;overflow:hidden;}
+#corridor-svg{width:100%;height:100%;display:block;}
+#corridor-virus{
+  position:absolute;left:50%;transform:translateX(-50%);
+  opacity:0;pointer-events:none;z-index:20;
+  transition:opacity 0.5s ease, bottom 0.55s cubic-bezier(0.4,0,0.2,1);
+  display:flex;justify-content:center;
+}
+#corridor-virus img{
+  display:block;
+  filter:drop-shadow(0 0 18px var(--red)) drop-shadow(0 0 50px #660000);
+  transition:width 0.55s cubic-bezier(0.4,0,0.2,1),filter 0.3s;
+}
+/* Corridor flashlight overlay */
+#center-flashlight-btn{position:absolute;bottom:7%;right:4%;z-index:10;}
+/* Desk */
+#desk-area{
+  position:absolute;bottom:0;left:0;right:0;height:44%;
+  background:linear-gradient(180deg,#180e00 0%,#0f0800 100%);
+  border-top:4px solid #2a1600;
+  display:flex;align-items:center;justify-content:center;
+  gap:clamp(12px,5%,55px);padding:0 6%;
+}
+/* Tablet */
+#tablet-btn{
+  width:clamp(70px,12%,115px);height:clamp(90px,16%,145px);
+  background:linear-gradient(180deg,#0e0e0e,#1a1a1a);
+  border:3px solid #2a2a2a;border-radius:12px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  transition:all 0.22s;
+  box-shadow:0 0 18px rgba(0,80,200,0.12),inset 0 0 12px rgba(0,0,0,0.6);
+  position:relative;overflow:hidden;
+}
+#tablet-btn::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.04),transparent);border-radius:12px;}
+#tablet-btn:hover{border-color:#0077ee;transform:translateY(-5px) scale(1.04);
+  box-shadow:0 8px 30px rgba(0,130,255,0.45),inset 0 0 12px rgba(0,0,0,0.6);}
+.tablet-screen{width:74%;height:50%;background:#001828;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;border:1px solid #003366;
+  animation:tabGlow 3s ease-in-out infinite;}
+@keyframes tabGlow{0%,100%{box-shadow:0 0 6px rgba(0,100,200,0.2);}50%{box-shadow:0 0 18px rgba(0,130,255,0.5);}}
+.tablet-lbl{font-family:'VT323',monospace;font-size:0.72rem;color:#0055aa;letter-spacing:1px;}
+/* Desk decor */
+.desk-lamp{width:min(8%,45px);height:min(20%,80px);flex-shrink:0;
+  background:linear-gradient(180deg,#1a1a1a,#111);border:2px solid #222;
+  border-radius:4px 4px 0 0;position:relative;}
+.desk-lamp::after{content:'';position:absolute;top:-10px;left:-6px;right:-6px;height:12px;
+  background:#1a1a1a;border-radius:4px;border:2px solid #222;}
+.desk-papers{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+.desk-paper{height:3px;background:#241400;border-radius:1px;}
+
+/* ── RIGHT VIEW ── */
+#view-right{background:linear-gradient(160deg,#0e0700,#1a0d00);}
+.wall-bg-r{position:absolute;inset:0;
+  background:linear-gradient(180deg,#120800 0%,#1e1000 35%,#150b00 100%);}
+.wall-bg-r::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 68px,rgba(0,0,0,0.12) 68px,rgba(0,0,0,0.12) 70px);}
+.wall-bg-r::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;
+  background:linear-gradient(180deg,#0d0600,#080300);border-top:2px solid #201000;}
+/* Charger */
+#charger-panel{
+  position:absolute;left:50%;top:28%;transform:translateX(-50%);
+  width:min(38%,210px);
+  background:linear-gradient(180deg,#161616,#0e0e0e);
+  border:3px solid #2d2d2d;border-radius:14px;padding:20px 18px;text-align:center;
+  box-shadow:0 0 0 4px #080400, 0 0 40px rgba(0,200,80,0.1), inset 0 0 20px rgba(0,0,0,0.5);
+}
+#charger-icon{font-size:2.6rem;margin-bottom:10px;display:block;
+  filter:drop-shadow(0 0 8px rgba(0,255,100,0.4));animation:chgPulse 2s ease-in-out infinite;}
+@keyframes chgPulse{0%,100%{filter:drop-shadow(0 0 8px rgba(0,255,100,0.4));}
+  50%{filter:drop-shadow(0 0 18px rgba(0,255,100,0.8));}}
+#charger-label{font-family:'VT323',monospace;font-size:1.15rem;color:#00cc66;
+  letter-spacing:2px;display:block;margin-bottom:12px;}
+#charger-bar-wrap{width:100%;height:13px;background:#0a0a0a;
+  border:1px solid #1e3a22;border-radius:7px;overflow:hidden;margin-bottom:10px;}
+#charger-bar-fill{height:100%;
+  background:linear-gradient(to right,#008844,#00ee77,#00ff99);
+  border-radius:7px;transition:width 0.12s;}
+#charger-status{font-family:'VT323',monospace;font-size:0.95rem;color:#00aa55;letter-spacing:1px;}
+/* Wall note */
+.wall-note{
+  position:absolute;bottom:30%;left:10%;max-width:175px;
+  font-family:'VT323',monospace;font-size:0.88rem;color:#3d1e00;
+  background:#120900;padding:10px 14px;border:1px solid #201000;
+  transform:rotate(-2.5deg);line-height:1.6;opacity:0.75;
+}
+
+/* ── UNDER DESK ── */
+#view-under{
+  position:fixed;inset:0;background:#000;
+  display:none;flex-direction:column;align-items:center;
+  z-index:155;
+}
+#view-under.visible{display:flex;animation:underFadeIn 0.35s ease;}
+@keyframes underFadeIn{from{opacity:0;transform:scale(0.97);}to{opacity:1;transform:scale(1);}}
+#under-scene{width:100%;flex:1;position:relative;
+  background:linear-gradient(180deg,#030100,#060300);overflow:hidden;}
+/* Desk underside */
+#under-desk-top{
+  position:absolute;top:0;left:0;right:0;height:36%;
+  background:linear-gradient(180deg,#1e1100,#120c00);
+  clip-path:polygon(0 0,100% 0,87% 100%,13% 100%);
+  border-bottom:3px solid #2a1600;
+  box-shadow:0 4px 30px rgba(0,0,0,0.8);
+}
+/* Wood grain on desk */
+#under-desk-top::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(92deg,transparent,transparent 22px,rgba(0,0,0,0.1) 22px,rgba(0,0,0,0.1) 24px);}
+.desk-leg{position:absolute;bottom:0;background:linear-gradient(180deg,#1e1100,#0a0600);border:2px solid #2a1600;}
+.desk-leg.l{left:13%;width:min(5%,26px);height:66%;}
+.desk-leg.r{right:13%;width:min(5%,26px);height:66%;}
+#under-floor{
+  position:absolute;bottom:0;left:0;right:0;height:22%;
+  background:linear-gradient(180deg,#0a0500,#050200);border-top:2px solid #180b00;
+}
+/* Floor scratches */
+#under-floor::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(88deg,transparent,transparent 30px,rgba(255,255,255,0.02) 30px,rgba(255,255,255,0.02) 31px);}
+/* Virus reach under desk */
+#under-virus-attack{
+  position:absolute;bottom:-120%;left:50%;transform:translateX(-50%) scaleX(-1);
+  width:min(55%,270px);
+  filter:drop-shadow(0 0 30px var(--red)) drop-shadow(0 0 70px #660000);
+  transition:bottom 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.4s;
+  opacity:0;z-index:10;
+}
+#under-virus-attack.attacking{bottom:10%;opacity:1;}
+/* Ambient dark fog */
+#under-scene::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 55% at 50% 55%,transparent 25%,rgba(0,0,0,0.82) 100%);
+  pointer-events:none;
+}
+#standup-btn{
+  margin-top:12px;font-family:'VT323',monospace;font-size:1.8rem;
+  color:var(--amber);background:rgba(0,0,0,0.88);border:2px solid var(--amber);
+  padding:10px 34px;cursor:pointer;letter-spacing:3px;transition:all 0.18s;
+}
+#standup-btn:hover{background:var(--amber);color:#000;}
+#under-hint{font-family:'VT323',monospace;font-size:0.88rem;color:#332200;
+  letter-spacing:2px;margin-top:6px;}
+
+/* ── NAV ARROWS ── */
+.nav-arrow{
+  position:fixed;z-index:260;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:opacity 0.3s,background 0.2s;
+}
+#nav-left{
+  left:0;top:15%;height:70%;width:70px;
+  background:linear-gradient(to right,rgba(0,0,0,0.7),transparent);
+  border-right:2px solid rgba(255,165,0,0.15);opacity:0.4;
+}
+#nav-right{
+  right:0;top:15%;height:70%;width:70px;
+  background:linear-gradient(to left,rgba(0,0,0,0.7),transparent);
+  border-left:2px solid rgba(255,165,0,0.15);opacity:0.4;
+}
+#nav-down{
+  bottom:52px;left:50%;transform:translateX(-50%);
+  width:200px;height:54px;
+  background:linear-gradient(to top,rgba(0,0,0,0.65),transparent);
+  border-top:2px solid rgba(255,165,0,0.15);opacity:0.4;
+}
+.nav-arrow:hover{opacity:1;}
+.nav-arrow svg{width:40px;height:40px;fill:var(--amber);
+  filter:drop-shadow(0 0 8px var(--amber));}
+/* Hover lean effect on panorama */
+#nav-left.leaning ~ #office-panorama #pano-inner{transform:translateX(calc(-33.333% + 12px));}
+.arr-bounce-l{animation:arrBL 1.5s ease-in-out infinite;}
+.arr-bounce-r{animation:arrBR 1.5s ease-in-out infinite;}
+.arr-bounce-d{animation:arrBD 1.5s ease-in-out infinite;}
+@keyframes arrBL{0%,100%{transform:translateX(0);}50%{transform:translateX(-7px);}}
+@keyframes arrBR{0%,100%{transform:translateX(0);}50%{transform:translateX(7px);}}
+@keyframes arrBD{0%,100%{transform:translateY(0);}50%{transform:translateY(7px);}}
+
+/* ── HUD ── */
+#hud{
+  position:fixed;bottom:0;left:0;right:0;height:52px;
+  background:rgba(0,0,0,0.92);border-top:1px solid #1a0d00;
+  display:flex;align-items:center;padding:0 14px;gap:14px;
+  z-index:310;pointer-events:none;font-family:'VT323',monospace;
+}
+#bat-row{display:flex;align-items:center;gap:7px;flex-shrink:0;}
+#bat-icon{font-size:1.1rem;}
+#bat-bar{width:105px;height:11px;background:#080300;border:1px solid #2a1500;
+  border-radius:3px;overflow:hidden;}
+#bat-fill{height:100%;border-radius:2px;transition:width 0.14s,background 0.4s;}
+#bat-pct{font-size:0.95rem;color:var(--amber);min-width:38px;}
+#hud-status{flex:1;text-align:center;font-size:1.05rem;color:#554400;letter-spacing:2px;overflow:hidden;white-space:nowrap;}
+#hud-enemies{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.edot{width:11px;height:11px;border-radius:50%;background:#111;border:1px solid #221100;transition:background 0.2s;}
+.edot.danger{animation:ePulse 0.45s steps(1) infinite;}
+@keyframes ePulse{0%,100%{opacity:1;}50%{opacity:0.1;}}
+#hud-rnd{font-size:1.05rem;color:#3a2800;letter-spacing:2px;flex-shrink:0;}
+#hud-hint{
+  position:fixed;bottom:54px;right:6px;
+  font-family:'VT323',monospace;font-size:0.7rem;color:#2a1800;
+  letter-spacing:1px;text-align:right;pointer-events:none;z-index:309;line-height:1.6;
+}
+
+/* Flashlight button */
+.flashlight-btn{
+  width:52px;height:52px;background:rgba(0,0,0,0.78);
+  border:2px solid #333;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;transition:all 0.18s;pointer-events:all;
+}
+.flashlight-btn:hover,.flashlight-btn.fl-on{
+  border-color:#ffcc66;background:rgba(55,30,0,0.88);
+  box-shadow:0 0 22px rgba(255,200,80,0.5);
+}
+.flashlight-btn.fl-on{animation:flPulse 1.4s ease-in-out infinite;}
+@keyframes flPulse{0%,100%{box-shadow:0 0 22px rgba(255,200,80,0.5);}
+  50%{box-shadow:0 0 34px rgba(255,200,80,0.75);}}
+
+/* ── WARN ── */
+#warn-overlay{
+  position:fixed;top:0;left:0;right:0;padding:10px;
+  text-align:center;z-index:400;pointer-events:none;
+  font-family:'VT323',monospace;font-size:clamp(1.3rem,3vw,2rem);
+  letter-spacing:4px;opacity:0;transition:opacity 0.15s;
+}
+#warn-overlay.show{opacity:1;animation:wFlash 0.55s steps(1) infinite;}
+@keyframes wFlash{0%,100%{opacity:1;}50%{opacity:0.15;}}
+
+/* ── TABLET OVERLAY ── */
+#tablet-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.97);
+  z-index:510;display:none;align-items:center;justify-content:center;padding:18px;
+}
+#tablet-overlay.visible{display:flex;}
+#tablet-frame{
+  width:min(590px,96vw);max-height:90vh;overflow-y:auto;
+  background:linear-gradient(180deg,#030d04,#050f05);
+  border:3px solid #009944;border-radius:16px;
+  padding:20px 20px 22px;
+  box-shadow:0 0 0 1px #00331a, 0 0 60px rgba(0,180,80,0.25),
+    inset 0 0 40px rgba(0,0,0,0.6);
+  animation:tabSlideUp 0.42s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes tabSlideUp{from{transform:translateY(70%) scale(0.75);opacity:0;}
+  to{transform:translateY(0) scale(1);opacity:1;}}
+#tab-close{float:right;font-family:'VT323',monospace;font-size:1.3rem;
+  color:#ff3333;background:rgba(3,13,4,0.95);border:1px solid #ff3333;
+  padding:3px 10px;cursor:pointer;border-radius:4px;transition:all 0.15s;}
+#tab-close:hover{background:#ff3333;color:#fff;}
+#tab-header{font-family:'VT323',monospace;font-size:1.75rem;color:var(--green);
+  text-align:center;letter-spacing:4px;margin-bottom:2px;
+  text-shadow:0 0 12px var(--green),0 0 30px rgba(0,255,136,0.3);}
+#tab-sub{font-family:'VT323',monospace;font-size:0.88rem;color:#226633;
+  text-align:center;margin-bottom:10px;letter-spacing:2px;}
+#tab-warn{font-family:'VT323',monospace;font-size:0.85rem;color:#dd4400;
+  text-align:center;margin-bottom:14px;
+  animation:wFlash 1.1s ease-in-out infinite;}
+/* Quest progress bar */
+#quests-wrap{display:flex;flex-direction:column;gap:11px;}
+.q-item{padding:12px 14px;background:rgba(0,35,12,0.5);border:1px solid #0d3320;
+  border-radius:7px;transition:border-color 0.3s,background 0.3s;}
+.q-item.done{border-color:#00aa55;background:rgba(0,50,18,0.6);}
+.q-name{font-family:'VT323',monospace;font-size:1.02rem;color:#66bb88;
+  letter-spacing:2px;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.q-name .qchk{color:var(--green);display:none;}
+.q-item.done .qchk{display:inline;}
+.q-bar-row{display:flex;align-items:center;gap:10px;}
+.q-bar{flex:1;height:14px;background:#060f07;border:1px solid #0d3320;
+  border-radius:8px;overflow:hidden;position:relative;}
+.q-bar-fill{height:100%;background:linear-gradient(to right,#003311,#00aa55,#00ff88);
+  border-radius:8px;transition:width 0.04s;position:relative;}
+.q-bar-fill::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(to right,transparent 60%,rgba(255,255,255,0.2));border-radius:8px;}
+.q-btn{
+  font-family:'VT323',monospace;font-size:0.92rem;color:#00cc66;
+  background:rgba(0,40,15,0.85);border:2px solid #009944;
+  border-radius:5px;padding:5px 14px;cursor:pointer;
+  letter-spacing:1px;touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:all 0.1s;white-space:nowrap;
+}
+.q-btn.pressing{background:#009944;color:#000;box-shadow:0 0 18px var(--green);}
+.q-item.done .q-btn{opacity:0.2;pointer-events:none;cursor:default;}
+#tab-complete{text-align:center;margin-top:18px;display:none;}
+#tab-complete.visible{display:block;}
+#complete-msg{font-family:'VT323',monospace;font-size:1.1rem;color:var(--green);
+  margin-bottom:14px;letter-spacing:3px;
+  animation:completePulse 1.5s ease-in-out infinite;}
+@keyframes completePulse{0%,100%{text-shadow:0 0 8px var(--green);}
+  50%{text-shadow:0 0 24px var(--green),0 0 50px rgba(0,255,136,0.5);}}
+.end-btn{
+  font-family:'VT323',monospace;font-size:1.8rem;
+  background:rgba(0,35,12,0.88);border:2px solid;
+  padding:13px 44px;cursor:pointer;letter-spacing:3px;
+  display:block;margin:10px auto;transition:all 0.18s;
+}
+#btn-terminar{color:var(--green);border-color:var(--green);}
+#btn-terminar:hover{background:var(--green);color:#000;box-shadow:0 0 35px var(--green);}
+#btn-fimnisto{color:var(--red);border-color:var(--red);font-size:1.4rem;display:none;}
+#btn-fimnisto:hover{background:var(--red);color:#fff;box-shadow:0 0 35px var(--red);}
+#tablet-frame::-webkit-scrollbar{width:5px;}
+#tablet-frame::-webkit-scrollbar-track{background:#020a03;}
+#tablet-frame::-webkit-scrollbar-thumb{background:#009944;border-radius:3px;}
+
+/* ── GAME OVER ── */
+#gameover-overlay{
+  position:fixed;inset:0;z-index:620;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:18px;
+}
+#gameover-overlay.visible{display:flex;animation:goReveal 0.8s ease forwards;}
+@keyframes goReveal{
+  0%{background:rgba(0,0,0,0);}
+  30%{background:rgba(60,0,0,0.95);}
+  100%{background:rgba(8,0,0,0.98);}
+}
+#go-virus{width:min(210px,32vw);
+  animation:spiderFloat 0.85s ease-in-out infinite,goShake 0.15s ease-in-out 0.4s 3;}
+@keyframes goShake{0%,100%{transform:translateX(0);}50%{transform:translateX(-8px);}}
+#go-title{
+  font-family:'Creepster',cursive;font-size:clamp(3.5rem,10vw,8rem);
+  color:var(--red);letter-spacing:5px;
+  text-shadow:0 0 60px var(--red),0 0 120px #550000;
+  animation:goGlitch 3s ease-in-out infinite;
+}
+@keyframes goGlitch{
+  0%,80%,100%{transform:none;}
+  82%{transform:translate(-5px,0);filter:hue-rotate(180deg);}
+  85%{transform:translate(5px,0);filter:hue-rotate(-180deg);}
+  88%{transform:none;filter:none;}
+}
+#go-reason{font-family:'VT323',monospace;font-size:1.4rem;color:#993333;letter-spacing:3px;text-align:center;}
+#go-retry{
+  font-family:'VT323',monospace;font-size:1.9rem;color:var(--amber);
+  background:rgba(0,0,0,0.85);border:2px solid var(--amber);
+  padding:12px 44px;cursor:pointer;letter-spacing:3px;
+  transition:all 0.18s;margin-top:8px;
+}
+#go-retry:hover{background:var(--amber);color:#000;box-shadow:0 0 35px var(--amber);}
+
+/* ── CUTSCENE ── */
+#screen-cutscene{background:#000;}
+#screen-cutscene.active{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+#cut-bg{position:absolute;inset:0;
+  background:linear-gradient(135deg,#080200,#040100 50%,#080300);
+  animation:cutBgFlicker 0.8s steps(1) infinite;}
+@keyframes cutBgFlicker{0%,90%,100%{opacity:1;}95%{opacity:0.8;}}
+#cut-floor{position:absolute;bottom:25%;left:0;right:0;height:3px;
+  background:linear-gradient(to right,transparent,#1a0800 20%,#1a0800 80%,transparent);}
+#cut-text{
+  font-family:'VT323',monospace;font-size:clamp(1.4rem,3.5vw,2.4rem);
+  color:#cc4400;text-align:center;padding:20px 30px;letter-spacing:3px;
+  line-height:1.7;max-width:600px;z-index:10;
+  text-shadow:0 0 10px #661100;min-height:80px;
+}
+#cut-runner{font-size:3rem;position:absolute;bottom:28%;left:-70px;z-index:8;display:none;}
+#cut-chasers{position:absolute;bottom:25%;left:-250px;display:none;gap:18px;z-index:7;}
+.chaser-img{width:40px;height:40px;object-fit:contain;animation:spiderFloat 0.5s ease-in-out infinite;}
+#cut-error{
+  font-family:'VT323',monospace;font-size:clamp(3rem,9vw,7rem);
+  color:var(--red);text-align:center;display:none;z-index:10;
+  text-shadow:0 0 30px var(--red),0 0 80px #550000;
+  animation:errorGlitch 0.3s steps(1) infinite;
+}
+@keyframes errorGlitch{0%,100%{transform:none;}50%{transform:translate(4px,-2px);}}
+
+/* ── CHOICE ── */
+#screen-choice{background:radial-gradient(ellipse at center,#100500 0%,#000 100%);}
+#screen-choice.active{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;}
+#choice-title{
+  font-family:'Creepster',cursive;font-size:clamp(2rem,6vw,4.5rem);
+  color:var(--amber);letter-spacing:4px;text-align:center;
+  text-shadow:0 0 40px var(--amber),0 0 80px #441100;
+  animation:menuTitlePulse 3s ease-in-out infinite;
+}
+#choice-sub{font-family:'VT323',monospace;font-size:clamp(1rem,2.5vw,1.5rem);
+  color:#885500;letter-spacing:3px;text-align:center;max-width:520px;line-height:1.7;}
+#choice-btns{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;}
+.choice-btn{
+  font-family:'VT323',monospace;font-size:2rem;letter-spacing:4px;
+  padding:16px 52px;cursor:pointer;border:2px solid;
+  background:rgba(0,0,0,0.88);transition:all 0.2s;position:relative;overflow:hidden;
+}
+.choice-btn::before{content:'';position:absolute;inset:0;transform:scaleX(0);
+  transform-origin:left;transition:transform 0.2s;}
+.choice-btn:hover::before{transform:scaleX(1);}
+.choice-btn span{position:relative;z-index:1;}
+#choice-ficar{color:#00ff88;border-color:#00ff88;}
+#choice-ficar::before{background:#00ff88;}
+#choice-ficar:hover{color:#000;box-shadow:0 0 40px #00ff88;}
+#choice-ir{color:#ff4444;border-color:#ff4444;}
+#choice-ir::before{background:#ff4444;}
+#choice-ir:hover{color:#000;box-shadow:0 0 40px #ff4444;}
+#choice-warning{font-family:'VT323',monospace;font-size:0.95rem;
+  color:#331100;letter-spacing:2px;text-align:center;}
+
+/* ── GONE ── */
+#screen-gone{background:#000;}
+#screen-gone.active{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;}
+#gone-title{
+  font-family:'VT323',monospace;font-size:clamp(2rem,7vw,5rem);
+  color:#eeeeee;letter-spacing:6px;text-align:center;
+  animation:goneFade 4s ease-in-out forwards;
+}
+@keyframes goneFade{0%{opacity:0;}40%{opacity:1;}100%{opacity:0.6;}}
+#gone-redact{
+  font-family:'VT323',monospace;font-size:clamp(2.5rem,8vw,6rem);
+  color:#cc0000;letter-spacing:8px;text-align:center;
+  text-shadow:0 0 20px #660000;
+  animation:redactGlitch 0.6s steps(1) infinite;
+}
+@keyframes redactGlitch{0%,100%{transform:none;opacity:1;}50%{transform:translate(3px,0);opacity:0.7;}}
+#gone-warning{
+  font-family:'VT323',monospace;font-size:clamp(0.9rem,2.5vw,1.4rem);
+  color:#883300;letter-spacing:3px;text-align:center;max-width:480px;line-height:1.8;
+  animation:goneAppear 1s ease-in forwards;animation-delay:1.5s;opacity:0;
+}
+@keyframes goneAppear{from{opacity:0;}to{opacity:1;}}
+#gone-back{
+  font-family:'VT323',monospace;font-size:1.6rem;color:#442200;
+  background:rgba(0,0,0,0.85);border:1px solid #331100;
+  padding:10px 34px;cursor:pointer;letter-spacing:3px;
+  transition:all 0.2s;margin-top:10px;
+  animation:goneAppear 1s ease-in forwards;animation-delay:4s;opacity:0;
+}
+#gone-back:hover{color:#aa5500;border-color:#aa5500;}
+
+/* ── PLANS ── */
+#screen-plans{background:#000;}
+#screen-plans.active{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;}
+#plan-lbl{font-family:'VT323',monospace;font-size:1.3rem;color:var(--red);
+  letter-spacing:4px;text-shadow:0 0 12px var(--red);animation:wFlash 2s steps(1) infinite;}
+#plan-img{max-width:88vw;max-height:65vh;object-fit:contain;
+  border:2px solid var(--red);box-shadow:0 0 50px rgba(255,0,0,0.25),0 0 120px rgba(255,0,0,0.1);}
+#plan-nav{display:flex;align-items:center;gap:28px;}
+.plan-btn{font-family:'VT323',monospace;font-size:1.75rem;color:var(--amber);
+  background:rgba(0,0,0,0.85);border:2px solid var(--amber);
+  padding:9px 22px;cursor:pointer;letter-spacing:2px;transition:all 0.18s;}
+.plan-btn:hover:not(:disabled){background:var(--amber);color:#000;box-shadow:0 0 25px var(--amber);}
+.plan-btn:disabled{opacity:0.2;cursor:default;}
+#plan-counter{font-family:'VT323',monospace;font-size:1.2rem;color:#444;letter-spacing:3px;}
+
+/* ── SHAKE ── */
+@keyframes shake{
+  0%,100%{transform:translate(0,0) rotate(0);}
+  10%{transform:translate(-6px,-3px) rotate(-0.3deg);}
+  20%{transform:translate(6px,3px) rotate(0.3deg);}
+  30%{transform:translate(-5px,5px) rotate(-0.2deg);}
+  40%{transform:translate(5px,-5px) rotate(0.2deg);}
+  50%{transform:translate(-4px,3px);}
+  60%{transform:translate(4px,-3px);}
+  70%{transform:translate(-5px,0);}
+  80%{transform:translate(5px,2px);}
+  90%{transform:translate(-3px,-2px);}
+}
+.shaking{animation:shake 0.5s ease-in-out;}
+
+/* Chromatic aberration on attack */
+@keyframes chromatic{
+  0%,100%{filter:none;}
+  20%{filter:blur(1px) hue-rotate(15deg);}
+  50%{filter:blur(0.5px) hue-rotate(-10deg);}
+}
+.chromatic{animation:chromatic 0.5s ease;}
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div id="red-flash"></div>
+
+<!-- ====== INTRO ====== -->
+<div id="screen-intro" class="screen active">
+  <div id="intro-box">
+    <img id="intro-virus-img" src="virus.png" alt="Virus">
+    <div id="intro-speech">
+      <div id="intro-typed"></div><span id="intro-cursor"></span>
+    </div>
+    <div id="intro-countdown"></div>
+    <div id="intro-skip">[ clica para saltar ]</div>
+  </div>
+</div>
+
+<!-- ====== MENU ====== -->
+<div id="screen-menu" class="screen">
+  <div id="menu-content">
+    <h1 id="menu-title">Survival<br>Virus:<br>3 Nights</h1>
+    <img id="menu-virus" src="capa.png" alt="Capa">
+    <div id="menu-bottom">
+      <div id="menu-round-info"></div>
+      <button class="menu-btn" id="new-game-btn"><span>NOVO JOGO</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== GAME ====== -->
+<div id="screen-game" class="screen">
+  <div id="office-panorama">
+    <div id="pano-inner">
+
+      <!-- LEFT -->
+      <div class="pano-section" id="view-left">
+        <div class="wall-bg-l"></div>
+        <div class="door-frame">
+          <div class="door-hallway">
+            <div id="left-door-flashlight"></div>
+            <img id="left-door-virus" src="virus2.png" alt="Yellow Virus">
+          </div>
+          <div class="door-panel open" id="door-panel"></div>
+        </div>
+        <div id="door-status">PORTA: <span id="door-status-txt" style="color:#00cc66">ABERTA</span></div>
+        <button class="flashlight-btn" id="left-flashlight-btn">🔦</button>
+        <button id="close-door-btn">FECHAR PORTA</button>
+      </div>
+
+      <!-- CENTER -->
+      <div class="pano-section" id="view-center">
+        <div id="corridor-area">
+          <svg id="corridor-svg" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <radialGradient id="spotGrad" cx="50%" cy="56%" r="50%">
+                <stop offset="0%" stop-color="#ffdd88" stop-opacity="0.3"/>
+                <stop offset="55%" stop-color="#ff8800" stop-opacity="0.06"/>
+                <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="ambGrad" cx="50%" cy="30%" r="60%">
+                <stop offset="0%" stop-color="#180800" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <!-- Walls -->
+            <polygon points="0,0 800,0 540,195 260,195" fill="#110700"/>
+            <polygon points="0,520 800,520 540,330 260,330" fill="#0e0700"/>
+            <polygon points="0,0 0,520 260,330 260,195" fill="#0c0500"/>
+            <polygon points="800,0 800,520 540,330 540,195" fill="#0b0500"/>
+            <rect x="260" y="195" width="280" height="135" fill="#040200"/>
+            <!-- Wall panels -->
+            <line x1="0" y1="100" x2="260" y2="200" stroke="#180900" stroke-width="1.5"/>
+            <line x1="0" y1="420" x2="260" y2="320" stroke="#180900" stroke-width="1.5"/>
+            <line x1="800" y1="100" x2="540" y2="200" stroke="#180900" stroke-width="1.5"/>
+            <line x1="800" y1="420" x2="540" y2="320" stroke="#180900" stroke-width="1.5"/>
+            <!-- Ceiling light strip -->
+            <rect x="355" y="0" width="90" height="8" fill="#1c1200" rx="2"/>
+            <!-- Floor seams -->
+            <line x1="0" y1="500" x2="260" y2="328" stroke="#120700" stroke-width="1"/>
+            <line x1="800" y1="500" x2="540" y2="328" stroke="#120700" stroke-width="1"/>
+            <!-- Ambient -->
+            <ellipse cx="400" cy="262" rx="400" ry="262" fill="url(#ambGrad)"/>
+            <!-- Spotlight (flashlight) -->
+            <ellipse id="svg-spot" cx="400" cy="370" rx="380" ry="260" fill="url(#spotGrad)" opacity="0"/>
+            <!-- Darkness -->
+            <rect id="svg-dark" x="0" y="0" width="800" height="520" fill="#000" opacity="0.88"/>
+          </svg>
+          <!-- CORRIDOR VIRUS -->
+          <div id="corridor-virus">
+            <img id="corridor-virus-img" src="virus.png" alt="Red Virus" style="width:65px;">
+          </div>
+          <button class="flashlight-btn" id="center-flashlight-btn" style="position:absolute;bottom:7%;right:4%;">🔦</button>
+        </div>
+        <!-- DESK -->
+        <div id="desk-area">
+          <div class="desk-lamp"></div>
+          <div id="tablet-btn">
+            <div class="tablet-screen"><span style="font-size:1.3rem">📊</span></div>
+            <div class="tablet-lbl">SISTEMA</div>
+          </div>
+          <div class="desk-papers">
+            <div class="desk-paper" style="width:52px;height:4px;background:#1e1000;"></div>
+            <div class="desk-paper" style="width:42px;height:4px;background:#180c00;"></div>
+            <div class="desk-paper" style="width:48px;height:4px;background:#1a0e00;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="pano-section" id="view-right">
+        <div class="wall-bg-r"></div>
+        <div id="charger-panel">
+          <span id="charger-icon">⚡</span>
+          <span id="charger-label">CARREGADOR</span>
+          <div id="charger-bar-wrap"><div id="charger-bar-fill" style="width:100%"></div></div>
+          <div id="charger-status">PRONTO</div>
+        </div>
+        <div class="wall-note">⚠ AVISO:<br>Mantenha a<br>lanterna<br>carregada!<br><br>Eles vêm<br>quando está<br>escuro...</div>
+      </div>
+
+    </div><!-- /pano-inner -->
+
+    <!-- UNDER DESK -->
+    <div id="view-under">
+      <div id="under-scene">
+        <div id="under-desk-top"></div>
+        <div class="desk-leg l"></div>
+        <div class="desk-leg r"></div>
+        <div id="under-floor"></div>
+        <img id="under-virus-attack" src="virus.png" alt="Virus">
+      </div>
+      <button id="standup-btn">▲ LEVANTAR</button>
+      <div id="under-hint">Escondido debaixo da mesa...</div>
+    </div>
+
+  </div><!-- /office-panorama -->
+
+  <!-- NAV ARROWS -->
+  <div id="nav-left" class="nav-arrow">
+    <svg viewBox="0 0 24 24" class="arr-bounce-l"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </div>
+  <div id="nav-right" class="nav-arrow">
+    <svg viewBox="0 0 24 24" class="arr-bounce-r"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+  </div>
+  <div id="nav-down" class="nav-arrow">
+    <svg viewBox="0 0 24 24" class="arr-bounce-d"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="bat-row">
+      <span id="bat-icon">🔦</span>
+      <div id="bat-bar"><div id="bat-fill" style="width:100%"></div></div>
+      <span id="bat-pct">100%</span>
+    </div>
+    <div id="hud-status">SEGURANÇA ATIVA</div>
+    <div id="hud-enemies">
+      <div class="edot" id="edot-r" title="Corredor"></div>
+      <div class="edot" id="edot-y" title="Porta"></div>
+    </div>
+    <div id="hud-rnd">RONDA 1</div>
+  </div>
+  <div id="hud-hint">A / D – Mover &nbsp;|&nbsp; S – Esconder &nbsp;|&nbsp; F – Lanterna &nbsp;|&nbsp; Q – Porta &nbsp;|&nbsp; T – Tablet</div>
+  <div id="warn-overlay"></div>
+
+  <!-- GAME OVER -->
+  <div id="gameover-overlay">
+    <img id="go-virus" src="virus.png" alt="Virus">
+    <div id="go-title">GAME OVER</div>
+    <div id="go-reason">O vírus entrou...</div>
+    <button id="go-retry">TENTAR NOVAMENTE</button>
+  </div>
+</div><!-- /screen-game -->
+
+<!-- ====== TABLET ====== -->
+<div id="tablet-overlay">
+  <div id="tablet-frame">
+    <button id="tab-close">✕</button>
+    <div id="tab-header">▣ ANÁLISE DO SISTEMA</div>
+    <div id="tab-sub">MANTÉM O BOTÃO PREMIDO PARA COMPLETAR CADA TAREFA</div>
+    <div id="tab-warn">⚠ ATENÇÃO: NÃO VÊS AMEAÇAS COM O TABLET ABERTO! ⚠</div>
+    <div id="quests-wrap"></div>
+    <div id="tab-complete">
+      <div id="complete-msg">✓ TODAS AS TAREFAS CONCLUÍDAS!</div>
+      <button class="end-btn" id="btn-terminar">TERMINAR RONDA</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== CUTSCENE ====== -->
+<div id="screen-cutscene" class="screen">
+  <div id="cut-bg"></div>
+  <div id="cut-floor"></div>
+  <div id="cut-text"></div>
+  <div id="cut-runner">🏃</div>
+  <div id="cut-chasers">
+    <img src="virus.png" class="chaser-img" style="filter:drop-shadow(0 0 8px #ff2200)">
+    <img src="virus.png" class="chaser-img" style="filter:hue-rotate(45deg)saturate(4)drop-shadow(0 0 8px #ffcc00)">
+    <img src="virus.png" class="chaser-img" style="filter:drop-shadow(0 0 8px #ff2200)">
+  </div>
+  <div id="cut-error">ERRO<br>ERRO<br>ERRO</div>
+</div>
+
+<!-- ====== PLANS ====== -->
+<div id="screen-plans" class="screen">
+  <div id="plan-lbl">▶ DOCUMENTO CLASSIFICADO</div>
+  <img id="plan-img" src="PlanoV1.jpg" alt="Plano">
+  <div id="plan-nav">
+    <button class="plan-btn" id="plan-prev">◄</button>
+    <div id="plan-counter">1 / 3</div>
+    <button class="plan-btn" id="plan-next">►</button>
+  </div>
+</div>
+
+<!-- ====== CHOICE (Ronda 3 → Ficar/Ir) ====== -->
+<div id="screen-choice" class="screen">
+  <div id="choice-title">A NOITE ACABOU.</div>
+  <div id="choice-sub">Os vírus foram contidos... por agora.<br>O que vais fazer?</div>
+  <div id="choice-btns">
+    <button class="choice-btn" id="choice-ficar"><span>⚔ FICAR</span></button>
+    <button class="choice-btn" id="choice-ir"><span>✦ IR EMBORA</span></button>
+  </div>
+  <div id="choice-warning">⚠ AVISO: Escolher "Ficar" inicia a Ronda 4. Não há retorno.</div>
+</div>
+
+<!-- ====== GONE ====== -->
+<div id="screen-gone" class="screen">
+  <div id="gone-title">VOCÊ FOI EMBORA.</div>
+  <div id="gone-redact">* * * *</div>
+  <div id="gone-warning">[ FICHEIRO CLASSIFICADO ]<br><br>VRS3000 NÃO É DE CONFIANÇA.<br>NÃO SIGAS AS SUAS INSTRUÇÕES.<br>ELE SABE MAIS DO QUE APARENTA.</div>
+  <button id="gone-back">← MENU PRINCIPAL</button>
+</div>
+
+<script>
+// =============================================================
+//   SURVIVAL VIRUS: 3 NIGHTS — Game Engine
+// =============================================================
+
+// ─── CONFIG ───────────────────────────────────────────────
+const CFG = {
+  1:{ q:3,  rMin:22000,rMax:32000,rMove:1900,rWin:9000,  yActive:false,yMin:0,yMax:0,yWin:0,yMaxAtk:0,     drain:0.85  },
+  2:{ q:4,  rMin:10000,rMax:17000,rMove:1500,rWin:7500,  yActive:true, yMin:20000,yMax:32000,yWin:5500,yMaxAtk:3, drain:0.95  },
+  3:{ q:6,  rMin:7500, rMax:12000,rMove:1050,rWin:7000,  yActive:true, yMin:9000, yMax:16000,yWin:4500,yMaxAtk:999, drain:1.1  },
+  4:{ q:5,  rMin:3500, rMax:6000, rMove:720, rWin:4500,  yActive:true, yMin:4000, yMax:7500, yWin:3200,yMaxAtk:999, drain:2.1  },
+};
+const QNAMES = [
+  'Analisar dados críticos...','Encriptar ficheiro do núcleo...',
+  'Eliminar código malicioso...','Verificar integridade do sistema...',
+  'Isolar processo infetado...','Reparar protocolo de segurança...',
+  'Descomprimir registos encriptados...','Autenticar acesso root...',
+  'Executar varrimento completo...','Fechar portas de rede abertas...',
+];
+
+// ─── STATE ────────────────────────────────────────────────
+let G = {
+  screen:'intro', view:'center', round:1, unlockedRound:1,
+  battery:100, flashOn:false, charging:false, chargeIv:null, batIv:null,
+  doorClosed:false,
+  redPos:0, yellowPos:0, redMoving:false, yellowMoving:false,
+  redTimeouts:[], yellowTimeouts:[],
+  redSchedT:null, yellowSchedT:null,
+  yellowAttackCount:0,
+  quests:[], activeQ:null, holdIv:null, drainIv:null,
+  gameOver:false, roundDone:false, tabletOpen:false,
+  canPan:true, panCooldown:700,
+  warnT:null, planIdx:0,
+};
+
+// ─── HELPERS ──────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+const R  = (a,b) => a + Math.random() * (b - a);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $('screen-' + name).classList.add('active');
+  G.screen = name;
+}
+
+// ─── RED FLASH ────────────────────────────────────────────
+function flashRed(intensity=0.55) {
+  const el = $('red-flash');
+  el.style.opacity = intensity;
+  setTimeout(() => el.style.opacity = '0', 120);
+}
+
+// ─── SHAKE ────────────────────────────────────────────────
+function doShake(el) {
+  el = el || $('screen-game');
+  el.classList.remove('shaking','chromatic');
+  void el.offsetWidth;
+  el.classList.add('shaking','chromatic');
+  setTimeout(() => el.classList.remove('shaking','chromatic'), 550);
+}
+
+// =============================================================
+//   INTRO
+// =============================================================
+async function runIntro() {
+  await sleep(700);
+  const typed = $('intro-typed');
+  const msg = 'Vamos fazer um jogo.';
+  for (let c of msg) {
+    typed.textContent += c;
+    await sleep(62);
+    if (G.screen !== 'intro') return;
+  }
+  for (let i = 20; i >= 0; i--) {
+    if (G.screen !== 'intro') return;
+    $('intro-countdown').textContent = i > 0 ? `${i}s` : '';
+    await sleep(1000);
+  }
+  goToMenu();
+}
+$('screen-intro').addEventListener('click', () => { if (G.screen === 'intro') goToMenu(); });
+
+// =============================================================
+//   MENU
+// =============================================================
+function goToMenu() {
+  cleanupGame();
+  showScreen('menu');
+  const r = G.unlockedRound;
+  $('menu-round-info').textContent = r <= 3 ? `RONDA ${r} DISPONÍVEL` : 'RONDAS 1-3 COMPLETAS';
+  $('new-game-btn').querySelector('span').textContent = r <= 3 ? `INICIAR RONDA ${r}` : 'JOGAR NOVAMENTE';
+}
+$('new-game-btn').onclick = () => {
+  const r = G.unlockedRound <= 3 ? G.unlockedRound : 1;
+  if (G.unlockedRound > 3) G.unlockedRound = 1;
+  startRound(r);
+};
+
+// =============================================================
+//   GAME SETUP
+// =============================================================
+function startRound(round) {
+  cleanupGame();
+  Object.assign(G, {
+    round, gameOver:false, roundDone:false, tabletOpen:false,
+    battery:100, flashOn:false, doorClosed:false,
+    redPos:0, yellowPos:0, redMoving:false, yellowMoving:false,
+    yellowAttackCount:0, canPan:true,
+  });
+  // Build quests
+  const cfg = CFG[round];
+  const names = [...QNAMES].sort(() => Math.random() - 0.5);
+  G.quests = Array.from({length:cfg.q}, (_,i) => ({
+    progress:0, completed:false, name:names[i % names.length]
+  }));
+
+  showScreen('game');
+  setView('center', false);
+  updateDoor();
+  updateFlashlight();
+  updateBatUI();
+  updateNavArrows();
+
+  $('hud-rnd').textContent    = `RONDA ${round}`;
+  $('hud-status').textContent = 'SEGURANÇA ATIVA';
+  $('gameover-overlay').classList.remove('visible');
+  $('tablet-overlay').classList.remove('visible');
+  $('view-under').classList.remove('visible');
+  $('corridor-virus').style.opacity = '0';
+  $('left-door-virus').style.opacity = '0';
+  $('under-virus-attack').classList.remove('attacking');
+  setEnemyDots(false, false);
+  clearWarn();
+
+  startBatTick();
+  scheduleRed();
+  if (cfg.yActive) scheduleYellow();
+  startQuestDrain();
+}
+
+function cleanupGame() {
+  clearAllTimers();
+  if (G.batIv)   { clearInterval(G.batIv);   G.batIv   = null; }
+  if (G.chargeIv){ clearInterval(G.chargeIv); G.chargeIv= null; }
+  if (G.drainIv) { clearInterval(G.drainIv);  G.drainIv = null; }
+  stopHold();
+  G.charging = G.redMoving = G.yellowMoving = false;
+}
+
+function clearAllTimers() {
+  if (G.redSchedT)    clearTimeout(G.redSchedT);
+  if (G.yellowSchedT) clearTimeout(G.yellowSchedT);
+  G.redTimeouts.forEach(clearTimeout);
+  G.yellowTimeouts.forEach(clearTimeout);
+  G.redTimeouts = []; G.yellowTimeouts = [];
+}
+
+// =============================================================
+//   VIEW / PANORAMA
+// =============================================================
+function setView(v, animated = true) {
+  if (!animated) {
+    const pi = $('pano-inner');
+    pi.style.transition = 'none';
+    requestAnimationFrame(() => { pi.style.transition = ''; });
+  }
+  G.view = v;
+  const offsets = { left:'0%', center:'-33.333%', right:'-66.666%' };
+  $('pano-inner').style.transform = `translateX(${offsets[v]})`;
+
+  if (v === 'right') startCharging(); else stopCharging();
+  updateFlashlight();
+  updateNavArrows();
+}
+
+function updateNavArrows() {
+  const nl = $('nav-left'), nr = $('nav-right'), nd = $('nav-down');
+  const under = G.view === 'under';
+  nl.style.pointerEvents = (G.view === 'left'  || under) ? 'none' : '';
+  nl.style.opacity       = (G.view === 'left'  || under) ? '0'   : '';
+  nr.style.pointerEvents = (G.view === 'right' || under) ? 'none' : '';
+  nr.style.opacity       = (G.view === 'right' || under) ? '0'   : '';
+  nd.style.display       = (G.view === 'center') ? 'flex' : 'none';
+}
+
+function panLeft() {
+  if (!G.canPan || G.tabletOpen || G.gameOver || G.roundDone || G.view === 'under') return;
+  G.canPan = false;
+  if      (G.view === 'center') setView('left');
+  else if (G.view === 'right')  setView('center');
+  setTimeout(() => G.canPan = true, G.panCooldown);
+}
+function panRight() {
+  if (!G.canPan || G.tabletOpen || G.gameOver || G.roundDone || G.view === 'under') return;
+  G.canPan = false;
+  if      (G.view === 'center') setView('right');
+  else if (G.view === 'left')   setView('center');
+  setTimeout(() => G.canPan = true, G.panCooldown);
+}
+
+// Nav arrow — hover delay then pan (FNAF-style)
+let lTimer, rTimer;
+$('nav-left').addEventListener('mouseenter', () => { lTimer = setTimeout(panLeft, 320); });
+$('nav-left').addEventListener('mouseleave', () => clearTimeout(lTimer));
+$('nav-left').addEventListener('click', panLeft);
+$('nav-left').addEventListener('touchstart', e => { e.preventDefault(); panLeft(); }, {passive:false});
+
+$('nav-right').addEventListener('mouseenter', () => { rTimer = setTimeout(panRight, 320); });
+$('nav-right').addEventListener('mouseleave', () => clearTimeout(rTimer));
+$('nav-right').addEventListener('click', panRight);
+$('nav-right').addEventListener('touchstart', e => { e.preventDefault(); panRight(); }, {passive:false});
+
+$('nav-down').addEventListener('click', goUnder);
+$('nav-down').addEventListener('touchstart', e => { e.preventDefault(); goUnder(); }, {passive:false});
+
+function goUnder() {
+  if (G.tabletOpen || G.gameOver || G.view !== 'center') return;
+  AC.hide();
+  G.view = 'under';
+  $('view-under').classList.add('visible');
+  updateNavArrows();
+  stopCharging();
+}
+function standUp() {
+  if (G.view !== 'under') return;
+  G.view = 'center';
+  $('view-under').classList.remove('visible');
+  $('under-virus-attack').classList.remove('attacking');
+  updateNavArrows();
+}
+$('standup-btn').onclick = standUp;
+
+// =============================================================
+//   FLASHLIGHT
+// =============================================================
+function toggleFlash() {
+  if (G.battery <= 0) return;
+  const turningOn = !G.flashOn;
+  G.flashOn = !G.flashOn;
+  if (G.flashOn) AC.flashOn(); else AC.flashOff();
+  updateFlashlight();
+
+  // 5% de chance de rush APENAS no momento em que LIGAS a lanterna
+  // e o vírus já está no corredor a avançar
+  if (turningOn && G.flashOn && G.view === 'center'
+      && G.redMoving && G.redPos > 0 && G.redPos < 4) {
+    if (Math.random() < 0.05) {
+      virusFlashRush();
+    }
+  }
+}
+function updateFlashlight() {
+  const on = G.flashOn && G.battery > 0;
+  $('svg-dark').setAttribute('opacity', on ? '0.15' : '0.88');
+  $('svg-spot').setAttribute('opacity', on ? '1'    : '0');
+  $('left-door-flashlight').style.opacity = (on && G.view === 'left') ? '1' : '0';
+  document.querySelectorAll('.flashlight-btn').forEach(b => b.classList.toggle('fl-on', on));
+  $('bat-icon').style.filter = on ? 'drop-shadow(0 0 7px #ffcc66)' : 'none';
+  if (G.view === 'left') updateDoorVirus(on);
+  if (G.view === 'center') updateCorridorVirus();
+}
+function updateDoorVirus(flOn) {
+  $('left-door-virus').style.opacity = (flOn && !G.doorClosed && G.yellowPos === 1) ? '1' : '0';
+}
+$('center-flashlight-btn').onclick = toggleFlash;
+$('left-flashlight-btn').onclick   = toggleFlash;
+
+// =============================================================
+//   BATTERY
+// =============================================================
+function startBatTick() {
+  G.batIv = setInterval(() => {
+    if (G.gameOver || G.roundDone || !G.flashOn || G.charging || G.view === 'right') return;
+    G.battery = Math.max(0, G.battery - CFG[G.round].drain);
+    if (G.battery <= 0) {
+      G.flashOn = false;
+      updateFlashlight();
+      showWarn('⚠ BATERIA ESGOTADA! ⚠', 2500, '#ff4400');
+    }
+    updateBatUI();
+  }, 100);
+}
+function updateBatUI() {
+  const pct = Math.round(G.battery);
+  $('bat-fill').style.width = pct + '%';
+  $('bat-pct').textContent  = pct + '%';
+  $('bat-fill').style.background = pct > 60
+    ? 'linear-gradient(to right,#00bb55,#00ff88)'
+    : pct > 25
+      ? 'linear-gradient(to right,#bb8800,#ffaa00)'
+      : 'linear-gradient(to right,#cc2200,#ff4400)';
+}
+function startCharging() {
+  if (G.charging) return;
+  G.charging = true;
+  AC.charge();
+  $('charger-status').textContent = 'CARREGANDO...';
+  $('charger-status').style.color = '#ffaa00';
+  G.chargeIv = setInterval(() => {
+    if (!G.charging) return;
+    G.battery = Math.min(100, G.battery + 2.2);
+    updateBatUI();
+    $('charger-bar-fill').style.width = G.battery + '%';
+    if (G.battery >= 100) {
+      $('charger-status').textContent = 'CARREGADO!';
+      $('charger-status').style.color = '#00ff88';
+    }
+  }, 100);
+}
+function stopCharging() {
+  G.charging = false;
+  if (G.chargeIv) { clearInterval(G.chargeIv); G.chargeIv = null; }
+  $('charger-status').textContent = G.battery >= 100 ? 'CARREGADO!' : 'PRONTO';
+  $('charger-status').style.color = G.battery >= 100 ? '#00ff88' : '#00aa55';
+}
+
+// =============================================================
+//   DOOR
+// =============================================================
+$('close-door-btn').onclick = () => { G.doorClosed ? openDoor() : closeDoor(); };
+function closeDoor() { AC.doorClose(); G.doorClosed = true;  updateDoor(); }
+function openDoor()  { AC.doorOpen();  G.doorClosed = false; updateDoor(); }
+function updateDoor() {
+  const closed = G.doorClosed;
+  $('door-panel').classList.toggle('open', !closed);
+  $('door-status-txt').textContent = closed ? 'FECHADA' : 'ABERTA';
+  $('door-status-txt').style.color = closed ? '#ff4444' : '#00cc66';
+  $('close-door-btn').textContent  = closed ? 'ABRIR PORTA' : 'FECHAR PORTA';
+  updateDoorVirus(G.flashOn && G.view === 'left');
+}
+
+// =============================================================
+//   RED VIRUS (CORRIDOR) — avanço por passos como Toy Freddy
+// =============================================================
+const CORRIDOR_POS = {
+  1:{ w:55,  bottom:'43%' },
+  2:{ w:115, bottom:'27%' },
+  3:{ w:210, bottom:'10%' },
+  4:{ w:290, bottom:'1%'  },
+};
+
+function updateCorridorVirus() {
+  const container = $('corridor-virus');
+  const img       = $('corridor-virus-img');
+  if (G.redPos === 0) { container.style.opacity = '0'; return; }
+  const p = CORRIDOR_POS[G.redPos];
+  img.style.width        = p.w + 'px';
+  container.style.bottom = p.bottom;
+  // Vírus só visível com a lanterna ligada na vista central
+  const visible = G.flashOn && G.battery > 0 && G.view === 'center';
+  container.style.opacity = visible ? '1' : '0';
+  if (G.redPos >= 3) {
+    doShake();
+    flashRed(0.35);
+  }
+}
+
+function scheduleRed() {
+  if (G.gameOver || G.roundDone) return;
+  G.redSchedT = setTimeout(startRedAttack, R(CFG[G.round].rMin, CFG[G.round].rMax));
+}
+
+function startRedAttack() {
+  if (G.gameOver || G.roundDone || G.redMoving) return;
+  G.redMoving = true;
+  G.redPos    = 1;
+  updateCorridorVirus();
+  setEnemyDots(true, G.yellowPos === 1);
+  if (G.round <= 2) showWarn('⚠ VÍRUS NO CORREDOR! ⚠', 1600, '#ff2200');
+
+  advanceRedStep();
+}
+
+function advanceRedStep() {
+  if (G.gameOver || G.roundDone || !G.redMoving) return;
+  const cfg  = CFG[G.round];
+  const next = G.redPos + 1;
+
+  const t = setTimeout(() => {
+    if (G.gameOver || G.roundDone || !G.redMoving) return;
+    G.redPos = next;
+    AC.step();
+    updateCorridorVirus();
+
+    if (G.redPos === 3 && G.round <= 2) showWarn('⚠ MUITO PERTO! ESCONDE-TE! ⚠', 1000, '#ff0000');
+    if (G.redPos === 3) AC.glitch();
+
+    if (G.redPos >= 4) {
+      triggerRedAttack();
+    } else {
+      advanceRedStep();
+    }
+  }, cfg.rMove);
+  G.redTimeouts.push(t);
+}
+
+// Rush instantâneo — acionado pela chance de 5% da lanterna
+function virusFlashRush() {
+  if (G.gameOver || G.roundDone || !G.redMoving) return;
+  // Cancela todos os avanços agendados
+  G.redTimeouts.forEach(clearTimeout);
+  G.redTimeouts = [];
+  // Mostra o vírus a correr (posição 3 brevemente, depois 4)
+  G.redPos = 3;
+  updateCorridorVirus();
+  flashRed(0.5);
+  doShake();
+  showWarn('⚡ ELE CORREU PARA CÁ! ⚡', 800, '#ff0000');
+  const t = setTimeout(() => {
+    if (G.gameOver || G.roundDone) return;
+    G.redPos = 4;
+    updateCorridorVirus();
+    triggerRedAttack();
+  }, 380);
+  G.redTimeouts.push(t);
+}
+
+// Lógica de ataque quando chega à posição 4
+function triggerRedAttack() {
+  if (G.view === 'under') {
+    // Jogador escondido — sobrevive
+    $('under-virus-attack').classList.add('attacking');
+    flashRed(0.6);
+    doShake($('view-under'));
+    const t = setTimeout(() => {
+      $('under-virus-attack').classList.remove('attacking');
+      G.redMoving = false;
+      G.redPos    = 0;
+      updateCorridorVirus();
+      setEnemyDots(false, G.yellowPos === 1);
+      showWarn('✔ ESCONDESTE-TE! VÍRUS PERDEU O RASTO.', 2000, '#00cc66');
+      scheduleRed();
+    }, 2200);
+    G.redTimeouts.push(t);
+  } else {
+    gameOver('O vírus vermelho apanhou-te!');
+  }
+}
+
+// =============================================================
+//   YELLOW VIRUS (DOOR)
+// =============================================================
+function scheduleYellow() {
+  const cfg = CFG[G.round];
+  if (!cfg.yActive || G.gameOver || G.roundDone || G.yellowAttackCount >= cfg.yMaxAtk) return;
+  G.yellowSchedT = setTimeout(startYellowAttack, R(cfg.yMin, cfg.yMax));
+}
+
+function startYellowAttack() {
+  if (G.gameOver || G.roundDone || G.yellowMoving) return;
+  G.yellowMoving = true;
+  G.yellowPos    = 1;
+  setEnemyDots(G.redMoving, true);
+  AC.knock();
+  if (G.round <= 2) showWarn('⚠ VÍRUS AMARELO NA PORTA ESQUERDA! ⚠', 2000, '#ffaa00');
+
+  let resolved = false;
+
+  const attackT = setTimeout(() => {
+    if (!G.yellowMoving || resolved) return;
+    resolved = true;
+    if (G.doorClosed) {
+      doorBlockYellow();
+    } else {
+      gameOver('O vírus amarelo entrou pela porta!');
+    }
+  }, CFG[G.round].yWin);
+  G.yellowTimeouts.push(attackT);
+
+  // Poll for door close
+  const pollT = setInterval(() => {
+    if (!G.yellowMoving || resolved) { clearInterval(pollT); return; }
+    if (G.doorClosed) {
+      resolved = true;
+      clearInterval(pollT);
+      clearTimeout(attackT);
+      doorBlockYellow();
+    }
+  }, 150);
+  G.yellowTimeouts.push(pollT);
+}
+
+function doorBlockYellow() {
+  flashRed(0.25);
+  doShake($('door-panel'));
+  showWarn('✔ PORTA FECHADA! VÍRUS BLOQUEADO E FOI EMBORA.', 2200, '#00cc66');
+  G.yellowMoving = false;
+  G.yellowPos    = 0;
+  updateDoorVirus(G.flashOn && G.view === 'left');
+  setEnemyDots(G.redMoving, false);
+  G.yellowAttackCount++;
+  scheduleYellow();
+}
+
+// =============================================================
+//   ENEMY DOTS
+// =============================================================
+function setEnemyDots(red, yellow) {
+  const rd = $('edot-r'), yd = $('edot-y');
+  rd.style.background = red    ? 'var(--red)'    : '#111';
+  yd.style.background = yellow ? 'var(--yellow)' : '#111';
+  rd.classList.toggle('danger', red);
+  yd.classList.toggle('danger', yellow);
+}
+
+// =============================================================
+//   WARNINGS
+// =============================================================
+function showWarn(msg, dur, color) {
+  const w = $('warn-overlay');
+  w.textContent   = msg;
+  w.style.color   = color || '#ff4400';
+  w.classList.add('show');
+  if (G.warnT) clearTimeout(G.warnT);
+  G.warnT = setTimeout(() => w.classList.remove('show'), dur);
+}
+function clearWarn() { $('warn-overlay').classList.remove('show'); }
+
+// =============================================================
+//   GAME OVER
+// =============================================================
+function gameOver(reason) {
+  if (G.gameOver) return;
+  G.gameOver = true;
+  AC.jumpscare();
+  stopHold();
+  clearAllTimers();
+  if (G.batIv)  { clearInterval(G.batIv);  G.batIv  = null; }
+  if (G.chargeIv){ clearInterval(G.chargeIv); G.chargeIv = null; }
+  stopCharging();
+  flashRed(0.85);
+  doShake();
+  setTimeout(() => {
+    $('go-reason').textContent = reason;
+    $('gameover-overlay').classList.add('visible');
+  }, 400);
+}
+$('go-retry').onclick = goToMenu;
+
+// =============================================================
+//   QUESTS (TABLET)
+// =============================================================
+function buildQuestUI() {
+  const wrap = $('quests-wrap');
+  wrap.innerHTML = '';
+  G.quests.forEach((q, idx) => {
+    const div = document.createElement('div');
+    div.className = 'q-item' + (q.completed ? ' done' : '');
+    div.dataset.idx = idx;
+    div.innerHTML = `
+      <div class="q-name"><span class="qchk">✓</span>${q.name}</div>
+      <div class="q-bar-row">
+        <div class="q-bar"><div class="q-bar-fill" style="width:${q.progress}%"></div></div>
+        <button class="q-btn" data-idx="${idx}">${q.completed ? 'COMPLETO' : 'SEGURAR'}</button>
+      </div>`;
+    wrap.appendChild(div);
+  });
+
+  // Bind hold buttons
+  wrap.querySelectorAll('.q-btn').forEach(btn => {
+    const idx = parseInt(btn.dataset.idx);
+    btn.addEventListener('mousedown',   e => { e.preventDefault(); startHold(idx, btn); });
+    btn.addEventListener('touchstart',  e => { e.preventDefault(); startHold(idx, btn); }, {passive:false});
+    btn.addEventListener('mouseup',     stopHold);
+    btn.addEventListener('mouseleave',  stopHold);
+    btn.addEventListener('touchend',    stopHold);
+    btn.addEventListener('touchcancel', stopHold);
+  });
+
+  // Complete section
+  const allDone = G.quests.every(q => q.completed);
+  $('tab-complete').classList.toggle('visible', allDone && !G.roundDone);
+}
+
+function startHold(idx, btn) {
+  if (G.quests[idx]?.completed) return;
+  stopHold();
+  G.activeQ = idx;
+  if (btn) btn.classList.add('pressing');
+  G.holdIv = setInterval(() => {
+    const q = G.quests[G.activeQ];
+    if (!q || q.completed) { stopHold(); return; }
+    q.progress = Math.min(100, q.progress + 0.55);
+    // tick sound a cada ~15 frames
+    if (Math.floor(q.progress * 10) % 15 === 0) AC.questTick();
+    // Update bar in-place (no full rebuild for performance)
+    const fill = $('quests-wrap').querySelectorAll('.q-bar-fill')[G.activeQ];
+    if (fill) fill.style.width = q.progress + '%';
+    if (q.progress >= 100) {
+      q.completed = true;
+      AC.questDone();
+      stopHold();
+      buildQuestUI();
+      if (G.quests.every(x => x.completed))
+        showWarn('✔ TODAS AS TAREFAS CONCLUÍDAS!', 2500, '#00ff88');
+    }
+  }, 45);
+}
+
+function stopHold() {
+  if (G.holdIv) { clearInterval(G.holdIv); G.holdIv = null; }
+  document.querySelectorAll('.q-btn.pressing').forEach(b => b.classList.remove('pressing'));
+  G.activeQ = null;
+}
+window.addEventListener('mouseup',     stopHold);
+window.addEventListener('touchend',    stopHold);
+window.addEventListener('touchcancel', stopHold);
+
+function startQuestDrain() {
+  if (G.drainIv) clearInterval(G.drainIv);
+  G.drainIv = setInterval(() => {
+    if (G.gameOver || G.roundDone || G.tabletOpen) return;
+    let changed = false;
+    G.quests.forEach(q => {
+      if (!q.completed && q.progress > 0) {
+        q.progress = Math.max(0, q.progress - 0.18);
+        changed = true;
+      }
+    });
+    if (changed) {
+      // Efficient update — just update fill widths
+      $('quests-wrap').querySelectorAll('.q-bar-fill').forEach((fill, i) => {
+        if (!G.quests[i].completed) fill.style.width = G.quests[i].progress + '%';
+      });
+    }
+  }, 280);
+}
+
+// Tablet open/close
+$('tablet-btn').onclick = () => {
+  if (G.gameOver || G.roundDone) return;
+  AC.tablet();
+  G.tabletOpen = true;
+  $('tablet-overlay').classList.add('visible');
+  buildQuestUI();
+};
+$('tab-close').onclick = () => {
+  G.tabletOpen = false;
+  stopHold();
+  $('tablet-overlay').classList.remove('visible');
+};
+$('btn-terminar').onclick = () => { if (G.quests.every(q => q.completed) && !G.roundDone) completeRound(); };
+
+// =============================================================
+//   ROUND COMPLETE
+// =============================================================
+function completeRound() {
+  if (G.roundDone) return;
+  G.roundDone = true;
+  stopHold();
+  clearAllTimers();
+  if (G.batIv)  { clearInterval(G.batIv);  G.batIv  = null; }
+  stopCharging();
+  G.tabletOpen = false;
+  $('tablet-overlay').classList.remove('visible');
+
+  if (G.round === 3) {
+    // Mostra ecrã de escolha: Ficar (R4) ou Ir (gone)
+    showScreen('choice');
+    return;
+  }
+  if (G.round === 4) {
+    startCutscene();
+    return;
+  }
+  const next = G.round + 1;
+  G.unlockedRound = Math.max(G.unlockedRound, next);
+  goToMenu();
+}
+
+// Botões do ecrã de escolha (script no fim do body, DOM já pronto)
+$('choice-ficar').onclick = () => startRound(4);
+$('choice-ir').onclick    = () => showScreen('gone');
+$('gone-back').onclick    = () => { G.unlockedRound = Math.max(G.unlockedRound, 4); goToMenu(); };
+
+// =============================================================
+//   CUTSCENE
+// =============================================================
+async function startCutscene() {
+  showScreen('cutscene');
+  const txt     = $('cut-text');
+  const runner  = $('cut-runner');
+  const chasers = $('cut-chasers');
+  const errDiv  = $('cut-error');
+  errDiv.style.display  = 'none';
+  runner.style.display  = 'block';
+  chasers.style.display = 'flex';
+  runner.style.left  = '-70px';
+  chasers.style.left = '-260px';
+
+  txt.textContent = 'Os vírus foram derrotados... Mas não por muito tempo.';
+  await sleep(2600);
+  if (G.screen !== 'cutscene') return;
+
+  txt.textContent = 'Descobri uma saída no corredor... Tenho de fugir AGORA!';
+  await sleep(2200);
+
+  txt.textContent = '';
+  // Animate runner + chasers
+  let pos = -70, cPos = -260;
+  const run = setInterval(() => {
+    pos  += 5.5; cPos += 4.2;
+    runner.style.left  = pos  + 'px';
+    chasers.style.left = cPos + 'px';
+    if (pos > window.innerWidth + 80) clearInterval(run);
+  }, 22);
+
+  await sleep(3000);
+  if (G.screen !== 'cutscene') { clearInterval(run); return; }
+  clearInterval(run);
+
+  txt.textContent = 'A saída... está à frente!';
+  runner.style.display  = 'none';
+  chasers.style.display = 'none';
+  await sleep(1800);
+
+  txt.textContent = 'ACESSO NEGADO.';
+  await sleep(1000);
+  txt.textContent = 'SEGURANÇA COMPROMETIDA.';
+  await sleep(1000);
+  txt.textContent = '';
+  errDiv.style.display = 'block';
+  await sleep(3000);
+
+  showPlans();
+}
+
+// =============================================================
+//   PLANS
+// =============================================================
+function showPlans() {
+  G.planIdx = 0;
+  showScreen('plans');
+  renderPlan();
+  $('plan-prev').onclick = () => { if (G.planIdx > 0) { G.planIdx--; renderPlan(); } };
+  $('plan-next').onclick = () => { if (G.planIdx < 2) { G.planIdx++; renderPlan(); } };
+}
+function renderPlan() {
+  const img = $('plan-img');
+  img.src = `PlanoV${G.planIdx + 1}.jpg`;
+  img.onerror = () => {
+    img.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 350'%3E%3Crect width='500' height='350' fill='%23100500'/%3E%3Ctext x='50%25' y='45%25' fill='%23ff2200' font-size='22' text-anchor='middle' font-family='monospace'%3EPlanoV${G.planIdx+1}.jpg%3C/text%3E%3Ctext x='50%25' y='60%25' fill='%23441100' font-size='14' text-anchor='middle' font-family='monospace'%3E(ficheiro não encontrado)%3C/text%3E%3C/svg%3E`;
+  };
+  $('plan-counter').textContent = `${G.planIdx + 1} / 3`;
+  $('plan-prev').disabled = G.planIdx === 0;
+  $('plan-next').disabled = G.planIdx === 2;
+}
+
+// =============================================================
+//   KEYBOARD
+// =============================================================
+let _chtP = false;
+document.addEventListener('keydown', e => {
+  if (G.screen !== 'game') return;
+
+  // Cheat: P depois M com tablet aberto = completa todas as quests
+  if (G.tabletOpen && !G.roundDone && !G.gameOver) {
+    if (e.key.toLowerCase() === 'p') { _chtP = true; return; }
+    if (e.key.toLowerCase() === 'm' && _chtP) {
+      _chtP = false;
+      G.quests.forEach(q => { q.progress = 100; q.completed = true; });
+      buildQuestUI();
+      showWarn('✔ MODO TESTE ATIVO', 1800, '#00ff88');
+      return;
+    }
+  }
+  _chtP = false;
+
+  switch (e.key.toLowerCase()) {
+    case 'a':      panLeft();    break;
+    case 'd':      panRight();   break;
+    case 's':      goUnder();    break;
+    case 'w': case 'arrowup': standUp(); break;
+    case 'f':      toggleFlash(); break;
+    case 'q':      G.doorClosed ? openDoor() : closeDoor(); break;
+    case 't':
+      if (!G.tabletOpen && !G.gameOver && !G.roundDone) {
+        $('tablet-btn').onclick();
+      } else if (G.tabletOpen) {
+        $('tab-close').onclick();
+      }
+      break;
+    case 'escape':
+      if (G.tabletOpen) $('tab-close').onclick();
+      break;
+  }
+});
+
+// =============================================================
+//   AUDIO ENGINE (Web Audio API — sem ficheiros externos)
+// =============================================================
+const AC = (function(){
+  let ctx = null;
+  function init() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+
+  function tone(freq, type, dur, vol, attack, decay) {
+    const c = init();
+    const osc  = c.createOscillator();
+    const gain = c.createGain();
+    osc.connect(gain); gain.connect(c.destination);
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, c.currentTime);
+    gain.gain.setValueAtTime(0, c.currentTime);
+    gain.gain.linearRampToValueAtTime(vol||0.4, c.currentTime + (attack||0.01));
+    gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + (decay||dur||0.3));
+    osc.start(c.currentTime);
+    osc.stop(c.currentTime + (dur||0.3));
+  }
+
+  function noise(dur, vol, bandFreq) {
+    const c = init();
+    const bufSz = c.sampleRate * dur;
+    const buf = c.createBuffer(1, bufSz, c.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSz; i++) data[i] = (Math.random() * 2 - 1);
+    const src  = c.createBufferSource();
+    src.buffer = buf;
+    const flt  = c.createBiquadFilter();
+    flt.type  = 'bandpass';
+    flt.frequency.value = bandFreq || 800;
+    flt.Q.value = 0.8;
+    const gain = c.createGain();
+    gain.gain.setValueAtTime(vol||0.3, c.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + dur);
+    src.connect(flt); flt.connect(gain); gain.connect(c.destination);
+    src.start(); src.stop(c.currentTime + dur);
+  }
+
+  return {
+    // Tablet abrir — clique electrónico suave
+    tablet: ()=>{
+      tone(420, 'sine',   0.08, 0.22, 0.005, 0.08);
+      setTimeout(()=>tone(680, 'sine', 0.06, 0.18, 0.005, 0.06), 80);
+    },
+    // Barra de quest a encher — bip grave contínuo enquanto segura
+    questTick: ()=>{
+      tone(260, 'square', 0.05, 0.06, 0.002, 0.05);
+    },
+    // Quest completada
+    questDone: ()=>{
+      tone(520, 'sine', 0.12, 0.28, 0.01, 0.12);
+      setTimeout(()=>tone(780, 'sine', 0.15, 0.30, 0.01, 0.15), 110);
+    },
+    // Esconder debaixo da mesa
+    hide: ()=>{
+      noise(0.18, 0.25, 300);
+      tone(140, 'sawtooth', 0.18, 0.2, 0.01, 0.18);
+    },
+    // Jumpscare (ataque)
+    jumpscare: ()=>{
+      noise(0.55, 0.9, 1200);
+      tone(90,  'sawtooth', 0.5, 0.85, 0.001, 0.5);
+      setTimeout(()=>noise(0.3, 0.6, 2400), 120);
+    },
+    // Passos no corredor — batida surda
+    step: ()=>{
+      tone(55, 'sine', 0.14, 0.55, 0.005, 0.14);
+      noise(0.12, 0.18, 120);
+    },
+    // Carregar lanterna
+    charge: ()=>{
+      const c = init();
+      const osc  = c.createOscillator();
+      const gain = c.createGain();
+      osc.connect(gain); gain.connect(c.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, c.currentTime);
+      osc.frequency.linearRampToValueAtTime(520, c.currentTime + 4.8);
+      gain.gain.setValueAtTime(0.18, c.currentTime);
+      gain.gain.linearRampToValueAtTime(0.32, c.currentTime + 4.8);
+      gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 5.1);
+      osc.start(c.currentTime); osc.stop(c.currentTime + 5.2);
+    },
+    // Ligar lanterna
+    flashOn: ()=>{
+      tone(880, 'sine', 0.07, 0.25, 0.003, 0.07);
+      setTimeout(()=>tone(1100, 'sine', 0.04, 0.15, 0.002, 0.04), 60);
+    },
+    // Desligar lanterna
+    flashOff: ()=>{
+      tone(550, 'sine', 0.06, 0.20, 0.003, 0.06);
+      setTimeout(()=>tone(280, 'sine', 0.08, 0.15, 0.002, 0.08), 55);
+    },
+    // Porta fechar
+    doorClose: ()=>{
+      noise(0.22, 0.45, 200);
+      tone(80, 'sine', 0.22, 0.5, 0.005, 0.22);
+    },
+    // Porta abrir
+    doorOpen: ()=>{
+      tone(95, 'sine', 0.16, 0.4, 0.005, 0.16);
+      noise(0.14, 0.3, 250);
+    },
+    // Glitch — vírus vermelho pronto a atacar (pos 3)
+    glitch: ()=>{
+      const c = init();
+      // Ruído digital rápido com sweep
+      for (let i = 0; i < 4; i++) {
+        setTimeout(()=>{
+          noise(0.06, 0.55, 1800 + Math.random()*1200);
+          tone(220 + Math.random()*180, 'square', 0.05, 0.3, 0.001, 0.05);
+        }, i * 70);
+      }
+      setTimeout(()=>tone(80, 'sawtooth', 0.2, 0.4, 0.005, 0.2), 260);
+    },
+    // Bater na porta — vírus amarelo a atacar
+    knock: ()=>{
+      // 3 batidas surdas
+      [0, 220, 420].forEach(delay => {
+        setTimeout(()=>{
+          tone(60, 'sine', 0.12, 0.7, 0.003, 0.12);
+          noise(0.08, 0.35, 150);
+        }, delay);
+      });
+    },
+  };
+})();
+
+// =============================================================
+//   BOOT
+// =============================================================
+runIntro();
+</script>
+</body>
+</html>
